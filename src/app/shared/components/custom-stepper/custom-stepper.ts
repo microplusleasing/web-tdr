@@ -312,25 +312,19 @@ export class CustomStepper
 
   next(): void {
 
-    const currentStep =
-      this.getCurrentStep();
+    const currentStep = this.getCurrentStep();
 
     if (!currentStep) {
       return;
     }
 
-    // Mark current step as visited.
-    this.markVisited(
-      this.currentStepIndex
-    );
-
-    // Don't allow moving forward
-    // when current step is invalid.
+    // Current step must be valid before moving forward.
     if (!currentStep.valid()) {
-
+      console.warn('Current step is invalid.');
       return;
     }
 
+    // Already at last step.
     if (
       this.currentStepIndex >=
       this.stepsArray.length - 1
@@ -341,28 +335,17 @@ export class CustomStepper
     const previousIndex =
       this.currentStepIndex;
 
-    const nextIndex =
-      previousIndex + 1;
-
-    if (
-      this.stepsArray[nextIndex]?.disabled()
-    ) {
-      return;
-    }
-
-    this.currentStepIndex =
-      nextIndex;
-
-    this.markVisited(nextIndex);
+    this.currentStepIndex++;
 
     this.emitStepChange(
       previousIndex,
-      nextIndex
+      this.currentStepIndex
     );
   }
 
   prev(): void {
 
+    // Already at first step.
     if (this.currentStepIndex <= 0) {
       return;
     }
@@ -370,26 +353,33 @@ export class CustomStepper
     const previousIndex =
       this.currentStepIndex;
 
-    const previousStepIndex =
-      previousIndex - 1;
-
-    if (
-      this.stepsArray[previousStepIndex]?.disabled()
-    ) {
-      return;
-    }
-
-    this.currentStepIndex =
-      previousStepIndex;
-
-    this.markVisited(
-      previousStepIndex
-    );
+    this.currentStepIndex--;
 
     this.emitStepChange(
       previousIndex,
-      previousStepIndex
+      this.currentStepIndex
     );
+  }
+
+  isFirstStep(): boolean {
+    return this.currentStepIndex === 0;
+  }
+
+  isLastStep(): boolean {
+    return (
+      this.currentStepIndex >=
+      this.stepsArray.length - 1
+    );
+  }
+
+  canGoNext(): boolean {
+
+    const currentStep =
+      this.getCurrentStep();
+
+    return !!currentStep &&
+      currentStep.valid() &&
+      !this.isLastStep();
   }
 
   goToStep(index: number): void {
@@ -406,6 +396,7 @@ export class CustomStepper
     ) {
       return;
     }
+
 
     const targetStep =
       this.stepsArray[index];
@@ -554,5 +545,16 @@ export class CustomStepper
     )?.icon;
   }
 
-  
+  getProgressWidth(): number {
+
+    if (this.stepsArray.length <= 1) {
+      return 0;
+    }
+
+    const progress =
+      this.currentStepIndex /
+      (this.stepsArray.length - 1);
+
+    return progress * 80;
+  }
 }
