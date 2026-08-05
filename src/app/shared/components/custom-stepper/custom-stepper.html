@@ -1,0 +1,303 @@
+<div class="w-full">
+
+  <!-- ========================================================= -->
+  <!-- Desktop / Tablet Header                                   -->
+  <!-- ========================================================= -->
+
+  <div
+    #stickyHeader
+    class="hidden sm:block"
+    [class.fixed]="isSticky"
+    [class.top-0]="isSticky"
+    [class.left-0]="isSticky"
+    [class.right-0]="isSticky"
+    [class.bg-white]="isSticky"
+    [class.z-50]="isSticky"
+    [class.mb-3]="!isSticky"
+    [class.p-3]="isSticky"
+    [class.shadow-md]="isSticky"
+    [class.border-b]="isSticky"
+    [class.top-8]="!isHideHeader"
+  >
+
+    <div class="flex items-center justify-between">
+
+      @for (
+        step of stepsArray;
+        track step.label();
+        let i = $index
+      ) {
+
+        <!-- Step -->
+        <div
+          class="flex-1 flex flex-col items-center"
+          [class.cursor-pointer]="!step.disabled()"
+          [class.opacity-50]="step.disabled()"
+          (click)="goToStep(i)"
+        >
+
+          <!-- Icon -->
+          @if (step.showIcon()) {
+
+            <button
+              type="button"
+              class="rounded-full h-10 w-10 flex items-center justify-center border border-gray-400 transition-colors"
+              [style.background-color]="getStepColor(i)"
+              [style.color]="
+                i === currentStepIndex
+                  ? '#ffffff'
+                  : '#ffffff'
+              "
+              [disabled]="step.disabled()"
+            >
+
+              @let icon = getIcon(
+                step.iconName()
+              );
+
+              @if (icon) {
+
+                <svg
+                  [attr.xmlns]="icon.xmlns"
+                  [attr.fill]="icon.fill"
+                  [attr.viewBox]="icon.viewBox"
+                  [attr.stroke]="icon.stroke"
+                  [attr.stroke-width]="icon.strokeWidth"
+                  [ngClass]="icon.class"
+                >
+
+                  <path
+                    [attr.d]="icon.path"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+
+                </svg>
+
+              }
+
+            </button>
+
+          }
+
+          <!-- Label -->
+          <div
+            class="mt-1 block max-w-[90px] sm:max-w-[150px] lg:max-w-[200px] truncate"
+            [class.font-semibold]="
+              currentStepIndex === i
+            "
+            [attr.title]="step.label()"
+          >
+
+            {{ step.label() }}
+
+          </div>
+
+        </div>
+
+        <!-- Connector -->
+        @if (i < stepsArray.length - 1) {
+
+          <div
+            class="flex-1 h-0.5 mx-2 mt-5 transition-colors"
+            [style.background-color]="
+              getStepColor(i)
+            "
+          ></div>
+
+        }
+
+      }
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- Mobile Header                                             -->
+  <!-- ========================================================= -->
+
+  <div
+    #stickyHeaderMobile
+    class="block sm:hidden"
+    [class.fixed]="isSticky"
+    [class.top-0]="isSticky"
+    [class.left-0]="isSticky"
+    [class.right-0]="isSticky"
+    [class.bg-white]="isSticky"
+    [class.z-50]="isSticky"
+    [class.mb-3]="!isSticky"
+    [class.p-3]="isSticky"
+    [class.shadow-md]="isSticky"
+    [class.border-b]="isSticky"
+    [class.top-8]="!isHideHeader"
+  >
+
+    <!-- Current label -->
+    <div
+      class="flex items-center justify-center text-center font-semibold"
+    >
+
+      @if (getCurrentStep(); as currentStep) {
+
+        {{ currentStep.label() }}
+
+      }
+
+    </div>
+
+
+    <!-- Mobile navigation -->
+    <div class="flex items-center justify-between mt-2">
+
+      <!-- Previous -->
+      <div class="flex-1 flex justify-center">
+
+        <button
+          z-button
+          type="button"
+          [disabled]="currentStepIndex === 0"
+          (click)="prev()"
+        >
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-5 h-5"
+          >
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"
+            />
+
+          </svg>
+
+          <span>Previous</span>
+
+        </button>
+
+      </div>
+
+
+      <!-- Current step icon -->
+      <div class="flex-1 flex justify-center">
+
+        @if (getCurrentStep(); as currentStep) {
+
+          <button
+            type="button"
+            class="rounded-full h-10 w-10 flex items-center justify-center border border-gray-400 text-white"
+            [style.background-color]="
+              getStepColor(currentStepIndex)
+            "
+          >
+
+            @let icon = getIcon(
+              currentStep.iconName()
+            );
+
+            @if (icon) {
+
+              <svg
+                [attr.xmlns]="icon.xmlns"
+                [attr.fill]="icon.fill"
+                [attr.viewBox]="icon.viewBox"
+                [attr.stroke]="icon.stroke"
+                [attr.stroke-width]="icon.strokeWidth"
+                [ngClass]="icon.class"
+              >
+
+                <path
+                  [attr.d]="icon.path"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+
+              </svg>
+
+            }
+
+          </button>
+
+        }
+
+      </div>
+
+
+      <!-- Next -->
+      <div class="flex-1 flex justify-center">
+
+        <button
+          z-button
+          type="button"
+          [disabled]="
+            currentStepIndex >=
+            stepsArray.length - 1
+          "
+          (click)="next()"
+        >
+
+          <span>Next</span>
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-5 h-5"
+          >
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
+            />
+
+          </svg>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- Step Content                                              -->
+  <!-- ========================================================= -->
+
+  <div
+    class="p-4 border rounded-lg shadow-sm bg-white min-h-[200px]"
+  >
+
+    @if (getCurrentStep(); as currentStep) {
+
+      <ng-container
+        *ngTemplateOutlet="currentStep.content"
+      />
+
+    }
+    @else {
+
+      <div class="text-gray-500 text-center">
+
+        <p>
+          No content available for this step
+        </p>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

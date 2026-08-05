@@ -1,0 +1,122 @@
+<div class="w-full">
+
+    <app-custom-stepper 
+        [(currentStepIndex)]="currentStepIndex" 
+        [stepDefaultColor]="'#d1d5db'"
+        [stepValidColor]="'#374151'" 
+        [stepInvalidColor]="'#374151'" 
+        [stepCurrentColor]="'#000000'"
+        (StepIndexChange)="onStepChange($event)">
+
+        <!-- ===================================================== -->
+        <!-- Step 1: Customer                                      -->
+        <!-- ===================================================== -->
+
+        <app-step id="customer" label="Customer" iconName="user" [showIcon]="true" [valid]="customerValid"
+            [visited]="customerVisited">
+
+            <div class="p-4">
+
+                <h2 class="text-lg font-semibold mb-4">
+                    Customer Information
+                </h2>
+
+                <p>
+                    Customer form will be here.
+                </p>
+
+            </div>
+
+        </app-step>
+
+
+        <!-- ===================================================== -->
+        <!-- Step 2: Loan Information                              -->
+        <!-- ===================================================== -->
+
+        <app-step id="loan" label="Loan Information" iconName="identification" [showIcon]="true" [valid]="loanValid"
+            [visited]="loanVisited">
+
+            <div class="p-4">
+
+                <h2 class="text-lg font-semibold mb-4">
+                    Loan Information
+                </h2>
+
+                <p>
+                    Loan form will be here.
+                </p>
+
+            </div>
+
+        </app-step>
+
+
+        <!-- ===================================================== -->
+        <!-- Step 3: Financial Assessment                          -->
+        <!-- ===================================================== -->
+
+        <app-step id="financial" label="Financial Assessment" iconName="briefcase" [showIcon]="true"
+            [valid]="financialValid" [visited]="financialVisited">
+
+            <div class="p-4">
+
+                <h2 class="text-lg font-semibold mb-4">
+                    Financial Assessment
+                </h2>
+
+                <p>
+                    Financial assessment form will be here.
+                </p>
+
+            </div>
+
+        </app-step>
+
+
+        <!-- ===================================================== -->
+        <!-- Step 4: Documents                                     -->
+        <!-- ===================================================== -->
+
+        <app-step id="document" label="Documents" iconName="clipboard-document" [showIcon]="true" [valid]="documentValid"
+            [visited]="documentVisited">
+
+            <div class="p-4">
+
+                <h2 class="text-lg font-semibold mb-4">
+                    Document Information
+                </h2>
+
+                <p>
+                    Document form will be here.
+                </p>
+
+            </div>
+
+        </app-step>
+
+
+        <!-- ===================================================== -->
+        <!-- Step 5: Summary                                       -->
+        <!-- ===================================================== -->
+
+        <app-step id="summary" label="Summary" iconName="newspaper" [showIcon]="true" [valid]="summaryValid"
+            [visited]="summaryVisited">
+
+            <div class="p-4">
+
+                <h2 class="text-lg font-semibold mb-4">
+                    Summary
+                </h2>
+
+                <p>
+                    Summary will be here.
+                </p>
+
+            </div>
+
+        </app-step>
+
+    </app-custom-stepper>
+
+</div>
