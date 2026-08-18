@@ -22,6 +22,14 @@ import {
 } from './components/product-information-step/product-information-step';
 
 import {
+  EstimateIncomeStep
+} from './components/estimate-income-step/estimate-income-step';
+
+import {
+  EstimatePaymentStep
+} from './components/estimate-payment-step/estimate-payment-step'
+
+import {
   CustomStepper,
   StepChangeEvent
 } from '@/shared/components/custom-stepper/custom-stepper';
@@ -35,6 +43,8 @@ import {
 } from './services/tdr-assessment.service';
 
 import {
+  IAssessmentCategoryDisplay,
+  IAssessmentItemDisplay,
   IMasterDataResponse,
   IMotorcyclePhotoTypeDisplay
 } from './interfaces/master-data.interface';
@@ -61,6 +71,8 @@ import {
 
     CustomerInformationStep,
     ProductInformationStep,
+    EstimateIncomeStep,
+    EstimatePaymentStep,
 
     ZardSpinnerComponent,
     DataLoadError
@@ -90,7 +102,9 @@ export class TdrAssessment implements OnInit {
   // Main Form
   // =========================================================
 
-  form!: FormGroup;
+  step2Form!: FormGroup;
+  step3Form!: FormGroup;
+  step4Form!: FormGroup;
 
 
   // =========================================================
@@ -111,6 +125,14 @@ export class TdrAssessment implements OnInit {
 
   motorcyclePhotoTypesDisplay =
     signal<IMotorcyclePhotoTypeDisplay[]>([]);
+
+  step3Fields =
+    signal<IAssessmentItemDisplay[]>([]);
+
+  step4Fields =
+    signal<IAssessmentCategoryDisplay[]>([]);
+
+
 
 
   // =========================================================
@@ -134,17 +156,17 @@ export class TdrAssessment implements OnInit {
   customerValid = true;
   customerVisited = true;
 
-  loanValid = false;
-  loanVisited = false;
+  loanValid = true;
+  loanVisited = true;
 
-  financialValid = false;
-  financialVisited = false;
+  financialValid = true;
+  financialVisited = true;
 
-  documentValid = false;
-  documentVisited = false;
+  documentValid = true;
+  documentVisited = true;
 
-  summaryValid = false;
-  summaryVisited = false;
+  summaryValid = true;
+  summaryVisited = true;
 
 
   // =========================================================
@@ -169,7 +191,7 @@ export class TdrAssessment implements OnInit {
 
   private buildForm(): void {
 
-    this.form = this.fb.group({
+    this.step2Form = this.fb.group({
 
       // =====================================================
       // STEP 1
@@ -560,10 +582,113 @@ export class TdrAssessment implements OnInit {
 
   get motorcyclePhotos(): FormArray {
 
-    return this.form.get(
+    return this.step2Form.get(
       'productInformation.motorcyclePhotos'
     ) as FormArray;
 
+  }
+
+  // step 3
+
+  private createStep3Form(
+    items: IAssessmentItemDisplay[],
+  ): FormGroup {
+    const incomes = this.fb.group({});
+
+    for (const item of items) {
+      incomes.addControl(
+        item.itemCode,
+        this.fb.group({
+          amount: this.fb.nonNullable.control<number | null>(
+            null,
+            {
+              validators: [
+                Validators.required,
+                Validators.min(0),
+              ],
+            },
+          ),
+
+          remark: this.fb.control<string | null>(
+            null,
+            item.requireRemark
+              ? [Validators.required]
+              : [],
+          ),
+        }),
+      );
+    }
+
+    return this.fb.group({
+      incomes,
+    });
+  }
+
+  /* ... use for step 4 ... */
+  private createAssessmentForm(
+    categories: IAssessmentCategoryDisplay[]
+  ): FormGroup {
+
+    const assessmentForm = this.fb.group({});
+
+    const sortedCategories = [...categories]
+      .sort(
+        (a, b) =>
+          a.displayOrder - b.displayOrder
+      );
+
+    for (const category of sortedCategories) {
+
+      const categoryForm = this.fb.group({});
+
+      const sortedItems = [...category.items]
+        .sort(
+          (a, b) =>
+            a.displayOrder - b.displayOrder
+        );
+
+      for (const item of sortedItems) {
+
+        categoryForm.addControl(
+
+          item.itemCode,
+
+          this.fb.group({
+
+            itemId: this.fb.nonNullable.control(
+              item.itemId
+            ),
+
+            amount: this.fb.control<number | null>(
+              null,
+              {
+                validators: [
+                  Validators.required,
+                  Validators.min(0)
+                ]
+              }
+            ),
+
+            remark: this.fb.control<string | null>(
+              null,
+              item.requireRemark
+                ? [Validators.required]
+                : []
+            )
+
+          })
+
+        );
+
+      }
+
+      assessmentForm.addControl(
+        category.categoryCode,
+        categoryForm
+      );
+    }
+
+    return assessmentForm;
   }
 
 
@@ -640,6 +765,45 @@ export class TdrAssessment implements OnInit {
             photoTypes
           );
 
+          // -------------------------------------------------
+          // Create dynamic estimate income controls
+          // -------------------------------------------------
+
+          const step3Items =
+            response.display.assessment[0]
+              .categories[0]
+              .items
+              .sort(
+                (a, b) =>
+                  a.displayOrder - b.displayOrder,
+              );
+
+          this.step3Fields.set(step3Items);
+
+          this.step3Form = this.createStep3Form(step3Items);
+
+          // Add Step 3 form into the main form
+          this.step2Form.addControl('estimateIncome', this.step3Form);
+
+          // -------------------------------------------------
+          // Create dynamic estimate payment controls
+          // -------------------------------------------------
+
+          const assessments = response.display.assessment ?? [];
+
+          const step4Categories =
+            [...(assessments[1]?.categories ?? [])]
+              .sort(
+                (a, b) =>
+                  a.displayOrder - b.displayOrder
+              );
+
+          this.step4Fields.set(step4Categories);
+
+          this.step4Form = this.createAssessmentForm(step4Categories);
+
+          this.step2Form.addControl('estimatePayment',this.step4Form);
+
 
           // -------------------------------------------------
           // Loading complete
@@ -689,7 +853,7 @@ export class TdrAssessment implements OnInit {
   ): void {
 
     const photos =
-      this.form.get(
+      this.step2Form.get(
         'productInformation.motorcyclePhotos'
       ) as FormArray;
 
@@ -745,7 +909,7 @@ export class TdrAssessment implements OnInit {
   setupAddressCopyHandlers(): void {
 
     const customer =
-      this.form.get(
+      this.step2Form.get(
         'customerInformation'
       ) as FormGroup;
 
@@ -864,7 +1028,7 @@ export class TdrAssessment implements OnInit {
 
 
     switch (
-      event.currentStepIndex
+    event.currentStepIndex
     ) {
 
       case 0:
@@ -910,19 +1074,19 @@ export class TdrAssessment implements OnInit {
   // Submit
   // =========================================================
 
-  submit(): void {
+  submitStep2Form(): void {
 
-    this.form.markAllAsTouched();
+    this.step2Form.markAllAsTouched();
 
 
-    if (this.form.invalid) {
+    if (this.step2Form.invalid) {
 
       console.log(
         'TDR Assessment form is invalid'
       );
 
       console.log(
-        this.form
+        this.step2Form
       );
 
       return;
@@ -932,7 +1096,7 @@ export class TdrAssessment implements OnInit {
 
     console.log(
       'TDR Assessment:',
-      this.form.getRawValue()
+      this.step2Form.getRawValue()
     );
 
   }

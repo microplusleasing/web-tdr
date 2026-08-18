@@ -126,3 +126,13 @@ export interface IAssessmentItemDisplay {
   requireRemark: boolean;
   remarkTextType: string | null;
 }
+
+/* ... display ... */
+export interface IIncomeFormValue {
+  amount: number;
+  remark: string | null;
+}
+
+export interface IEstimateIncomeFormValue {
+  incomes: Record<string, IIncomeFormValue>;
+}

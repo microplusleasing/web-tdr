@@ -1,0 +1,389 @@
+<div
+  class="w-full"
+  [formGroup]="form"
+>
+
+  <div
+    class="w-full rounded-2xl border border-gray-300 p-6 md:p-8"
+  >
+
+    <!-- ===================================================== -->
+    <!-- TITLE -->
+    <!-- ===================================================== -->
+
+    <h2
+      class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl"
+    >
+      การประเมินค่าใช้จ่ายและภาระหนี้
+    </h2>
+
+
+    <!-- ===================================================== -->
+    <!-- NOTICE -->
+    <!-- ===================================================== -->
+
+    <div
+      class="mb-6"
+    >
+
+      <p
+        class="text-base font-medium text-gray-800"
+      >
+        <span
+          class="mr-1 text-red-500"
+        >
+          *
+        </span>
+
+        ถ้าช่องไหนไม่มีค่าใช้จ่ายหรือภาระหนี้
+        ให้ใส่เลขศูนย์ (0)
+      </p>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- DYNAMIC CATEGORIES -->
+    <!-- ===================================================== -->
+
+    <div
+      class="w-full"
+    >
+
+      @for (
+        category of categories;
+        track category.categoryId;
+        let last = $last
+      ) {
+
+        <!-- ================================================= -->
+        <!-- CATEGORY -->
+        <!-- ================================================= -->
+
+        <section
+          class="w-full"
+          [formGroup]="
+            getCategoryForm(
+              category.categoryCode
+            )
+          "
+        >
+
+          <!-- =============================================== -->
+          <!-- CATEGORY TITLE -->
+          <!-- =============================================== -->
+
+          <h3
+            class="mb-5 text-lg font-semibold text-gray-900"
+          >
+            {{ category.categoryName }}
+          </h3>
+
+
+          <!-- =============================================== -->
+          <!-- ITEMS -->
+          <!-- =============================================== -->
+
+          <div
+            class="w-full space-y-5"
+          >
+
+            @for (
+              item of category.items;
+              track item.itemId
+            ) {
+
+              <div
+                class="w-full"
+                [formGroup]="
+                  getItemGroup(
+                    category.categoryCode,
+                    item.itemCode
+                  )
+                "
+              >
+
+                <!-- Label -->
+
+                <label
+                  class="mb-2 block text-sm font-medium text-gray-800"
+                  [for]="
+                    category.categoryCode +
+                    '_' +
+                    item.itemCode
+                  "
+                >
+
+                  {{ item.itemName }}
+
+                  <span
+                    class="ml-1 text-red-500"
+                  >
+                    *
+                  </span>
+
+                </label>
+
+
+                <!-- ========================================= -->
+                <!-- OTHER / REMARK -->
+                <!-- ========================================= -->
+
+                @if (
+                  item.remarkTextType === 'C'
+                ) {
+
+                  <div
+                    class="flex w-full flex-col gap-3 md:flex-row"
+                  >
+
+                    <!-- Remark -->
+
+                    <div
+                      class="w-full md:w-1/2"
+                    >
+
+                      <input
+                        type="text"
+                        class="w-full rounded-md border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="โปรดระบุรายละเอียด"
+                        [formControl]="
+                          getRemarkControl(
+                            category.categoryCode,
+                            item.itemCode
+                          )
+                        "
+                      />
+
+                    </div>
+
+
+                    <!-- Amount -->
+
+                    <div
+                      class="relative w-full md:w-1/2"
+                    >
+
+                      <input
+                        [id]="
+                          category.categoryCode +
+                          '_' +
+                          item.itemCode
+                        "
+                        type="number"
+                        min="0"
+                        inputmode="decimal"
+                        class="w-full rounded-md border border-gray-300 px-4 py-3 pr-16 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="จำนวนเงิน"
+                        [formControl]="
+                          getAmountControl(
+                            category.categoryCode,
+                            item.itemCode
+                          )
+                        "
+                      />
+
+                      <span
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+                      >
+                        บาท
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                } @else {
+
+                  <!-- ======================================= -->
+                  <!-- NORMAL AMOUNT -->
+                  <!-- ======================================= -->
+
+                  <div
+                    class="relative w-full"
+                  >
+
+                    <input
+                      [id]="
+                        category.categoryCode +
+                        '_' +
+                        item.itemCode
+                      "
+                      type="number"
+                      min="0"
+                      inputmode="decimal"
+                      class="w-full rounded-md border border-gray-300 px-4 py-3 pr-16 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="จำนวนเงิน"
+                      [formControl]="
+                        getAmountControl(
+                          category.categoryCode,
+                          item.itemCode
+                        )
+                      "
+                    />
+
+                    <span
+                      class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+                    >
+                      บาท
+                    </span>
+
+                  </div>
+
+                }
+
+
+                <!-- ========================================= -->
+                <!-- REMARK VALIDATION -->
+                <!-- ========================================= -->
+
+                @if (
+                  item.requireRemark &&
+                  getRemarkControl(
+                    category.categoryCode,
+                    item.itemCode
+                  ).touched &&
+                  getRemarkControl(
+                    category.categoryCode,
+                    item.itemCode
+                  ).invalid
+                ) {
+
+                  <p
+                    class="mt-1 text-sm text-red-500"
+                  >
+                    กรุณาระบุรายละเอียด
+                  </p>
+
+                }
+
+
+                <!-- ========================================= -->
+                <!-- AMOUNT VALIDATION -->
+                <!-- ========================================= -->
+
+                @if (
+                  getAmountControl(
+                    category.categoryCode,
+                    item.itemCode
+                  ).touched &&
+                  getAmountControl(
+                    category.categoryCode,
+                    item.itemCode
+                  ).invalid
+                ) {
+
+                  <p
+                    class="mt-1 text-sm text-red-500"
+                  >
+                    กรุณาระบุจำนวนเงิน
+                  </p>
+
+                }
+
+              </div>
+
+            }
+
+
+            <!-- ============================================= -->
+            <!-- CATEGORY TOTAL -->
+            <!-- ============================================= -->
+
+            <div
+              class="w-full pt-2"
+            >
+
+              <label
+                class="mb-2 block text-sm font-semibold text-gray-800"
+              >
+                รวม{{ category.categoryName }}
+              </label>
+
+              <div
+                class="relative w-full"
+              >
+
+                <input
+                  type="text"
+                  readonly
+                  [value]="
+                    getCategoryTotal(category)
+                      | number:'1.0-2'
+                  "
+                  class="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-3 pr-16 text-sm font-medium text-gray-700"
+                />
+
+                <span
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+                >
+                  บาท
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ================================================= -->
+          <!-- SEPARATOR BETWEEN CATEGORIES -->
+          <!-- ================================================= -->
+
+          @if (!last) {
+
+            <z-separator
+              class="my-8 h-[2px] bg-black"
+            />
+
+          }
+
+        </section>
+
+      }
+
+
+      <!-- ===================================================== -->
+      <!-- GRAND TOTAL -->
+      <!-- ===================================================== -->
+
+      <div
+        class="mt-8 w-full border-t-2 border-black pt-6"
+      >
+
+        <label
+          class="mb-2 block text-base font-semibold text-gray-900"
+        >
+          รวมค่าใช้จ่ายและภาระหนี้ต่อเดือน
+        </label>
+
+        <div
+          class="relative w-full"
+        >
+
+          <input
+            type="text"
+            readonly
+            [value]="
+              totalPayment
+                | number:'1.0-2'
+            "
+            class="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-3 pr-16 text-sm font-semibold text-gray-700"
+          />
+
+          <span
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+          >
+            บาท
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,1 +1,178 @@
-<p>estimate-income-step works!</p>
+<div
+  class="w-full"
+  [formGroup]="form"
+>
+  <div
+    class="w-full rounded-2xl border border-gray-300 p-6 md:p-8"
+  >
+
+    <!-- Title -->
+    <h2
+      class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl"
+    >
+      การประเมินรายได้ (รวมต่อเดือน)
+    </h2>
+
+    <!-- Zero income notice -->
+    <div class="mb-6">
+      <p class="text-base font-medium text-gray-800">
+        <span class="mr-1 text-red-500">*</span>
+        ถ้าช่องไหนไม่มีรายได้ ให้ใส่เลขศูนย์ (0)
+      </p>
+    </div>
+
+    <!-- Dynamic income fields -->
+    <div class="w-full space-y-5">
+
+      @for (
+        item of items;
+        track item.itemId
+      ) {
+
+        <div
+          class="w-full"
+          [formGroup]="getIncomeGroup(item.itemCode)"
+        >
+
+          <!-- Label -->
+          <label
+            class="mb-2 block text-sm font-medium text-gray-800"
+            [for]="item.itemCode"
+          >
+            {{ item.itemName }}
+
+            <span
+              class="ml-1 text-red-500"
+            >
+              *
+            </span>
+          </label>
+
+          <!-- Other income -->
+          @if (
+            item.itemCode === 'OTHER_INCOME'
+          ) {
+
+            <div
+              class="flex w-full flex-col gap-3 md:flex-row"
+            >
+
+              <!-- Remark -->
+              <div
+                class="w-full md:w-1/2"
+              >
+                <input
+                  type="text"
+                  class="w-full rounded-md border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="รายได้อื่นๆ"
+                  [formControl]="getRemarkControl(item.itemCode)"
+                />
+              </div>
+
+              <!-- Amount -->
+              <div
+                class="relative w-full md:w-1/2"
+              >
+                <input
+                  [id]="item.itemCode"
+                  type="number"
+                  min="0"
+                  inputmode="decimal"
+                  class="w-full rounded-md border border-gray-300 px-4 py-3 pr-16 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="จำนวนเงิน"
+                  [formControl]="getAmountControl(item.itemCode)"
+                />
+
+                <span
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+                >
+                  บาท
+                </span>
+              </div>
+
+            </div>
+
+          } @else {
+
+            <!-- Normal income -->
+            <div
+              class="relative w-full"
+            >
+              <input
+                [id]="item.itemCode"
+                type="number"
+                min="0"
+                inputmode="decimal"
+                class="w-full rounded-md border border-gray-300 px-4 py-3 pr-16 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="รายได้หลัก"
+                [formControl]="getAmountControl(item.itemCode)"
+              />
+
+              <span
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+              >
+                บาท
+              </span>
+            </div>
+
+          }
+
+          <!-- Remark validation -->
+          @if (
+            item.requireRemark &&
+            getRemarkControl(item.itemCode).touched &&
+            getRemarkControl(item.itemCode).invalid
+          ) {
+            <p
+              class="mt-1 text-sm text-red-500"
+            >
+              กรุณาระบุรายละเอียด
+            </p>
+          }
+
+          <!-- Amount validation -->
+          @if (
+            getAmountControl(item.itemCode).touched &&
+            getAmountControl(item.itemCode).invalid
+          ) {
+            <p
+              class="mt-1 text-sm text-red-500"
+            >
+              กรุณาระบุจำนวนเงิน
+            </p>
+          }
+
+        </div>
+      }
+
+      <!-- Total -->
+      <div
+        class="w-full"
+      >
+        <label
+          class="mb-2 block text-sm font-medium text-gray-800"
+        >
+          รวมรายได้ต่อเดือน
+        </label>
+
+        <div
+          class="relative w-full"
+        >
+          <input
+            type="text"
+            readonly
+            [value]="totalIncome | number:'1.0-2'"
+            class="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-3 pr-16 text-sm text-gray-700"
+          />
+
+          <span
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+          >
+            บาท
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
