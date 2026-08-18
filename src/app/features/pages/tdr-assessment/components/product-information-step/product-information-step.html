@@ -1,0 +1,389 @@
+<form
+  [formGroup]="form"
+  class="w-full"
+>
+
+  <!-- ===================================================== -->
+  <!-- Product Information -->
+  <!-- ===================================================== -->
+
+  <section
+    formGroupName="productInformation"
+    class="w-full"
+  >
+
+    <!-- Header -->
+
+    <div class="mb-6">
+
+      <h2 class="text-xl font-semibold">
+        ข้อมูลรถจักรยานยนต์
+      </h2>
+
+      <p class="mt-1 text-sm text-muted-foreground">
+        กรุณากรอกข้อมูลรถจักรยานยนต์
+      </p>
+
+    </div>
+
+
+    <!-- =================================================== -->
+    <!-- Product fields -->
+    <!-- =================================================== -->
+
+    <div
+      class="grid w-full grid-cols-1 gap-5 md:grid-cols-2"
+    >
+
+      <!-- Brand -->
+
+      <div class="w-full">
+
+        <label
+          for="brand"
+          class="mb-2 block text-sm font-medium"
+        >
+          ยี่ห้อรถจักรยานยนต์
+        </label>
+
+        <input
+          id="brand"
+          z-input
+          type="text"
+          formControlName="brand"
+          placeholder="กรุณาระบุยี่ห้อ"
+          class="w-full"
+        />
+
+        @if (isInvalid(
+          'productInformation.brand'
+        )) {
+
+          <p class="mt-1 text-sm text-destructive">
+            กรุณาระบุยี่ห้อรถจักรยานยนต์
+          </p>
+
+        }
+
+      </div>
+
+
+      <!-- Model -->
+
+      <div class="w-full">
+
+        <label
+          for="model"
+          class="mb-2 block text-sm font-medium"
+        >
+          รุ่นรถจักรยานยนต์
+        </label>
+
+        <input
+          id="model"
+          z-input
+          type="text"
+          formControlName="model"
+          placeholder="กรุณาระบุรุ่น"
+          class="w-full"
+        />
+
+        @if (isInvalid(
+          'productInformation.model'
+        )) {
+
+          <p class="mt-1 text-sm text-destructive">
+            กรุณาระบุรุ่นรถจักรยานยนต์
+          </p>
+
+        }
+
+      </div>
+
+
+      <!-- Color -->
+
+      <div class="w-full">
+
+        <label
+          for="color"
+          class="mb-2 block text-sm font-medium"
+        >
+          สีรถจักรยานยนต์
+        </label>
+
+        <input
+          id="color"
+          z-input
+          type="text"
+          formControlName="color"
+          placeholder="กรุณาระบุสี"
+          class="w-full"
+        />
+
+      </div>
+
+
+      <!-- Registration No -->
+
+      <div class="w-full">
+
+        <label
+          for="registrationNo"
+          class="mb-2 block text-sm font-medium"
+        >
+          เลขทะเบียน
+        </label>
+
+        <input
+          id="registrationNo"
+          z-input
+          type="text"
+          formControlName="registrationNo"
+          placeholder="กรุณาระบุเลขทะเบียน"
+          class="w-full"
+        />
+
+      </div>
+
+
+      <!-- Engine No -->
+
+      <div class="w-full">
+
+        <label
+          for="engineNo"
+          class="mb-2 block text-sm font-medium"
+        >
+          เลขเครื่องยนต์
+        </label>
+
+        <input
+          id="engineNo"
+          z-input
+          type="text"
+          formControlName="engineNo"
+          placeholder="กรุณาระบุเลขเครื่องยนต์"
+          class="w-full"
+        />
+
+      </div>
+
+
+      <!-- Chassis No -->
+
+      <div class="w-full">
+
+        <label
+          for="chassisNo"
+          class="mb-2 block text-sm font-medium"
+        >
+          เลขตัวถัง
+        </label>
+
+        <input
+          id="chassisNo"
+          z-input
+          type="text"
+          formControlName="chassisNo"
+          placeholder="กรุณาระบุเลขตัวถัง"
+          class="w-full"
+        />
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================== -->
+    <!-- Motorcycle Photos -->
+    <!-- =================================================== -->
+
+    <section
+      class="mt-10 w-full"
+    >
+
+      <!-- Section title -->
+
+      <div class="mb-5">
+
+        <h2 class="text-lg font-semibold">
+          แนบรูปถ่ายรถจักรยานยนต์
+        </h2>
+
+        <p class="mt-1 text-sm text-muted-foreground">
+          กรุณาแนบรูปถ่ายรถจักรยานยนต์ตามรายการ
+        </p>
+
+      </div>
+
+
+      <!-- Dynamic photo list -->
+
+      <div
+        formArrayName="motorcyclePhotos"
+        class="grid w-full grid-cols-1 gap-5 md:grid-cols-2"
+      >
+
+        @for (
+          photoType of motorcyclePhotoTypes;
+          track photoType.code;
+          let i = $index
+        ) {
+
+          <div
+            [formGroupName]="i"
+            class="w-full rounded-lg border p-5"
+          >
+
+            <!-- Photo title -->
+
+            <div class="mb-4">
+
+              <p class="font-medium">
+                {{ photoType.name }}
+              </p>
+
+              <p class="mt-1 text-xs text-muted-foreground">
+                กรุณาแนบไฟล์รูปภาพ
+              </p>
+
+            </div>
+
+
+            <!-- Upload area -->
+
+            @if (
+              !getPhotoFile(i)
+            ) {
+
+              <label
+                class="flex min-h-[180px] cursor-pointer
+                       flex-col items-center justify-center
+                       rounded-lg border-2 border-dashed
+                       p-6 text-center
+                       transition
+                       hover:bg-muted/50"
+              >
+
+                <input
+                  type="file"
+                  class="hidden"
+                  accept="image/*"
+                  (change)="selectPhoto(i, $event)"
+                />
+
+                <div
+                  class="mb-3 text-3xl"
+                >
+                  📷
+                </div>
+
+                <p class="text-sm font-medium">
+                  คลิกเพื่อแนบรูป
+                </p>
+
+                <p class="mt-1 text-xs text-muted-foreground">
+                  รองรับ JPG, JPEG, PNG
+                </p>
+
+              </label>
+
+            }
+
+
+            <!-- Selected file -->
+
+            @if (
+              getPhotoFile(i)
+            ) {
+
+              <div
+                class="flex min-h-[180px]
+                       flex-col items-center
+                       justify-center
+                       rounded-lg border
+                       p-5"
+              >
+
+                <div class="text-3xl">
+                  🖼️
+                </div>
+
+                <p
+                  class="mt-3 max-w-full truncate
+                         text-sm font-medium"
+                >
+                  {{ getPhotoFile(i)?.name }}
+                </p>
+
+                <div class="mt-4 flex gap-2">
+
+                  <label
+                    class="cursor-pointer rounded-md
+                           border px-3 py-2 text-sm
+                           hover:bg-muted"
+                  >
+
+                    <input
+                      type="file"
+                      class="hidden"
+                      accept="image/*"
+                      (change)="selectPhoto(i, $event)"
+                    />
+
+                    เปลี่ยนรูป
+
+                  </label>
+
+
+                  <button
+                    type="button"
+                    class="rounded-md border
+                           px-3 py-2 text-sm
+                           text-destructive
+                           hover:bg-muted"
+                    (click)="removePhoto(i)"
+                  >
+                    ลบรูป
+                  </button>
+
+                </div>
+
+              </div>
+
+            }
+
+
+            <!-- Required error -->
+
+            @if (
+              motorcyclePhotos
+                .at(i)
+                .get('file')
+                ?.invalid &&
+              motorcyclePhotos
+                .at(i)
+                .get('file')
+                ?.touched
+            ) {
+
+              <p
+                class="mt-2 text-sm text-destructive"
+              >
+                กรุณาแนบรูปภาพ
+              </p>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+    </section>
+
+  </section>
+
+</form>

@@ -1,108 +1,397 @@
-<!-- Desktop / Tablet -->
-<div
-  #stickyHeader
-  class="hidden sm:block"
-  [class.fixed]="isSticky"
-  [class.top-0]="isSticky"
-  [class.left-0]="isSticky"
-  [class.right-0]="isSticky"
-  [class.bg-white]="isSticky"
-  [class.z-50]="isSticky"
-  [class.mb-3]="!isSticky"
-  [class.p-3]="isSticky"
-  [class.shadow-md]="isSticky"
-  [class.border-b]="isSticky"
-  [class.top-8]="!isHideHeader"
->
-  <div class="relative flex w-full items-start">
+<div class="w-full">
 
-    <!-- Background line -->
-    <div
-      class="absolute left-[10%] right-[10%] top-7 h-0.5 bg-gray-300 z-0"
-    ></div>
+  <!-- ===================================================== -->
+  <!-- Desktop / Tablet                                      -->
+  <!-- ===================================================== -->
 
-    <!-- Progress line -->
-    <div
-      class="absolute left-[10%] top-7 h-0.5 bg-gray-700 z-0 transition-all duration-300"
-      [style.width.%]="getProgressWidth()"
-    ></div>
+  <div
+    #stickyHeader
+    class="hidden sm:block"
+    [class.fixed]="isSticky"
+    [class.top-0]="isSticky"
+    [class.left-0]="isSticky"
+    [class.right-0]="isSticky"
+    [class.bg-white]="isSticky"
+    [class.z-50]="isSticky"
+    [class.mb-3]="!isSticky"
+    [class.p-3]="isSticky"
+    [class.shadow-md]="isSticky"
+    [class.border-b]="isSticky"
+    [class.top-8]="!isHideHeader"
+  >
 
-    @for (step of stepsArray; track step.id(); let i = $index) {
+    <div class="relative flex w-full items-start">
+
+      <!-- Background line -->
 
       <div
-        class="relative z-10 flex min-w-0 flex-1 flex-col items-center"
-        [class.cursor-pointer]="!step.disabled()"
-        [class.opacity-50]="step.disabled()"
-        (click)="goToStep(i)"
-      >
+        class="
+          absolute
+          left-[10%]
+          right-[10%]
+          top-7
+          z-0
+          h-0.5
+          rounded-full
+          bg-gray-300
+        "
+      ></div>
 
-        <!-- Circle -->
-        <button
-          type="button"
+
+      <!-- Progress line -->
+
+      <div
+        class="
+          absolute
+          left-[10%]
+          top-7
+          z-0
+          h-0.5
+          rounded-full
+          bg-gray-700
+          transition-all
+          duration-300
+          ease-in-out
+        "
+        [style.width.%]="getProgressWidth()"
+      ></div>
+
+
+      <!-- Steps -->
+
+      @for (
+        step of stepsArray;
+        track step.id();
+        let i = $index
+      ) {
+
+        <div
           class="
-            flex h-14 w-14
-            items-center justify-center
-            rounded-full
-            border-4 border-white
-            text-white
-            shadow-sm
-            transition-all duration-200
-            hover:scale-105
+            relative
+            z-10
+            flex
+            min-w-0
+            flex-1
+            flex-col
+            items-center
           "
-          [class.ring-2]="currentStepIndex === i"
-          [class.ring-gray-400]="currentStepIndex === i"
-          [style.background-color]="getStepColor(i)"
-          [disabled]="step.disabled()"
+          [class.cursor-pointer]="!step.disabled()"
+          [class.opacity-50]="step.disabled()"
+          (click)="goToStep(i)"
         >
 
-          @if (step.showIcon()) {
+          <!-- Circle -->
 
-            @let icon = getIcon(step.iconName());
+          <button
+            type="button"
+            class="
+              flex
+              h-14
+              w-14
+              items-center
+              justify-center
+              rounded-full
+              border-4
+              border-white
+              text-white
+              shadow-sm
+              transition-all
+              duration-200
+              hover:scale-105
+            "
+            [class.ring-2]="currentStepIndex === i"
+            [class.ring-gray-400]="currentStepIndex === i"
+            [class.shadow-md]="currentStepIndex === i"
+            [style.background-color]="getStepColor(i)"
+            [disabled]="step.disabled()"
+          >
 
-            @if (icon) {
+            @if (step.showIcon()) {
 
-              <svg
-                [attr.xmlns]="icon.xmlns"
-                [attr.fill]="icon.fill"
-                [attr.viewBox]="icon.viewBox"
-                [attr.stroke]="icon.stroke"
-                [attr.stroke-width]="icon.strokeWidth"
-                [ngClass]="icon.class"
-              >
-                <path
-                  [attr.d]="icon.path"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              @let icon = getIcon(step.iconName());
+
+              @if (icon) {
+
+                <svg
+                  [attr.xmlns]="icon.xmlns"
+                  [attr.fill]="icon.fill"
+                  [attr.viewBox]="icon.viewBox"
+                  [attr.stroke]="icon.stroke"
+                  [attr.stroke-width]="icon.strokeWidth"
+                  [ngClass]="icon.class"
+                >
+
+                  <path
+                    [attr.d]="icon.path"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+
+                </svg>
+
+              }
 
             }
 
-          }
+          </button>
+
+
+          <!-- Label -->
+
+          <div
+            class="
+              mt-2
+              max-w-[150px]
+              truncate
+              text-center
+              text-sm
+              text-gray-700
+            "
+            [class.font-semibold]="currentStepIndex === i"
+            [class.text-black]="currentStepIndex === i"
+          >
+            {{ step.label() }}
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- Mobile                                                -->
+  <!-- ===================================================== -->
+
+  <div
+    #stickyHeaderMobile
+    class="block sm:hidden"
+    [class.fixed]="isSticky"
+    [class.top-0]="isSticky"
+    [class.left-0]="isSticky"
+    [class.right-0]="isSticky"
+    [class.bg-white]="isSticky"
+    [class.z-50]="isSticky"
+    [class.mb-3]="!isSticky"
+    [class.p-3]="isSticky"
+    [class.shadow-md]="isSticky"
+    [class.border-b]="isSticky"
+    [class.top-8]="!isHideHeader"
+  >
+
+    <!-- Current step label -->
+
+    <div
+      class="
+        mb-3
+        text-center
+        text-sm
+        font-semibold
+        text-gray-800
+      "
+    >
+      {{ getCurrentStep()?.label() }}
+    </div>
+
+
+    <div
+      class="
+        flex
+        items-center
+        justify-between
+      "
+    >
+
+      <!-- Previous -->
+
+      <div
+        class="
+          flex
+          flex-1
+          justify-start
+        "
+      >
+
+        <button
+          z-button
+          [disabled]="currentStepIndex === 0"
+          (click)="prev()"
+        >
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-5 w-5"
+          >
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"
+            />
+
+          </svg>
+
+          <span>
+            Previous
+          </span>
 
         </button>
 
-        <!-- Label -->
+      </div>
+
+
+      <!-- Current circle -->
+
+      <div
+        class="
+          flex
+          flex-1
+          justify-center
+        "
+      >
+
         <div
           class="
-            mt-2
-            max-w-[150px]
-            truncate
-            text-center
-            text-sm
-            text-gray-700
+            flex
+            h-12
+            w-12
+            items-center
+            justify-center
+            rounded-full
+            bg-gray-900
+            text-white
+            shadow-md
           "
-          [class.font-semibold]="currentStepIndex === i"
-          [class.text-black]="currentStepIndex === i"
         >
-          {{ step.label() }}
+
+          @let currentIcon =
+            getIcon(
+              getCurrentStep()?.iconName()
+            );
+
+          @if (currentIcon) {
+
+            <svg
+              [attr.xmlns]="currentIcon.xmlns"
+              [attr.fill]="currentIcon.fill"
+              [attr.viewBox]="currentIcon.viewBox"
+              [attr.stroke]="currentIcon.stroke"
+              [attr.stroke-width]="currentIcon.strokeWidth"
+              [ngClass]="currentIcon.class"
+            >
+
+              <path
+                [attr.d]="currentIcon.path"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+
+            </svg>
+
+          }
+
         </div>
 
       </div>
 
-    }
 
-    
+      <!-- Next -->
+
+      <div
+        class="
+          flex
+          flex-1
+          justify-end
+        "
+      >
+
+        <button
+          z-button
+          [disabled]="
+            currentStepIndex >=
+            stepsArray.length - 1
+          "
+          (click)="next()"
+        >
+
+          <span>
+            Next
+          </span>
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-5 w-5"
+          >
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m5.25 4.5 7.5 7.5m-6-15 7.5 7.5"
+            />
+
+          </svg>
+
+        </button>
+
+      </div>
+
+    </div>
 
   </div>
+
+
+  <!-- ===================================================== -->
+  <!-- Step content                                          -->
+  <!-- ===================================================== -->
+
+  <div
+    class="
+      mt-6
+      min-h-[200px]
+      rounded-xl
+      border
+      border-gray-200
+      bg-white
+      p-4
+      shadow-sm
+    "
+  >
+
+    @if (getCurrentStep(); as currentStep) {
+
+      <ng-container
+        *ngTemplateOutlet="
+          currentStep.content
+        "
+      ></ng-container>
+
+    }
+
+    @else {
+
+      <div
+        class="
+          py-10
+          text-center
+          text-gray-500
+        "
+      >
+        No content available for this step.
+      </div>
+
+    }
+
+  </div>
+
 </div>

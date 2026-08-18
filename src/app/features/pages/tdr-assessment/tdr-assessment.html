@@ -1,122 +1,168 @@
-<div class="w-full">
+<div class="w-full space-y-4 mt-4">
 
-    <app-custom-stepper 
-        [(currentStepIndex)]="currentStepIndex" 
-        [stepDefaultColor]="'#d1d5db'"
-        [stepValidColor]="'#374151'" 
-        [stepInvalidColor]="'#374151'" 
-        [stepCurrentColor]="'#000000'"
-        (StepIndexChange)="onStepChange($event)">
+  <div class=text-center>
+    <span class="text-xl font-bold text-blue-800">
+      แบบฟอร์มพิจารณาปรับโครงสร้างหนี้
+    </span>
+  </div>
 
-        <!-- ===================================================== -->
-        <!-- Step 1: Customer                                      -->
-        <!-- ===================================================== -->
+  <div>
+    @if (errorMessage()) {
 
-        <app-step id="customer" label="Customer" iconName="user" [showIcon]="true" [valid]="customerValid"
-            [visited]="customerVisited">
+    <app-data-load-error [errorMessage]="errorMessage() ?? 'Not found error.'" />
 
-            <div class="p-4">
+    }
+    @else if (isLoaded()) {
 
-                <h2 class="text-lg font-semibold mb-4">
-                    Customer Information
-                </h2>
-
-                <p>
-                    Customer form will be here.
-                </p>
-
-            </div>
-
-        </app-step>
+    <app-custom-stepper [(currentStepIndex)]="currentStepIndex" [stepDefaultColor]="'#d1d5db'"
+      [stepValidColor]="'#374151'" [stepInvalidColor]="'#374151'" [stepCurrentColor]="'#000000'"
+      (stepIndexChange)="onStepChange($event)">
 
 
-        <!-- ===================================================== -->
-        <!-- Step 2: Loan Information                              -->
-        <!-- ===================================================== -->
+      <!-- ===================================================== -->
+      <!-- Step 1: Customer (ข้อมูลลูกค้า)                           -->
+      <!-- ===================================================== -->
 
-        <app-step id="loan" label="Loan Information" iconName="identification" [showIcon]="true" [valid]="loanValid"
-            [visited]="loanVisited">
+      <app-step id="customer" label="ข้อมูลลูกค้า" iconName="user" [showIcon]="true" [valid]="customerValid"
+        [visited]="customerVisited">
 
-            <div class="p-4">
+        <!-- <ng-template> -->
+        <app-customer-information-step></app-customer-information-step>
+        <!-- </ng-template> -->
 
-                <h2 class="text-lg font-semibold mb-4">
-                    Loan Information
-                </h2>
-
-                <p>
-                    Loan form will be here.
-                </p>
-
-            </div>
-
-        </app-step>
+      </app-step>
 
 
-        <!-- ===================================================== -->
-        <!-- Step 3: Financial Assessment                          -->
-        <!-- ===================================================== -->
+      <!-- ===================================================== -->
+      <!-- Step 2: Loan Information   (ข้อมูลผลิดภัณฑ์เช่าช์้อ)        -->
+      <!-- ===================================================== -->
 
-        <app-step id="financial" label="Financial Assessment" iconName="briefcase" [showIcon]="true"
-            [valid]="financialValid" [visited]="financialVisited">
+      <app-step id="loan" label="ข้อมูลผลิดภัณฑ์เช่าช์้อ" iconName="identification" [showIcon]="true"
+        [valid]="loanValid" [visited]="loanVisited">
 
-            <div class="p-4">
+        <app-product-information-step [form]="form" [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()" />
 
-                <h2 class="text-lg font-semibold mb-4">
-                    Financial Assessment
-                </h2>
-
-                <p>
-                    Financial assessment form will be here.
-                </p>
-
-            </div>
-
-        </app-step>
+      </app-step>
 
 
-        <!-- ===================================================== -->
-        <!-- Step 4: Documents                                     -->
-        <!-- ===================================================== -->
+      <!-- ===================================================== -->
+      <!-- Step 3: Financial Assessment	การประเมินรายได้ (รวมต่อเดือน) -->
+      <!-- ===================================================== -->
 
-        <app-step id="document" label="Documents" iconName="clipboard-document" [showIcon]="true" [valid]="documentValid"
-            [visited]="documentVisited">
+      <app-step id="financial" label="Financial Assessment" iconName="briefcase" [showIcon]="true"
+        [valid]="financialValid" [visited]="financialVisited">
 
-            <div class="p-4">
+        <ng-template>
 
-                <h2 class="text-lg font-semibold mb-4">
-                    Document Information
-                </h2>
+          <div class="p-4">
 
-                <p>
-                    Document form will be here.
-                </p>
-
-            </div>
-
-        </app-step>
+            <h2 class="
+              mb-4
+              text-lg
+              font-semibold
+            ">
+              Financial Assessment
+            </h2>
 
 
-        <!-- ===================================================== -->
-        <!-- Step 5: Summary                                       -->
-        <!-- ===================================================== -->
+            <p class="text-gray-600">
 
-        <app-step id="summary" label="Summary" iconName="newspaper" [showIcon]="true" [valid]="summaryValid"
-            [visited]="summaryVisited">
+              Financial assessment form will be here.
 
-            <div class="p-4">
+            </p>
 
-                <h2 class="text-lg font-semibold mb-4">
-                    Summary
-                </h2>
+          </div>
 
-                <p>
-                    Summary will be here.
-                </p>
+        </ng-template>
 
-            </div>
+      </app-step>
 
-        </app-step>
+
+      <!-- ===================================================== -->
+      <!-- Step 4: Documents  การประเมินค่าใช้จ่าย (รวมต่อเดือน)        -->
+      <!-- ===================================================== -->
+
+      <app-step id="document" label="Documents" iconName="clipboard-document" [showIcon]="true" [valid]="documentValid"
+        [visited]="documentVisited">
+
+        <ng-template>
+
+          <div class="p-4">
+
+            <h2 class="
+              mb-4
+              text-lg
+              font-semibold
+            ">
+              Document Information
+            </h2>
+
+
+            <p class="text-gray-600">
+
+              Document form will be here.
+
+            </p>
+
+          </div>
+
+        </ng-template>
+
+      </app-step>
+
+
+      <!-- ===================================================== -->
+      <!-- Step 5: Reason	เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้  -->
+      <!-- ===================================================== -->
+
+      <app-step id="summary" label="Summary" iconName="newspaper" [showIcon]="true" [valid]="summaryValid"
+        [visited]="summaryVisited">
+
+        <ng-template>
+
+          <div class="p-4">
+
+            <h2 class="
+              mb-4
+              text-lg
+              font-semibold
+            ">
+              Summary
+            </h2>
+
+
+            <p class="text-gray-600">
+
+              Summary will be here.
+
+            </p>
+
+          </div>
+
+        </ng-template>
+
+      </app-step>
+
 
     </app-custom-stepper>
+
+    }
+    @else if (isLoading()) {
+    <div class="flex min-h-80 w-full items-center justify-center">
+
+      <div class="flex flex-col items-center gap-4">
+
+        <z-spinner class="size-8" />
+
+        <span class="text-sm text-gray-500">
+          กำลังโหลดข้อมูล...
+        </span>
+
+      </div>
+
+    </div>
+
+    }
+  </div>
 
 </div>

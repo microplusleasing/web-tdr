@@ -13,44 +13,37 @@ import {
 })
 export class Step {
 
-   id = input.required<string>();
+  // Unique identifier for the step
+  id = input.required<string>();
 
-  /**
-   * Text displayed in the step header.
-   */
+  // Text displayed in the step header
   label = input.required<string>();
 
-  /**
-   * Icon name used by CustomStepper.
-   */
+  // Icon used by CustomStepper
   iconName = input('');
 
-  /**
-   * Whether this step should display an icon.
-   */
+  // Whether to display the icon
   showIcon = input(false);
 
-  /**
-   * Whether the form/content of this step is valid.
-   */
+  // Whether this step is currently valid
   valid = input(false);
 
-  /**
-   * Whether the user has visited this step.
-   *
-   * This is useful because an untouched required form
-   * is technically invalid, but we may not want to
-   * display it as an "invalid" step yet.
-   */
+  // Whether this step has been visited
   visited = input(false);
 
-  /**
-   * Prevent navigation to this step.
-   */
+  // Prevent navigation to this step
   disabled = input(false);
 
   /**
-   * Template containing the actual step content.
+   * Template containing everything inside <app-step>.
+   *
+   * Example:
+   *
+   * <app-step>
+   *   <app-customer-form />
+   * </app-step>
+   *
+   * The content above becomes this TemplateRef.
    */
   @ViewChild('stepContent', { static: true })
   content!: TemplateRef<unknown>;

@@ -1,0 +1,35 @@
+<div class="flex min-h-80 w-full items-center justify-center px-4">
+
+  <z-empty
+    zIcon="lucideCircleAlert"
+
+    zTitle="ไม่สามารถโหลดข้อมูลได้"
+
+    [zDescription]="errorMessage()"
+
+    class="
+      w-full
+      max-w-xl
+      border
+      border-red-200
+      bg-red-50/50
+      shadow-sm
+    "
+  >
+
+    <div class="mt-2 flex items-center justify-center gap-2">
+
+      <ng-icon
+        name="lucideCircleAlert"
+        class="size-4 text-red-500"
+      />
+
+      <span class="text-sm font-medium text-red-600">
+        กรุณาตรวจสอบการเชื่อมต่อ แล้วลองใหม่อีกครั้ง
+      </span>
+
+    </div>
+
+  </z-empty>
+
+</div>
