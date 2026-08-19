@@ -27,17 +27,21 @@
         [visited]="customerVisited">
 
         <!-- <ng-template> -->
-        <app-customer-information-step></app-customer-information-step>
+        <app-customer-information-step [form]="asFormGroup(step2Form.get('customerInformation'))"
+          [titleOptions]="masterData()?.parameters?.titles ?? []"
+          [locations]="masterData()?.parameters?.locations ?? []" 
+          [marriedStatusOptions]="masterData()?.parameters?.marriedStatus ?? []"
+          />
         <!-- </ng-template> -->
 
       </app-step>
 
 
       <!-- ===================================================== -->
-      <!-- Step 2: Loan Information   (ข้อมูลผลิดภัณฑ์เช่าช์้อ)        -->
+      <!-- Step 2: Loan Information   (ข้อมูลผลิดภัณฑ์เช่าชื้อ)        -->
       <!-- ===================================================== -->
 
-      <app-step id="loan" label="ข้อมูลผลิดภัณฑ์เช่าช์้อ" iconName="identification" [showIcon]="true"
+      <app-step id="loan" label="ข้อมูลผลิดภัณฑ์เช่าชื้อ" iconName="identification" [showIcon]="true"
         [valid]="loanValid" [visited]="loanVisited">
 
         <app-product-information-step [form]="step2Form" [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()" />
@@ -74,28 +78,7 @@
       <app-step id="summary" label="เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้" iconName="paper" [showIcon]="true"
         [valid]="summaryValid" [visited]="summaryVisited">
 
-        <ng-template>
-
-          <div class="p-4">
-
-            <h2 class="
-              mb-4
-              text-lg
-              font-semibold
-            ">
-              Summary
-            </h2>
-
-
-            <p class="text-gray-600">
-
-              Summary will be here.
-
-            </p>
-
-          </div>
-
-        </ng-template>
+        <app-restructure-reason-step [form]="step5Form" [reasons]="restructureReasons()" />
 
       </app-step>
 
@@ -106,28 +89,7 @@
       <app-step id="summary" label="เอกสารประกอบการพิจารณา" iconName="magnifying" [showIcon]="true"
         [valid]="summaryValid" [visited]="summaryVisited">
 
-        <ng-template>
-
-          <div class="p-4">
-
-            <h2 class="
-              mb-4
-              text-lg
-              font-semibold
-            ">
-              Summary
-            </h2>
-
-
-            <p class="text-gray-600">
-
-              Summary will be here.
-
-            </p>
-
-          </div>
-
-        </ng-template>
+        <app-document-attach-step [form]="step6Form" [attachments]="attachmentTypesDisplay()" />
 
       </app-step>
 

@@ -1,79 +1,97 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  OnInit
+  Input,
+  OnInit,
 } from '@angular/core';
 
 import {
   AbstractControl,
-  FormBuilder,
   FormGroup,
   ReactiveFormsModule,
-  Validators
 } from '@angular/forms';
 
-import { ZardInputComponent } from '@/shared/components/input';
-import { ZardSelectImports } from '@/shared/components/select';
-import { ZardCheckboxComponent } from '@/shared/components/checkbox';
+import {
+  ZardInputComponent
+} from '@/shared/components/input';
+
+import {
+  ZardSelectImports
+} from '@/shared/components/select';
+
+import {
+  ZardCheckboxComponent
+} from '@/shared/components/checkbox';
+
+import {
+  ITitleParameter,
+  ILocationParameter,
+  IMarriedStatusParameter,
+} from '../../interfaces/master-data.interface';
+
 
 @Component({
   selector: 'app-customer-information-step',
+
+  standalone: true,
+
   imports: [
     ReactiveFormsModule,
+
     ZardInputComponent,
+
     ZardSelectImports,
-    ZardCheckboxComponent
+
+    ZardCheckboxComponent,
   ],
+
   templateUrl: './customer-information-step.html',
+
   styleUrl: './customer-information-step.css',
+
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerInformationStep implements OnInit {
 
-  private readonly fb = new FormBuilder();
 
   // =========================================================
-  // Form
+  // Inputs
   // =========================================================
 
+  @Input({
+    required: true,
+  })
   form!: FormGroup;
 
 
-  // =========================================================
-  // Master data / options
-  // =========================================================
+  /**
+   * Title master data from API
+   *
+   * response.parameters.title
+   */
+  @Input()
+  titleOptions: ITitleParameter[] = [];
 
-  titleOptions = [
-    {
-      value: 'mr',
-      label: 'นาย'
-    },
-    {
-      value: 'mrs',
-      label: 'นาง'
-    },
-    {
-      value: 'ms',
-      label: 'นางสาว'
-    }
-  ];
+  /**
+   * Married Status master data from API
+   *
+   * response.parameters.title
+   */
+  @Input()
+  marriedStatusOptions: IMarriedStatusParameter[] = [];
 
-  maritalStatusOptions = [
-    {
-      value: 'single',
-      label: 'โสด'
-    },
-    {
-      value: 'married',
-      label: 'สมรส'
-    },
-    {
-      value: 'divorced',
-      label: 'หย่า'
-    },
-    {
-      value: 'widowed',
-      label: 'หม้าย'
-    }
-  ];
+
+  /**
+   * Location master data from API
+   *
+   * Currently not used.
+   *
+   * We keep it here so the component is ready
+   * when postcode / district / province lookup
+   * is implemented later.
+   */
+  @Input()
+  locations: ILocationParameter[] = [];
 
 
   // =========================================================
@@ -82,286 +100,13 @@ export class CustomerInformationStep implements OnInit {
 
   ngOnInit(): void {
 
-    this.buildForm();
-
     this.setupAddressCopyHandlers();
+
   }
 
 
   // =========================================================
-  // Build form
-  // =========================================================
-
-  private buildForm(): void {
-
-    this.form = this.fb.group({
-
-      // -------------------------------------------------------
-      // Customer information
-      // -------------------------------------------------------
-
-      contractNo: [
-        '',
-        Validators.required
-      ],
-
-      title: [
-        '',
-        Validators.required
-      ],
-
-      firstName: [
-        '',
-        Validators.required
-      ],
-
-      lastName: [
-        '',
-        Validators.required
-      ],
-
-      citizenId: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{13}$/)
-        ]
-      ],
-
-
-      // -------------------------------------------------------
-      // ID card address
-      // -------------------------------------------------------
-
-      idCardAddress: this.createAddressGroup(),
-
-
-      // -------------------------------------------------------
-      // Registered address
-      // -------------------------------------------------------
-
-      registeredAddressSameAsIdCard: [
-        false
-      ],
-
-      registeredAddress: this.createAddressGroup(),
-
-
-      // -------------------------------------------------------
-      // Current address
-      // -------------------------------------------------------
-
-      currentAddressSameAsIdCard: [
-        false
-      ],
-
-      currentAddress: this.createAddressGroup(),
-
-
-      // -------------------------------------------------------
-      // Contact information
-      // -------------------------------------------------------
-
-      phoneNo: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^0\d{9}$/)
-        ]
-      ],
-
-      maritalStatus: [
-        '',
-        Validators.required
-      ],
-
-      numberOfChildren: [
-        0,
-        [
-          Validators.required,
-          Validators.min(0)
-        ]
-      ],
-
-      dependents: [
-        0,
-        [
-          Validators.required,
-          Validators.min(0)
-        ]
-      ],
-
-
-      // -------------------------------------------------------
-      // Employment
-      // -------------------------------------------------------
-
-      occupation: [
-        '',
-        Validators.required
-      ],
-
-      position: [
-        '',
-        Validators.required
-      ],
-
-      jobDescription: [
-        '',
-        Validators.required
-      ],
-
-      workplaceName: [
-        '',
-        Validators.required
-      ],
-
-
-      // -------------------------------------------------------
-      // Workplace address
-      // -------------------------------------------------------
-
-      // workplaceAddress: this.createAddressGroup(),
-
-
-      // workplacePhone: [
-      //   '',
-      //   [
-      //     Validators.required,
-      //     Validators.pattern(/^0\d{9}$/)
-      //   ]
-      // ],
-
-      // workplaceDescription: [
-      //   '',
-      //   Validators.required
-      // ],
-      workplaceAddress: this.fb.group({
-        ...this.createAddressGroup().controls,
-
-        workplacePhone: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(/^0\d{9}$/)
-          ]
-        ],
-
-        workplaceDescription: [
-          '',
-          Validators.required
-        ],
-      }),
-
-
-      // -------------------------------------------------------
-      // Emergency / reference contacts
-      // -------------------------------------------------------
-
-      reference1: this.createReferenceGroup(
-        true
-      ),
-
-      reference2: this.createReferenceGroup(
-        false
-      )
-
-    });
-  }
-
-
-  // =========================================================
-  // Address group
-  // =========================================================
-
-  private createAddressGroup(): FormGroup {
-
-    return this.fb.group({
-
-      houseNo: [
-        '',
-        Validators.required
-      ],
-
-      alley: [
-        '',
-        Validators.required
-      ],
-
-      soi: [
-        '',
-        Validators.required
-      ],
-
-      road: [
-        '',
-        Validators.required
-      ],
-
-      postalCode: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{5}$/)
-        ]
-      ],
-
-      subDistrict: [
-        ''
-      ],
-
-      district: [
-        ''
-      ],
-
-      province: [
-        ''
-      ]
-
-    });
-  }
-
-
-  // =========================================================
-  // Reference contact group
-  // =========================================================
-
-  private createReferenceGroup(
-    required: boolean
-  ): FormGroup {
-
-    return this.fb.group({
-
-      name: [
-        '',
-        required
-          ? Validators.required
-          : []
-      ],
-
-      phone: [
-        '',
-        required
-          ? [
-            Validators.required,
-            Validators.pattern(/^0\d{9}$/)
-          ]
-          : []
-      ],
-
-      relationship: [
-        '',
-        required
-          ? Validators.required
-          : []
-      ]
-
-    });
-  }
-
-
-  // =========================================================
-  // Address copy
+  // Address Copy
   // =========================================================
 
   private setupAddressCopyHandlers(): void {
@@ -418,6 +163,7 @@ export class CustomerInformationStep implements OnInit {
         }
 
       });
+
   }
 
 
@@ -432,21 +178,26 @@ export class CustomerInformationStep implements OnInit {
     const targetGroup =
       this.form.get(target);
 
+
     if (
       !sourceGroup ||
       !targetGroup
     ) {
+
       return;
+
     }
+
 
     targetGroup.patchValue(
       sourceGroup.getRawValue()
     );
+
   }
 
 
   // =========================================================
-  // Form helpers
+  // Form Helpers
   // =========================================================
 
   control(
@@ -454,40 +205,66 @@ export class CustomerInformationStep implements OnInit {
   ): AbstractControl | null {
 
     return this.form.get(path);
+
   }
 
 
-  isInvalid(controlName: string): boolean {
-    const control = this.form.get(controlName);
+  isInvalid(
+    controlName: string
+  ): boolean {
+
+    const control =
+      this.form.get(controlName);
+
 
     return !!control &&
       control.invalid &&
-      (control.touched || control.dirty);
+      (
+        control.touched ||
+        control.dirty
+      );
+
+  }
+
+
+  isAddressInvalid(
+    address: string,
+    controlName: string
+  ): boolean {
+
+    const control =
+      this.form.get(
+        `${address}.${controlName}`
+      );
+
+
+    return !!control &&
+      control.invalid &&
+      (
+        control.touched ||
+        control.dirty
+      );
+
   }
 
 
   // =========================================================
-  // Submit
+  // Title Helper
   // =========================================================
 
-  submit(): void {
+  getTitleLabel(
+    titleId: string
+  ): string {
 
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-
-      console.log(
-        'Form invalid',
-        this.form
+    const title =
+      this.titleOptions.find(
+        item =>
+          item.titleId === titleId
       );
 
-      return;
-    }
 
-    console.log(
-      'Step One:',
-      this.form.getRawValue()
-    );
+    return title?.titleName ?? '';
+
   }
 
 }

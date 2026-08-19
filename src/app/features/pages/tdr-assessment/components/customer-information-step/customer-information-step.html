@@ -1,1136 +1,868 @@
-<form
-  [formGroup]="form"
-  class="w-full"
->
+<div class="w-full" [formGroup]="form">
 
-  <div
-    class="
-      mx-auto
-      w-full
-      max-w-6xl
-      rounded-2xl
-      border
-      border-gray-200
-      bg-background
-      shadow-sm
-    "
-  >
+  <!-- ===================================================== -->
+  <!-- MAIN CARD -->
+  <!-- ===================================================== -->
 
-    <!-- ===================================================== -->
-    <!-- Header -->
-    <!-- ===================================================== -->
+  <div class="w-full rounded-2xl border border-gray-300 p-6 md:p-8">
 
-    <div
-      class="
-        border-b
-        border-gray-200
-        px-6
-        py-5
-        text-center
-      "
-    >
+    <!-- =================================================== -->
+    <!-- TITLE -->
+    <!-- =================================================== -->
 
-      <h2
-        class="
-          text-xl
-          font-bold
-          text-blue-900
-          md:text-2xl
-        "
-      >
-        ข้อมูลลูกค้า
-      </h2>
-
-    </div>
+    <h2 class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl">
+      ข้อมูลลูกค้า
+    </h2>
 
 
-    <div class="space-y-8 p-5 md:p-8">
+    <!-- =================================================== -->
+    <!-- CUSTOMER INFORMATION -->
+    <!-- =================================================== -->
+
+    <div class="space-y-6">
+
+      <!-- ================================================= -->
+      <!-- CONTRACT NO -->
+      <!-- ================================================= -->
+
+      <div>
+
+        <label class="mb-2 block text-sm font-medium text-gray-800" for="contractNo">
+          เลขที่สัญญา
+
+          <span class="ml-1 text-red-500">
+            *
+          </span>
+        </label>
+
+        <input id="contractNo" type="text" z-input formControlName="contractNo" placeholder="ระบุเลขที่สัญญา" />
+
+        @if (
+        isInvalid('contractNo')
+        ) {
+
+        <p class="mt-1 text-sm text-red-500">
+          กรุณาระบุเลขที่สัญญา
+        </p>
+
+        }
+
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Customer Information -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- TITLE / FIRST NAME / LAST NAME -->
+      <!-- ================================================= -->
 
-      <section>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-12">
 
-        <div
-          class="
-            grid
-            grid-cols-1
-            gap-5
-            md:grid-cols-6
-          "
-        >
+        <!-- ================================================= -->
+        <!-- TITLE -->
+        <!-- ================================================= -->
 
-          <!-- Contract number -->
+        <div class="md:col-span-3">
 
-          <div class="md:col-span-3">
+          <label class="mb-2 block text-sm font-medium text-gray-800">
+            คำนำหน้า
 
-            <label class="field-label">
-              เลขที่สัญญา
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              type="text"
-              formControlName="contractNo"
-              placeholder="เลขที่สัญญา"
-              [class.border-red-500]="isInvalid('contractNo')"
-            />
-
-            @if (isInvalid('contractNo')) {
-                <p class="text-xs text-red-500">
-                กรุณากรอกเลขที่สัญญา
-                </p>
-            }
-          </div>
+            <span class="ml-1 text-red-500">
+              *
+            </span>
+          </label>
 
 
-          <!-- Title -->
+          <z-select formControlName="title" zPlaceholder="เลือกคำนำหน้า">
 
-          <div class="md:col-span-2">
+            @for (
+            title of titleOptions;
+            track title.titleId
+            ) {
 
-            <label class="field-label">
-              คำนำหน้า
-              <span class="required">*</span>
-            </label>
+            <z-select-item [zValue]="title.titleId">
+              {{ title.titleName }}
+            </z-select-item>
 
-            <z-select
-              class="w-full"
-              formControlName="title"
-              zPlaceholder="เลือกคำนำหน้า"
-              [zInvalid]="isInvalid('title')"
-            >
-
-              @for (
-                option of titleOptions;
-                track option.value
-              ) {
-
-                <z-select-item
-                  [zValue]="option.value"
-                >
-                  {{ option.label }}
-                </z-select-item>
-
-              }
-
-            </z-select>
-
-          </div>
-
-
-          <!-- First name -->
-
-          <div class="md:col-span-3">
-
-            <label class="field-label">
-              ชื่อ
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              type="text"
-              formControlName="firstName"
-              placeholder="ชื่อ ภาษาไทย"
-              [class.border-red-500]="isInvalid('firstName')"
-            />
-
-            @if (isInvalid('firstName')) {
-                <p class="text-xs text-red-500">
-                กรุณากรอกชื่อ
-                </p>
-            }
-          </div>
-
-
-          <!-- Last name -->
-
-          <div class="md:col-span-3">
-
-            <label class="field-label">
-              นามสกุล
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              type="text"
-              formControlName="lastName"
-              placeholder="นามสกุล ภาษาไทย"
-              [class.border-red-500]="isInvalid('lastName')"
-            />
-
-             @if (isInvalid('lastName')) {
-                <p class="text-xs text-red-500">
-                กรุณากรอกนามสกุล
-                </p>
-            }
-          </div>
-
-
-          <!-- Citizen ID -->
-
-          <div class="md:col-span-4">
-
-            <label class="field-label">
-              เลขที่บัตรประชาชน
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              type="text"
-              inputmode="numeric"
-              maxlength="13"
-              formControlName="citizenId"
-              placeholder="เลขที่บัตรประชาชน"
-              [class.border-red-500]="isInvalid('citizenId')"
-            />
-
-            @if (isInvalid('citizenId')) {
-                <p class="text-xs text-red-500">
-                กรุณากรอกเลขที่บัตรประชาชน
-                </p>
             }
 
-          </div>
+          </z-select>
+
+
+          @if (
+          isInvalid('title')
+          ) {
+
+          <p class="mt-1 text-sm text-red-500">
+            กรุณาเลือกคำนำหน้า
+          </p>
+
+          }
 
         </div>
 
-      </section>
+
+        <!-- ================================================= -->
+        <!-- FIRST NAME -->
+        <!-- ================================================= -->
+
+        <div class="md:col-span-4">
+
+          <label class="mb-2 block text-sm font-medium text-gray-800" for="firstName">
+            ชื่อ
+
+            <span class="ml-1 text-red-500">
+              *
+            </span>
+          </label>
+
+          <input id="firstName" type="text" z-input formControlName="firstName" placeholder="ระบุชื่อ" />
 
 
-      <!-- =================================================== -->
-      <!-- ID Card Address -->
-      <!-- =================================================== -->
+          @if (
+          isInvalid('firstName')
+          ) {
 
-      <section
-        formGroupName="idCardAddress"
-        class="section"
-      >
+          <p class="mt-1 text-sm text-red-500">
+            กรุณาระบุชื่อ
+          </p>
 
-        <h3 class="section-title">
+          }
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- LAST NAME -->
+        <!-- ================================================= -->
+
+        <div class="md:col-span-5">
+
+          <label class="mb-2 block text-sm font-medium text-gray-800" for="lastName">
+            นามสกุล
+
+            <span class="ml-1 text-red-500">
+              *
+            </span>
+          </label>
+
+          <input id="lastName" type="text" z-input formControlName="lastName" placeholder="ระบุนามสกุล" />
+
+
+          @if (
+          isInvalid('lastName')
+          ) {
+
+          <p class="mt-1 text-sm text-red-500">
+            กรุณาระบุนามสกุล
+          </p>
+
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- CITIZEN ID -->
+      <!-- ================================================= -->
+
+      <div>
+
+        <label class="mb-2 block text-sm font-medium text-gray-800" for="citizenId">
+          เลขบัตรประชาชน
+
+          <span class="ml-1 text-red-500">
+            *
+          </span>
+        </label>
+
+
+        <input id="citizenId" type="text" z-input maxlength="13" inputmode="numeric" formControlName="citizenId"
+          placeholder="เลขบัตรประชาชน 13 หลัก" />
+
+
+        @if (
+        isInvalid('citizenId')
+        ) {
+
+        <p class="mt-1 text-sm text-red-500">
+
+          @if (
+          control('citizenId')?.hasError('required')
+          ) {
+
+          กรุณาระบุเลขบัตรประชาชน
+
+          } @else {
+
+          เลขบัตรประชาชนต้องมี 13 หลัก
+
+          }
+
+        </p>
+
+        }
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- ID CARD ADDRESS -->
+      <!-- ================================================= -->
+
+      <div class="border-t border-gray-200 pt-6">
+
+        <h3 class="mb-5 text-lg font-semibold text-gray-900">
           ที่อยู่ตามบัตรประชาชน
         </h3>
 
 
-        <div class="grid-fields">
+        <div class="space-y-5" formGroupName="idCardAddress">
 
-
-          <!-- House -->
+          <!-- House No -->
 
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               บ้านเลขที่
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              formControlName="houseNo"
-              placeholder="บ้านเลขที่"
-              [class.border-red-500]="isInvalid('houseNo')"
-            />
+            <input type="text" z-input formControlName="houseNo" placeholder="ระบุบ้านเลขที่" />
 
-            @if (isInvalid('houseNo')) {
-                <p class="text-xs text-red-500">
-                กรุณากรอกบ้านเลขที่
-                </p>
-            }
           </div>
 
 
-          <!-- Alley -->
+          <!-- Alley / Soi / Road -->
 
-          <div>
-            <label class="field-label">
-              ตรอก
-              <span class="required">*</span>
-            </label>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-            <input
-              z-input
-              formControlName="alley"
-              placeholder="ตรอก"
-            />
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                หมู่ / ซอย
+
+                <span class="ml-1 text-red-500">
+                  *
+                </span>
+              </label>
+
+              <input type="text" z-input formControlName="alley" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ซอย
+
+                <span class="ml-1 text-red-500">
+                  *
+                </span>
+              </label>
+
+              <input type="text" z-input formControlName="soi" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ถนน
+
+                <span class="ml-1 text-red-500">
+                  *
+                </span>
+              </label>
+
+              <input type="text" z-input formControlName="road" />
+
+            </div>
+
           </div>
 
 
-          <!-- Soi -->
+          <!-- Post Code -->
 
           <div>
-            <label class="field-label">
-              ซอย
-              <span class="required">*</span>
-            </label>
 
-            <input
-              z-input
-              formControlName="soi"
-              placeholder="ซอย"
-            />
-          </div>
-
-
-          <!-- Road -->
-
-          <div>
-            <label class="field-label">
-              ถนน
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="road"
-              placeholder="ถนน"
-            />
-          </div>
-
-
-          <!-- Postal -->
-
-          <div>
-            <label class="field-label">
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               รหัสไปรษณีย์
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              formControlName="postalCode"
-              inputmode="numeric"
-              maxlength="5"
-              placeholder="รหัสไปรษณีย์"
-            />
+            <input type="text" z-input maxlength="5" inputmode="numeric" formControlName="postalCode"
+              placeholder="รหัสไปรษณีย์" />
+
           </div>
 
 
-          <!-- Subdistrict -->
-
-          <div>
-            <label class="field-label">
-              แขวง/ตำบล
-            </label>
-
-            <input
-              z-input
-              formControlName="subDistrict"
-              placeholder="แขวง/ตำบล"
-            />
-          </div>
-
-
-          <!-- District -->
-
-          <div>
-            <label class="field-label">
-              เขต/อำเภอ
-            </label>
-
-            <input
-              z-input
-              formControlName="district"
-              placeholder="เขต/อำเภอ"
-            />
-          </div>
-
-
-          <!-- Province -->
-
-          <div>
-            <label class="field-label">
-              จังหวัด
-            </label>
-
-            <input
-              z-input
-              formControlName="province"
-              placeholder="จังหวัด"
-            />
-          </div>
+          <!-- Location -->
+          <!--
+            Location master data is received by the component
+            but is intentionally not used yet.
+          -->
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Registered Address -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- REGISTERED ADDRESS -->
+      <!-- ================================================= -->
 
-      <section class="section">
+      <div class="border-t border-gray-200 pt-6">
 
-        <div
-          class="
-            mb-4
-            flex
-            flex-wrap
-            items-center
-            justify-between
-            gap-3
-          "
-        >
+        <h3 class="mb-4 text-lg font-semibold text-gray-900">
+          ที่อยู่ตามทะเบียนบ้าน
+        </h3>
 
-          <h3 class="section-title">
-            ที่อยู่ตามทะเบียนบ้าน
-          </h3>
 
-          <label
-            class="
-              flex
-              cursor-pointer
-              items-center
-              gap-2
-              text-sm
-              text-gray-600
-            "
-          >
+        <div class="mb-5">
 
-            <z-checkbox
-              zId="registered-address-same"
-              formControlName="registeredAddressSameAsIdCard"
-            />
-
-            <span>
-              ที่อยู่ตามบัตรประชาชน
-            </span>
-
-          </label>
+          <z-checkbox formControlName="registeredAddressSameAsIdCard">
+            ใช้ที่อยู่เดียวกับที่อยู่ตามบัตรประชาชน
+          </z-checkbox>
 
         </div>
 
 
-        <div
-          formGroupName="registeredAddress"
-          class="grid-fields"
-        >
+        <div formGroupName="registeredAddress" class="space-y-5">
 
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               บ้านเลขที่
-              <span class="required">*</span>
             </label>
 
-            <input
-              z-input
-              formControlName="houseNo"
-              placeholder="บ้านเลขที่"
-            />
+            <input type="text" z-input formControlName="houseNo" />
+
+          </div>
+
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                หมู่ / ซอย
+              </label>
+
+              <input type="text" z-input formControlName="alley" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ซอย
+              </label>
+
+              <input type="text" z-input formControlName="soi" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ถนน
+              </label>
+
+              <input type="text" z-input formControlName="road" />
+
+            </div>
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              ตรอก
-              <span class="required">*</span>
-            </label>
 
-            <input
-              z-input
-              formControlName="alley"
-              placeholder="ตรอก"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              ซอย
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="soi"
-              placeholder="ซอย"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              ถนน
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="road"
-              placeholder="ถนน"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               รหัสไปรษณีย์
-              <span class="required">*</span>
             </label>
 
-            <input
-              z-input
-              formControlName="postalCode"
-              maxlength="5"
-              inputmode="numeric"
-              placeholder="รหัสไปรษณีย์"
-            />
-          </div>
+            <input type="text" z-input maxlength="5" inputmode="numeric" formControlName="postalCode" />
 
-
-          <div>
-            <label class="field-label">
-              แขวง/ตำบล
-            </label>
-
-            <input
-              z-input
-              formControlName="subDistrict"
-              placeholder="แขวง/ตำบล"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              เขต/อำเภอ
-            </label>
-
-            <input
-              z-input
-              formControlName="district"
-              placeholder="เขต/อำเภอ"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              จังหวัด
-            </label>
-
-            <input
-              z-input
-              formControlName="province"
-              placeholder="จังหวัด"
-            />
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Current Address -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- CURRENT ADDRESS -->
+      <!-- ================================================= -->
 
-      <section class="section">
+      <div class="border-t border-gray-200 pt-6">
 
-        <div
-          class="
-            mb-4
-            flex
-            flex-wrap
-            items-center
-            justify-between
-            gap-3
-          "
-        >
+        <h3 class="mb-4 text-lg font-semibold text-gray-900">
+          ที่อยู่ปัจจุบัน
+        </h3>
 
-          <h3 class="section-title">
-            ที่อยู่ปัจจุบัน
-          </h3>
 
-          <label
-            class="
-              flex
-              cursor-pointer
-              items-center
-              gap-2
-              text-sm
-              text-gray-600
-            "
-          >
+        <div class="mb-5">
 
-            <z-checkbox
-              zId="current-address-same"
-              formControlName="currentAddressSameAsIdCard"
-            />
-
-            <span>
-              ที่อยู่ตามบัตรประชาชน
-            </span>
-
-          </label>
+          <z-checkbox formControlName="currentAddressSameAsIdCard">
+            ใช้ที่อยู่เดียวกับที่อยู่ตามบัตรประชาชน
+          </z-checkbox>
 
         </div>
 
 
-        <div
-          formGroupName="currentAddress"
-          class="grid-fields"
-        >
+        <div formGroupName="currentAddress" class="space-y-5">
 
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               บ้านเลขที่
-              <span class="required">*</span>
             </label>
 
-            <input
-              z-input
-              formControlName="houseNo"
-              placeholder="บ้านเลขที่"
-            />
+            <input type="text" z-input formControlName="houseNo" />
+
+          </div>
+
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                หมู่ / ซอย
+              </label>
+
+              <input type="text" z-input formControlName="alley" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ซอย
+              </label>
+
+              <input type="text" z-input formControlName="soi" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ถนน
+              </label>
+
+              <input type="text" z-input formControlName="road" />
+
+            </div>
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              ตรอก
-              <span class="required">*</span>
-            </label>
 
-            <input
-              z-input
-              formControlName="alley"
-              placeholder="ตรอก"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              ซอย
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="soi"
-              placeholder="ซอย"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              ถนน
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="road"
-              placeholder="ถนน"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               รหัสไปรษณีย์
-              <span class="required">*</span>
             </label>
 
-            <input
-              z-input
-              formControlName="postalCode"
-              maxlength="5"
-              inputmode="numeric"
-              placeholder="รหัสไปรษณีย์"
-            />
-          </div>
+            <input type="text" z-input maxlength="5" inputmode="numeric" formControlName="postalCode" />
 
-
-          <div>
-            <label class="field-label">
-              แขวง/ตำบล
-            </label>
-
-            <input
-              z-input
-              formControlName="subDistrict"
-              placeholder="แขวง/ตำบล"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              เขต/อำเภอ
-            </label>
-
-            <input
-              z-input
-              formControlName="district"
-              placeholder="เขต/อำเภอ"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              จังหวัด
-            </label>
-
-            <input
-              z-input
-              formControlName="province"
-              placeholder="จังหวัด"
-            />
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Contact -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- CONTACT -->
+      <!-- ================================================= -->
 
-      <section class="section">
+      <div class="border-t border-gray-200 pt-6">
 
-        <div class="grid-fields">
+        <h3 class="mb-5 text-lg font-semibold text-gray-900">
+          ข้อมูลการติดต่อ
+        </h3>
+
+
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+          <!-- Phone -->
 
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               เบอร์โทรศัพท์
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              type="tel"
-              inputmode="numeric"
-              maxlength="10"
-              formControlName="phoneNo"
-              placeholder="เบอร์โทรศัพท์"
-            />
+            <input type="text" z-input maxlength="10" inputmode="tel" formControlName="phoneNo"
+              placeholder="0XXXXXXXXX" />
+
           </div>
 
 
+          <!-- Marital -->
+
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               สถานภาพ
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <z-select
-              class="w-full"
-              formControlName="maritalStatus"
-              zPlaceholder="เลือกสถานภาพ"
-            >
+            <z-select formControlName="maritalStatus" zPlaceholder="เลือกสถานภาพ">
 
               @for (
-                option of maritalStatusOptions;
-                track option.value
+              mars of marriedStatusOptions;
+              track mars.code
               ) {
 
-                <z-select-item
-                  [zValue]="option.value"
-                >
-                  {{ option.label }}
-                </z-select-item>
+              <z-select-item [zValue]="mars.code">
+                {{ mars.name }}
+              </z-select-item>
 
               }
 
             </z-select>
+
           </div>
 
 
+          <!-- Children -->
+
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               จำนวนบุตร
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              type="number"
-              min="0"
-              formControlName="numberOfChildren"
-              placeholder="จำนวนบุตร"
-            />
+            <input type="number" z-input min="0" formControlName="numberOfChildren" />
+
           </div>
 
 
+          <!-- Dependents -->
+
           <div>
-            <label class="field-label">
-              จำนวนผู้ที่อยู่ในการอุปการะ
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              จำนวนผู้ที่อยู่ในอุปการะ
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              type="number"
-              min="0"
-              formControlName="dependents"
-              placeholder="จำนวนผู้ที่อยู่ในการอุปการะ"
-            />
+            <input type="number" z-input min="0" formControlName="dependents" />
+
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Employment -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- EMPLOYMENT -->
+      <!-- ================================================= -->
 
-      <section class="section">
+      <div class="border-t border-gray-200 pt-6">
 
-        <div class="grid-fields">
+        <h3 class="mb-5 text-lg font-semibold text-gray-900">
+          ข้อมูลการทำงาน
+        </h3>
 
-          <div>
-            <label class="field-label">
-              อาชีพ
-              <span class="required">*</span>
-            </label>
 
-            <input
-              z-input
-              formControlName="occupation"
-              placeholder="อาชีพ"
-            />
+        <div class="space-y-5">
+
+          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                อาชีพ
+
+                <span class="ml-1 text-red-500">
+                  *
+                </span>
+              </label>
+
+              <input type="text" z-input formControlName="occupation" />
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                ตำแหน่ง
+
+                <span class="ml-1 text-red-500">
+                  *
+                </span>
+              </label>
+
+              <input type="text" z-input formControlName="position" />
+
+            </div>
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              ตำแหน่ง
-              <span class="required">*</span>
-            </label>
 
-            <input
-              z-input
-              formControlName="position"
-              placeholder="ตำแหน่ง"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               ลักษณะงาน
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              formControlName="jobDescription"
-              placeholder="ลักษณะงาน"
-            />
+            <input type="text" z-input formControlName="jobDescription" />
+
           </div>
 
 
           <div>
-            <label class="field-label">
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
               ชื่อสถานที่ทำงาน
-              <span class="required">*</span>
+
+              <span class="ml-1 text-red-500">
+                *
+              </span>
             </label>
 
-            <input
-              z-input
-              formControlName="workplaceName"
-              placeholder="ชื่อสถานที่ทำงาน"
-            />
+            <input type="text" z-input formControlName="workplaceName" />
+
+          </div>
+
+
+          <!-- Workplace Address -->
+
+          <div formGroupName="workplaceAddress" class="space-y-5">
+
+            <h4 class="text-base font-semibold text-gray-800">
+              ที่อยู่สถานที่ทำงาน
+            </h4>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                บ้านเลขที่
+              </label>
+
+              <input type="text" z-input formControlName="houseNo" />
+
+            </div>
+
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+              <div>
+
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  หมู่ / ซอย
+                </label>
+
+                <input type="text" z-input formControlName="alley" />
+
+              </div>
+
+
+              <div>
+
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  ซอย
+                </label>
+
+                <input type="text" z-input formControlName="soi" />
+
+              </div>
+
+
+              <div>
+
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  ถนน
+                </label>
+
+                <input type="text" z-input formControlName="road" />
+
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                รหัสไปรษณีย์
+              </label>
+
+              <input type="text" z-input maxlength="5" inputmode="numeric" formControlName="postalCode" />
+
+            </div>
+
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+              <div>
+
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  เบอร์โทรศัพท์สถานที่ทำงาน
+                </label>
+
+                <input type="text" z-input maxlength="10" inputmode="tel" formControlName="workplacePhone" />
+
+              </div>
+
+
+              <div>
+
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  รายละเอียดสถานที่ทำงาน
+                </label>
+
+                <input type="text" z-input formControlName="workplaceDescription" />
+
+              </div>
+
+            </div>
+
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Workplace Address -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- REFERENCE 1 -->
+      <!-- ================================================= -->
 
-      <section
-        formGroupName="workplaceAddress"
-        class="section"
-      >
+      <div class="border-t border-gray-200 pt-6">
 
-        <h3 class="section-title">
-          ที่อยู่ที่ทำงาน
+        <h3 class="mb-5 text-lg font-semibold text-gray-900">
+          บุคคลอ้างอิง 1
         </h3>
 
 
-        <div class="grid-fields">
+        <div formGroupName="reference1" class="grid grid-cols-1 gap-5 md:grid-cols-3">
 
           <div>
-            <label class="field-label">
-              เลขที่
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              ชื่อ-นามสกุล
             </label>
 
-            <input
-              z-input
-              formControlName="houseNo"
-              placeholder="เลขที่"
-            />
+            <input type="text" z-input formControlName="name" />
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              ตรอก
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              เบอร์โทรศัพท์
             </label>
 
-            <input
-              z-input
-              formControlName="alley"
-              placeholder="ตรอก"
-            />
+            <input type="text" z-input maxlength="10" formControlName="phone" />
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              ซอย
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              ความสัมพันธ์
             </label>
 
-            <input
-              z-input
-              formControlName="soi"
-              placeholder="ซอย"
-            />
-          </div>
+            <input type="text" z-input formControlName="relationship" />
 
-
-          <div>
-            <label class="field-label">
-              ถนน
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="road"
-              placeholder="ถนน"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              รหัสไปรษณีย์
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              formControlName="postalCode"
-              maxlength="5"
-              inputmode="numeric"
-              placeholder="รหัสไปรษณีย์"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              แขวง/ตำบล
-            </label>
-
-            <input
-              z-input
-              formControlName="subDistrict"
-              placeholder="แขวง/ตำบล"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              เขต/อำเภอ
-            </label>
-
-            <input
-              z-input
-              formControlName="district"
-              placeholder="เขต/อำเภอ"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              จังหวัด
-            </label>
-
-            <input
-              z-input
-              formControlName="province"
-              placeholder="จังหวัด"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              เบอร์โทรศัพท์ที่ทำงาน
-              <span class="required">*</span>
-            </label>
-
-            <input
-              z-input
-              type="tel"
-              inputmode="numeric"
-              maxlength="10"
-              formControlName="workplacePhone"
-              placeholder="เบอร์โทรศัพท์ที่ทำงาน"
-            />
-          </div>
-
-
-          <div class="md:col-span-2 w-full">
-            <label class="mb-2 block">
-              ลักษณะสถานที่ทำงาน
-              <span class="required">*</span>
-            </label>
-
-            <textarea
-              z-input
-              rows="3"
-              formControlName="workplaceDescription"
-              placeholder="เช่น อยู่ใกล้ห้างสรรพสินค้า โรงพยาบาล ฯลฯ"
-              class="w-full min-h-[120px]"
-            ></textarea>
           </div>
 
         </div>
 
-      </section>
+      </div>
 
 
-      <!-- =================================================== -->
-      <!-- Reference Contacts -->
-      <!-- =================================================== -->
+      <!-- ================================================= -->
+      <!-- REFERENCE 2 -->
+      <!-- ================================================= -->
 
-      <section class="section">
+      <div class="border-t border-gray-200 pt-6">
 
-        <h3 class="section-title">
-          เบอร์โทรบุคคลใกล้ชิด/บุคคลในครอบครัว
+        <h3 class="mb-5 text-lg font-semibold text-gray-900">
+          บุคคลอ้างอิง 2
         </h3>
 
 
-        <!-- Reference 1 -->
-
-        <div
-          formGroupName="reference1"
-          class="mb-5 grid-fields"
-        >
+        <div formGroupName="reference2" class="grid grid-cols-1 gap-5 md:grid-cols-3">
 
           <div>
-            <label class="field-label">
-              ชื่อบุคคลอ้างอิง 1
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              ชื่อ-นามสกุล
             </label>
 
-            <input
-              z-input
-              formControlName="name"
-              placeholder="ชื่อบุคคลอ้างอิง 1"
-            />
+            <input type="text" z-input formControlName="name" />
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              เบอร์โทรบุคคลที่ 1
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              เบอร์โทรศัพท์
             </label>
 
-            <input
-              z-input
-              type="tel"
-              inputmode="numeric"
-              maxlength="10"
-              formControlName="phone"
-              placeholder="เบอร์โทรบุคคลที่ 1"
-            />
+            <input type="text" z-input maxlength="10" formControlName="phone" />
+
           </div>
 
 
           <div>
-            <label class="field-label">
-              ความสัมพันธ์บุคคลที่ 1
-              <span class="required">*</span>
+
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              ความสัมพันธ์
             </label>
 
-            <input
-              z-input
-              formControlName="relationship"
-              placeholder="ความสัมพันธ์บุคคลที่ 1"
-            />
+            <input type="text" z-input formControlName="relationship" />
+
           </div>
 
         </div>
 
-
-        <!-- Reference 2 -->
-
-        <div
-          formGroupName="reference2"
-          class="grid-fields"
-        >
-
-          <div>
-            <label class="field-label">
-              ชื่อบุคคลอ้างอิง 2
-            </label>
-
-            <input
-              z-input
-              formControlName="name"
-              placeholder="ชื่อบุคคลอ้างอิง 2"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              เบอร์โทรบุคคลที่ 2
-            </label>
-
-            <input
-              z-input
-              type="tel"
-              inputmode="numeric"
-              maxlength="10"
-              formControlName="phone"
-              placeholder="เบอร์โทรบุคคลที่ 2"
-            />
-          </div>
-
-
-          <div>
-            <label class="field-label">
-              ความสัมพันธ์บุคคลที่ 2
-            </label>
-
-            <input
-              z-input
-              formControlName="relationship"
-              placeholder="ความสัมพันธ์บุคคลที่ 2"
-            />
-          </div>
-
-        </div>
-
-      </section>
+      </div>
 
     </div>
 
   </div>
 
-</form>
+</div>

@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
@@ -29,6 +30,10 @@ import {
   EstimatePaymentStep
 } from './components/estimate-payment-step/estimate-payment-step'
 
+import { RestructureReasonStep } from './components/restructure-reason-step/restructure-reason-step';
+
+import { DocumentAttachStep } from './components/document-attach-step/document-attach-step';
+
 import {
   CustomStepper,
   StepChangeEvent
@@ -43,10 +48,12 @@ import {
 } from './services/tdr-assessment.service';
 
 import {
+  IAttachmentTypeDisplay,
   IAssessmentCategoryDisplay,
   IAssessmentItemDisplay,
   IMasterDataResponse,
-  IMotorcyclePhotoTypeDisplay
+  IMotorcyclePhotoTypeDisplay,
+  IRestructureReasonDisplay
 } from './interfaces/master-data.interface';
 
 import {
@@ -73,6 +80,8 @@ import {
     ProductInformationStep,
     EstimateIncomeStep,
     EstimatePaymentStep,
+    RestructureReasonStep,
+    DocumentAttachStep,
 
     ZardSpinnerComponent,
     DataLoadError
@@ -105,6 +114,8 @@ export class TdrAssessment implements OnInit {
   step2Form!: FormGroup;
   step3Form!: FormGroup;
   step4Form!: FormGroup;
+  step5Form!: FormGroup;
+  step6Form!: FormGroup;
 
 
   // =========================================================
@@ -132,6 +143,11 @@ export class TdrAssessment implements OnInit {
   step4Fields =
     signal<IAssessmentCategoryDisplay[]>([]);
 
+  restructureReasons =
+    signal<IRestructureReasonDisplay[]>([]);
+
+  attachmentTypesDisplay =
+    signal<IAttachmentTypeDisplay[]>([]);
 
 
 
@@ -212,6 +228,10 @@ export class TdrAssessment implements OnInit {
 
     });
 
+  }
+
+  asFormGroup(control: AbstractControl | null): FormGroup {
+    return control as FormGroup;
   }
 
 
@@ -691,6 +711,158 @@ export class TdrAssessment implements OnInit {
     return assessmentForm;
   }
 
+  /* ... create form step 5 ... */
+  private createStep5Form(
+    reasons: IRestructureReasonDisplay[]
+  ): FormGroup {
+
+    const reasonControls =
+      reasons
+        .sort(
+          (a, b) =>
+            a.displayOrder - b.displayOrder
+        )
+        .map((reason) => {
+
+          return this.fb.group({
+
+            reasonCode: [
+              reason.code,
+              Validators.required
+            ],
+
+            selected: [
+              false
+            ],
+
+            otherReason: [
+              ''
+            ]
+
+          });
+
+        });
+
+
+    return this.fb.group({
+
+      reasons:
+        this.fb.array(reasonControls)
+
+    });
+
+  }
+
+  get restructureReasonForms(): FormArray {
+
+    return this.step5Form.get(
+      'reasons'
+    ) as FormArray;
+
+  }
+
+  private setupRestructureReasonValidators(): void {
+
+    this.restructureReasonForms.controls.forEach(
+      (control, index) => {
+
+        const reason =
+          this.restructureReasons()[index];
+
+        const selectedControl =
+          control.get('selected');
+
+        const otherReasonControl =
+          control.get('otherReason');
+
+        if (
+          !selectedControl ||
+          !otherReasonControl
+        ) {
+          return;
+        }
+
+        selectedControl.valueChanges.subscribe(
+          (selected) => {
+
+            if (
+              selected &&
+              reason.requireRemark
+            ) {
+
+              otherReasonControl.setValidators([
+                Validators.required,
+                Validators.maxLength(500)
+              ]);
+
+            } else {
+
+              otherReasonControl.clearValidators();
+
+              otherReasonControl.setValue(
+                '',
+                {
+                  emitEvent: false
+                }
+              );
+
+            }
+
+            otherReasonControl.updateValueAndValidity();
+
+          }
+        );
+
+      }
+    );
+
+  }
+
+  /* ... create form step 6 ... */
+  private createStep6Form(
+    attachmentTypes: IAttachmentTypeDisplay[],
+  ): FormGroup {
+
+    const attachments =
+      attachmentTypes.map(
+        attachment =>
+          this.fb.group({
+
+            attachmentCode: [
+              attachment.attachmentCode,
+              Validators.required,
+            ],
+
+            files:
+              this.fb.control<File[] | null>(
+                null,
+                attachment.isRequired
+                  ? [Validators.required]
+                  : [],
+              ),
+
+          }),
+      );
+
+
+    return this.fb.group({
+
+      attachments:
+        this.fb.array(
+          attachments,
+        ),
+
+    });
+
+  }
+
+  get attachmentForms(): FormArray {
+
+    return this.step6Form.get(
+      'attachments'
+    ) as FormArray;
+
+  }
 
   // =========================================================
   // Load Master Data
@@ -802,7 +974,67 @@ export class TdrAssessment implements OnInit {
 
           this.step4Form = this.createAssessmentForm(step4Categories);
 
-          this.step2Form.addControl('estimatePayment',this.step4Form);
+          this.step2Form.addControl('estimatePayment', this.step4Form);
+
+          // -------------------------------------------------
+          // Restructure Reasons
+          // -------------------------------------------------
+
+          const restructureReasons =
+            [...(
+              response.display.restructureReasons ?? []
+            )]
+              .sort(
+                (a, b) =>
+                  a.displayOrder - b.displayOrder
+              );
+
+          this.restructureReasons.set(
+            restructureReasons
+          );
+
+          this.step5Form =
+            this.createStep5Form(
+              restructureReasons
+            );
+
+          this.step2Form.addControl(
+            'restructureReasons',
+            this.step5Form
+          );
+
+          this.setupRestructureReasonValidators();
+
+          // -------------------------------------------------
+          // Attachment Types
+          // -------------------------------------------------
+
+          const attachmentTypes =
+            [...(
+              response.display
+                ?.attachmentTypes ?? []
+            )]
+              .sort(
+                (a, b) =>
+                  a.displayOrder - b.displayOrder
+              );
+
+
+          this.attachmentTypesDisplay.set(
+            attachmentTypes
+          );
+
+
+          this.step6Form =
+            this.createStep6Form(
+              attachmentTypes
+            );
+
+
+          this.step2Form.addControl(
+            'documentAttachments',
+            this.step6Form
+          );
 
 
           // -------------------------------------------------

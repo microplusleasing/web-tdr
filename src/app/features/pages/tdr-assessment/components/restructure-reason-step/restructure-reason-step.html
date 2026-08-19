@@ -1,1 +1,147 @@
-<p>restructure-reason-step works!</p>
+<div
+  class="w-full"
+  [formGroup]="form"
+>
+
+  <div
+    class="w-full rounded-2xl border border-gray-300 p-6 md:p-8"
+  >
+
+    <!-- ===================================================== -->
+    <!-- TITLE -->
+    <!-- ===================================================== -->
+
+    <h2
+      class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl"
+    >
+      เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้
+    </h2>
+
+
+    <!-- ===================================================== -->
+    <!-- DESCRIPTION -->
+    <!-- ===================================================== -->
+
+    <div
+      class="mb-6"
+    >
+
+      <p
+        class="text-base font-medium text-gray-800"
+      >
+        เลือกได้มากกว่า 1 ข้อ
+      </p>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- REASONS -->
+    <!-- ===================================================== -->
+
+    <div
+      class="w-full"
+      formArrayName="reasons"
+    >
+
+      @for (
+        reason of reasons;
+        track reason.code;
+        let i = $index
+      ) {
+
+        <div
+          class="w-full"
+          [formGroupName]="i"
+        >
+
+          <!-- ================================================= -->
+          <!-- CHECKBOX -->
+          <!-- ================================================= -->
+
+          <div
+            class="flex items-center gap-3"
+          >
+
+            <z-checkbox
+              [zId]="'restructure-reason-' + reason.code"
+              formControlName="selected"
+            />
+
+            <label
+              [for]="'restructure-reason-' + reason.code"
+              class="cursor-pointer text-sm font-medium text-gray-800"
+            >
+              {{ reason.name }}
+            </label>
+
+          </div>
+
+
+          <!-- ================================================= -->
+          <!-- OTHER REASON -->
+          <!-- ================================================= -->
+
+          @if (
+            reason.requireRemark &&
+            getSelectedControl(i).value
+          ) {
+
+            <div
+              class="mt-3 pl-8"
+            >
+
+              <input
+                type="text"
+                formControlName="otherReason"
+                maxlength="500"
+                placeholder="โปรดระบุรายละเอียด"
+                class="w-full rounded-md border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+
+
+              <!-- ============================================= -->
+              <!-- OTHER REASON VALIDATION -->
+              <!-- ============================================= -->
+
+              @if (
+                getOtherReasonControl(i).touched &&
+                getOtherReasonControl(i).invalid
+              ) {
+
+                <p
+                  class="mt-1 text-sm text-red-500"
+                >
+                  กรุณาระบุรายละเอียด
+                </p>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- SPACING -->
+        <!-- ================================================= -->
+
+        @if (
+          !$last
+        ) {
+
+          <div
+            class="h-4"
+          ></div>
+
+        }
+
+      }
+
+    </div>
+
+  </div>
+
+</div>
