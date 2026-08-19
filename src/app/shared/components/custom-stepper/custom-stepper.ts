@@ -20,6 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Step } from './step';
 import { ICON_MAP } from '@/shared/constants/icon-map';
 import { ZardButtonComponent } from '../button';
+import { ZardPopoverImports } from '../popover';
 
 
 export type HeaderStyle =
@@ -48,7 +49,8 @@ export interface StepChangeEvent {
 
   imports: [
     CommonModule,
-    ZardButtonComponent
+    ZardButtonComponent,
+    ZardPopoverImports
   ],
 
   templateUrl: './custom-stepper.html',
@@ -58,6 +60,27 @@ export interface StepChangeEvent {
 export class CustomStepper
   implements AfterContentInit, OnDestroy {
 
+  // ...existing fields...
+
+  // =========================================================
+  // Compact label mode (lg-and-below + >5 steps)
+  // =========================================================
+
+  isCompactMode = false;
+
+  private readonly compactBreakpoint = 1024; // Tailwind `lg`
+  private readonly compactStepThreshold = 5;
+
+  private updateCompactMode(): void {
+    this.isCompactMode =
+      window.innerWidth <= this.compactBreakpoint &&
+      this.stepsArray.length > this.compactStepThreshold;
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateCompactMode();
+  }
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -301,9 +324,8 @@ export class CustomStepper
 
   private updateStepsArray(): void {
 
-    this.stepsArray =
-      this.steps?.toArray() ?? [];
-
+    this.stepsArray = this.steps?.toArray() ?? [];
+    this.updateCompactMode();
   }
 
 
@@ -311,7 +333,7 @@ export class CustomStepper
 
     return (
       this.stepsArray[
-        this.currentStepIndex
+      this.currentStepIndex
       ] ?? null
     );
   }
@@ -477,7 +499,7 @@ export class CustomStepper
 
     const previousStep =
       this.stepsArray[
-        previousStepIndex
+      previousStepIndex
       ];
 
 
