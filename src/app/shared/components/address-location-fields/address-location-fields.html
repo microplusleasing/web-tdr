@@ -1,0 +1,167 @@
+<div
+  [formGroup]="addressGroup"
+  class="grid grid-cols-1 gap-4 md:grid-cols-2"
+>
+
+  <!-- ===================================================== -->
+  <!-- POST CODE / LOCATION SEARCH -->
+  <!-- ===================================================== -->
+
+  <div class="md:col-span-2">
+
+    <label
+      class="mb-2 block text-sm font-medium text-gray-800"
+    >
+      รหัสไปรษณีย์ / ค้นหาพื้นที่
+
+      <span class="ml-1 text-red-500">
+        *
+      </span>
+    </label>
+
+
+    <z-combobox
+      zWidth="full"
+
+      /*
+       * IMPORTANT:
+       *
+       * Do NOT use:
+       *
+       * zFilter="none"
+       *
+       * because that disables Zard's internal filtering.
+       *
+       * "contains" searches the option label.
+       */
+      zFilter="contains"
+
+      [options]="locationOptions"
+
+      formControlName="postalCodeLookup"
+
+      (zComboSelected)="onSelected($event)"
+    >
+
+      <!-- ================================================= -->
+      <!-- INPUT -->
+      <!-- ================================================= -->
+
+      <z-combobox-input
+        placeholder="พิมพ์รหัสไปรษณีย์ ตำบล อำเภอ หรือจังหวัด"
+        searchPlaceholder="ค้นหา..."
+      />
+
+
+      <!-- ================================================= -->
+      <!-- CONTENT -->
+      <!-- ================================================= -->
+
+      <z-combobox-content>
+
+        <!-- =============================================== -->
+        <!-- EMPTY -->
+        <!-- =============================================== -->
+
+        <z-combobox-empty>
+          ไม่พบข้อมูล
+        </z-combobox-empty>
+
+
+        <!-- =============================================== -->
+        <!-- LIST -->
+        <!-- =============================================== -->
+
+        <z-combobox-list>
+
+          @for (
+            option of locationOptions;
+            track option.value
+          ) {
+
+            <z-combobox-item
+              [zValue]="option.value"
+              [zLabel]="option.label"
+            >
+
+              {{ getDisplayLabel(option.value) }}
+
+            </z-combobox-item>
+
+          }
+
+        </z-combobox-list>
+
+      </z-combobox-content>
+
+    </z-combobox>
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- SUB DISTRICT -->
+  <!-- ===================================================== -->
+
+  <div>
+
+    <label
+      class="mb-2 block text-sm font-medium text-gray-800"
+    >
+      ตำบล / แขวง
+    </label>
+
+    <input
+      type="text"
+      z-input
+      formControlName="subDistrict"
+      readonly
+    />
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- DISTRICT -->
+  <!-- ===================================================== -->
+
+  <div>
+
+    <label
+      class="mb-2 block text-sm font-medium text-gray-800"
+    >
+      อำเภอ / เขต
+    </label>
+
+    <input
+      type="text"
+      z-input
+      formControlName="district"
+      readonly
+    />
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- PROVINCE -->
+  <!-- ===================================================== -->
+
+  <div>
+
+    <label
+      class="mb-2 block text-sm font-medium text-gray-800"
+    >
+      จังหวัด
+    </label>
+
+    <input
+      type="text"
+      z-input
+      formControlName="province"
+      readonly
+    />
+
+  </div>
+
+</div>

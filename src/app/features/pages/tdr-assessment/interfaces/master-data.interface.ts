@@ -67,6 +67,8 @@ export interface ILocationParameter {
 
   floodEffect: string | null;
 
+  label_text: string
+
 }
 
 // ============================================================

@@ -28,6 +28,7 @@ import {
   ILocationParameter,
   IMarriedStatusParameter,
 } from '../../interfaces/master-data.interface';
+import { AddressLocationFields } from "@/shared/components/address-location-fields/address-location-fields";
 
 
 @Component({
@@ -37,12 +38,10 @@ import {
 
   imports: [
     ReactiveFormsModule,
-
     ZardInputComponent,
-
     ZardSelectImports,
-
     ZardCheckboxComponent,
+    AddressLocationFields
   ],
 
   templateUrl: './customer-information-step.html',
@@ -92,6 +91,20 @@ export class CustomerInformationStep implements OnInit {
    */
   @Input()
   locations: ILocationParameter[] = [];
+
+  // =========================================================
+  // Address Group
+  // =========================================================
+
+  addressGroup(
+    addressName: string,
+  ): FormGroup {
+
+    return this.form.get(
+      addressName,
+    ) as FormGroup;
+
+  }
 
 
   // =========================================================

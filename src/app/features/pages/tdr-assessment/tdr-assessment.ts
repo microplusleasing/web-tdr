@@ -398,6 +398,8 @@ export class TdrAssessment implements OnInit {
 
     return this.fb.group({
 
+      postalCodeLookup: ['',Validators.required],
+
       houseNo: [
         '',
         Validators.required
