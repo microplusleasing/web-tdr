@@ -1,6 +1,6 @@
 <div
   [formGroup]="addressGroup"
-  class="grid grid-cols-1 gap-4 md:grid-cols-2"
+  class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-3"
 >
 
   <!-- ===================================================== -->
@@ -12,7 +12,7 @@
     <label
       class="mb-2 block text-sm font-medium text-gray-800"
     >
-      รหัสไปรษณีย์ / ค้นหาพื้นที่
+      ค้นหาพื้นที่จากรหัสไปรษณีย์
 
       <span class="ml-1 text-red-500">
         *
@@ -37,7 +37,7 @@
       <!-- ================================================= -->
 
       <z-combobox-input
-        placeholder="พิมพ์รหัสไปรษณีย์อย่างน้อย 5 หลัก"
+        placeholder="พิมพ์รหัสไปรษณีย์ 5 หลัก"
         searchPlaceholder="ค้นหารหัสไปรษณีย์..."
 
         (input)="onSearch($any($event.target).value)"
@@ -51,20 +51,38 @@
       <z-combobox-content>
 
         <!-- =============================================== -->
-        <!-- LESS THAN 5 CHARACTERS -->
+        <!-- LESS THAN 5 DIGITS -->
         <!-- =============================================== -->
 
         @if (
-          searchValue.length <
-          minimumSearchLength
+          searchValue.length > 0 &&
+          searchValue.length < minimumSearchLength
         ) {
 
           <z-combobox-empty>
 
-            กรุณาพิมพ์รหัสไปรษณีย์
-            อย่างน้อย
+            กรุณากรอกรหัสไปรษณีย์
             {{ minimumSearchLength }}
             หลัก
+
+          </z-combobox-empty>
+
+        }
+
+
+        <!-- =============================================== -->
+        <!-- INVALID FORMAT -->
+        <!-- =============================================== -->
+
+        @if (
+          searchValue.length > 0 &&
+          !/^\d+$/.test(searchValue)
+        ) {
+
+          <z-combobox-empty>
+
+            กรุณากรอกรหัสไปรษณีย์
+            เป็นตัวเลข 5 หลัก
 
           </z-combobox-empty>
 
@@ -76,13 +94,14 @@
         <!-- =============================================== -->
 
         @if (
-          searchValue.length >= minimumSearchLength &&
+          searchValue.length === minimumSearchLength &&
+          /^\d+$/.test(searchValue) &&
           locationOptions.length === 0
         ) {
 
           <z-combobox-empty>
 
-            ไม่พบรหัสไปรษณีย์
+            ไม่พบรหัสไปรษณีย์นี้ในข้อมูลระบบ
 
           </z-combobox-empty>
 
@@ -109,7 +128,7 @@
                 [zLabel]="option.label"
               >
 
-                {{ getDisplayLabel(option.value) }}
+                {{ option.label }}
 
               </z-combobox-item>
 
@@ -122,6 +141,21 @@
       </z-combobox-content>
 
     </z-combobox>
+
+
+    <!-- =================================================== -->
+    <!-- ERROR -->
+    <!-- =================================================== -->
+
+    @if (showLocationError) {
+
+      <p
+        class="mt-1 text-sm text-red-500"
+      >
+        {{ locationError }}
+      </p>
+
+    }
 
   </div>
 

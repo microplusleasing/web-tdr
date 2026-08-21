@@ -7,13 +7,16 @@ import {
 } from '@angular/core';
 
 import {
+  AbstractControl,
   FormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
 
 import { ZardInputComponent } from '@/shared/components/input';
 
-import { ZardComboboxImports } from '@/shared/components/combobox/combobox.imports';
+import {
+  ZardComboboxImports,
+} from '@/shared/components/combobox/combobox.imports';
 
 import type {
   ZardComboboxOption,
@@ -58,34 +61,16 @@ export class AddressLocationFields implements OnChanges {
   // =========================================================
 
   /**
-   * Minimum number of digits required before searching.
+   * User must enter at least 5 digits
+   * before searching the master data.
    */
   readonly minimumSearchLength = 5;
 
 
   /**
-   * Maximum number of results displayed in the combobox.
-   *
-   * We don't want to render thousands of records.
+   * Maximum number of results displayed.
    */
   readonly maximumResults = 50;
-
-
-  // =========================================================
-  // Filtered Options
-  // =========================================================
-
-  /**
-   * Options currently displayed by the combobox.
-   *
-   * IMPORTANT:
-   *
-   * This is NOT all 30,000 records.
-   *
-   * It only contains the records matching the
-   * postal-code search.
-   */
-  locationOptions: ZardComboboxOption[] = [];
 
 
   // =========================================================
@@ -93,6 +78,12 @@ export class AddressLocationFields implements OnChanges {
   // =========================================================
 
   searchValue = '';
+
+
+  /**
+   * Results displayed in the Zard Combobox.
+   */
+  locationOptions: ZardComboboxOption[] = [];
 
 
   // =========================================================
@@ -103,13 +94,9 @@ export class AddressLocationFields implements OnChanges {
 
     if (changes['locations']) {
 
-      /**
-       * Master data has been loaded.
-       *
-       * We intentionally do NOT put all 30,000 records
-       * into locationOptions.
-       */
       this.locationOptions = [];
+
+      this.searchValue = '';
 
     }
 
@@ -120,31 +107,53 @@ export class AddressLocationFields implements OnChanges {
   // Search
   // =========================================================
 
-  /**
-   * Search locations by POSTAL CODE ONLY.
-   *
-   * Example:
-   *
-   * 10260
-   *
-   * will search:
-   *
-   * item.postCode
-   *
-   * It will NOT search:
-   *
-   * - province
-   * - district
-   * - subDistrict
-   * - label_text
-   */
   onSearch(value: string): void {
 
     this.searchValue = value.trim();
 
 
     // -------------------------------------------------------
-    // Less than 5 digits
+    // Clear selected address when user starts changing
+    // the search value.
+    // -------------------------------------------------------
+
+    this.clearAddressIfSearchChanged();
+
+
+    // -------------------------------------------------------
+    // Empty
+    // -------------------------------------------------------
+
+    if (!this.searchValue) {
+
+      this.locationOptions = [];
+
+      this.setValidationError(null);
+
+      return;
+
+    }
+
+
+    // -------------------------------------------------------
+    // Validate format
+    // -------------------------------------------------------
+
+    if (!/^\d+$/.test(this.searchValue)) {
+
+      this.locationOptions = [];
+
+      this.setValidationError(
+        'กรุณากรอกรหัสไปรษณีย์เป็นตัวเลข 5 หลัก',
+      );
+
+      return;
+
+    }
+
+
+    // -------------------------------------------------------
+    // Minimum length
     // -------------------------------------------------------
 
     if (
@@ -154,16 +163,41 @@ export class AddressLocationFields implements OnChanges {
 
       this.locationOptions = [];
 
+      this.setValidationError(
+        'กรุณากรอกรหัสไปรษณีย์ 5 หลัก',
+      );
+
       return;
 
     }
 
 
     // -------------------------------------------------------
-    // Search POST CODE only
+    // Postal code must be exactly 5 digits
     // -------------------------------------------------------
 
-    const search = this.searchValue;
+    if (
+      this.searchValue.length >
+      this.minimumSearchLength
+    ) {
+
+      this.locationOptions = [];
+
+      this.setValidationError(
+        'กรุณากรอกรหัสไปรษณีย์ 5 หลัก',
+      );
+
+      return;
+
+    }
+
+
+    // -------------------------------------------------------
+    // Search POST CODE ONLY
+    // -------------------------------------------------------
+
+    const search =
+      this.searchValue;
 
 
     const results =
@@ -173,13 +207,37 @@ export class AddressLocationFields implements OnChanges {
           const postCode =
             item.postCode?.toString() ?? '';
 
-          return postCode.includes(search);
+          return postCode === search;
 
         })
         .slice(
           0,
-          this.maximumResults
+          this.maximumResults,
         );
+
+
+    // -------------------------------------------------------
+    // No match
+    // -------------------------------------------------------
+
+    if (results.length === 0) {
+
+      this.locationOptions = [];
+
+      this.setValidationError(
+        'ไม่พบรหัสไปรษณีย์นี้ในข้อมูลระบบ',
+      );
+
+      return;
+
+    }
+
+
+    // -------------------------------------------------------
+    // Valid
+    // -------------------------------------------------------
+
+    this.setValidationError(null);
 
 
     // -------------------------------------------------------
@@ -193,47 +251,22 @@ export class AddressLocationFields implements OnChanges {
           item.locationCode ?? '',
 
         /**
-         * The label shown internally to Zard.
+         * Internal Zard search label.
          *
-         * We can include the information needed
-         * by the option, but the visible template
-         * below will show our desired display text.
+         * We keep postal code and location information
+         * here, although our custom search is based
+         * ONLY on postalCode.
          */
         label: [
-          item.postCode,
-          item.label_text,
           item.subDistrict,
           item.district,
           item.province,
+          item.postCode,
         ]
           .filter(Boolean)
-          .join(' '),
+          .join(' / '),
 
       }));
-
-  }
-
-
-  // =========================================================
-  // Display Label
-  // =========================================================
-
-  /**
-   * Get the clean display text for a selected option.
-   */
-  getDisplayLabel(
-    locationCode: string,
-  ): string {
-
-    const location =
-      this.locations.find(
-        item =>
-          item.locationCode ===
-          locationCode,
-      );
-
-
-    return location?.label_text ?? '';
 
   }
 
@@ -256,16 +289,23 @@ export class AddressLocationFields implements OnChanges {
 
     if (!selected) {
 
+      this.setValidationError(
+        'ไม่พบข้อมูลพื้นที่ที่เลือก',
+      );
+
       return;
 
     }
 
 
     // -------------------------------------------------------
-    // Populate address fields
+    // Update address form
     // -------------------------------------------------------
 
     this.addressGroup.patchValue({
+
+      postalCodeLookup:
+        selected.locationCode,
 
       postalCode:
         selected.postCode,
@@ -280,6 +320,156 @@ export class AddressLocationFields implements OnChanges {
         selected.province,
 
     });
+
+
+    // -------------------------------------------------------
+    // Clear validation error
+    // -------------------------------------------------------
+
+    this.setValidationError(null);
+
+  }
+
+
+  // =========================================================
+  // Display Label
+  // =========================================================
+
+  getDisplayLabel(
+    locationCode: string,
+  ): string {
+
+    const location =
+      this.locations.find(
+        item =>
+          item.locationCode ===
+          locationCode,
+      );
+
+
+    if (!location) {
+
+      return '';
+
+    }
+
+
+    return [
+      location.subDistrict,
+      location.district,
+      location.province,
+      location.postCode,
+    ]
+      .filter(Boolean)
+      .join(' / ');
+
+  }
+
+
+  // =========================================================
+  // Validation
+  // =========================================================
+
+  private setValidationError(
+    message: string | null,
+  ): void {
+
+    const control =
+      this.addressGroup.get(
+        'postalCodeLookup',
+      );
+
+
+    if (!control) {
+
+      return;
+
+    }
+
+
+    if (message) {
+
+      control.setErrors({
+        ...control.errors,
+        locationInvalid: message,
+      });
+
+    } else {
+
+      const errors = {
+        ...control.errors,
+      };
+
+
+      delete errors['locationInvalid'];
+
+
+      control.setErrors(
+        Object.keys(errors).length
+          ? errors
+          : null,
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // Clear Address
+  // =========================================================
+
+  private clearAddressIfSearchChanged(): void {
+
+    this.addressGroup.patchValue({
+
+      postalCode: '',
+      subDistrict: '',
+      district: '',
+      province: '',
+
+    });
+
+  }
+
+
+  // =========================================================
+  // Form Helpers
+  // =========================================================
+
+  get postalCodeLookupControl(): AbstractControl | null {
+
+    return this.addressGroup.get(
+      'postalCodeLookup',
+    );
+
+  }
+
+
+  get locationError(): string | null {
+
+    return (
+      this.postalCodeLookupControl
+        ?.errors?.['locationInvalid'] ?? null
+    );
+
+  }
+
+
+  get showLocationError(): boolean {
+
+    const control =
+      this.postalCodeLookupControl;
+
+
+    if (!control) {
+
+      return false;
+
+    }
+
+
+    return !!control.errors?.['locationInvalid'];
 
   }
 
