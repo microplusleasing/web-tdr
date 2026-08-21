@@ -23,17 +23,6 @@
     <z-combobox
       zWidth="full"
 
-      /*
-       * IMPORTANT:
-       *
-       * Do NOT use:
-       *
-       * zFilter="none"
-       *
-       * because that disables Zard's internal filtering.
-       *
-       * "contains" searches the option label.
-       */
       zFilter="contains"
 
       [options]="locationOptions"
@@ -48,8 +37,10 @@
       <!-- ================================================= -->
 
       <z-combobox-input
-        placeholder="พิมพ์รหัสไปรษณีย์ ตำบล อำเภอ หรือจังหวัด"
-        searchPlaceholder="ค้นหา..."
+        placeholder="พิมพ์รหัสไปรษณีย์อย่างน้อย 5 หลัก"
+        searchPlaceholder="ค้นหารหัสไปรษณีย์..."
+
+        (input)="onSearch($any($event.target).value)"
       />
 
 
@@ -60,37 +51,73 @@
       <z-combobox-content>
 
         <!-- =============================================== -->
-        <!-- EMPTY -->
+        <!-- LESS THAN 5 CHARACTERS -->
         <!-- =============================================== -->
 
-        <z-combobox-empty>
-          ไม่พบข้อมูล
-        </z-combobox-empty>
+        @if (
+          searchValue.length <
+          minimumSearchLength
+        ) {
+
+          <z-combobox-empty>
+
+            กรุณาพิมพ์รหัสไปรษณีย์
+            อย่างน้อย
+            {{ minimumSearchLength }}
+            หลัก
+
+          </z-combobox-empty>
+
+        }
 
 
         <!-- =============================================== -->
-        <!-- LIST -->
+        <!-- NO RESULT -->
         <!-- =============================================== -->
 
-        <z-combobox-list>
+        @if (
+          searchValue.length >= minimumSearchLength &&
+          locationOptions.length === 0
+        ) {
 
-          @for (
-            option of locationOptions;
-            track option.value
-          ) {
+          <z-combobox-empty>
 
-            <z-combobox-item
-              [zValue]="option.value"
-              [zLabel]="option.label"
-            >
+            ไม่พบรหัสไปรษณีย์
 
-              {{ getDisplayLabel(option.value) }}
+          </z-combobox-empty>
 
-            </z-combobox-item>
+        }
 
-          }
 
-        </z-combobox-list>
+        <!-- =============================================== -->
+        <!-- RESULT LIST -->
+        <!-- =============================================== -->
+
+        @if (
+          locationOptions.length > 0
+        ) {
+
+          <z-combobox-list>
+
+            @for (
+              option of locationOptions;
+              track option.value
+            ) {
+
+              <z-combobox-item
+                [zValue]="option.value"
+                [zLabel]="option.label"
+              >
+
+                {{ getDisplayLabel(option.value) }}
+
+              </z-combobox-item>
+
+            }
+
+          </z-combobox-list>
+
+        }
 
       </z-combobox-content>
 
