@@ -1,118 +1,128 @@
 <div class="w-full space-y-4 mt-4">
-
-  <div class=text-center>
-    <span class="text-xl font-bold text-blue-800">
-      แบบฟอร์มพิจารณาปรับโครงสร้างหนี้
-    </span>
+  <div class="text-center">
+    <span class="text-xl font-bold text-blue-800">แบบฟอร์มพิจารณาปรับโครงสร้างหนี้</span>
   </div>
 
   <div>
     @if (errorMessage()) {
+      <app-data-load-error [errorMessage]="errorMessage() ?? 'Not found error.'" />
+    } @else if (isLoaded()) {
+      <app-custom-stepper
+        [(currentStepIndex)]="currentStepIndex"
+        [stepDefaultColor]="'#d1d5db'"
+        [stepValidColor]="'#374151'"
+        [stepInvalidColor]="'#374151'"
+        [stepCurrentColor]="'#000000'"
+        (stepIndexChange)="onStepChange($event)"
+      >
+        <!-- ===================================================== -->
+        <!-- Step 1: Customer (ข้อมูลลูกค้า)                           -->
+        <!-- ===================================================== -->
 
-    <app-data-load-error [errorMessage]="errorMessage() ?? 'Not found error.'" />
-
-    }
-    @else if (isLoaded()) {
-
-    <app-custom-stepper [(currentStepIndex)]="currentStepIndex" [stepDefaultColor]="'#d1d5db'"
-      [stepValidColor]="'#374151'" [stepInvalidColor]="'#374151'" [stepCurrentColor]="'#000000'"
-      (stepIndexChange)="onStepChange($event)">
-
-
-      <!-- ===================================================== -->
-      <!-- Step 1: Customer (ข้อมูลลูกค้า)                           -->
-      <!-- ===================================================== -->
-
-      <app-step id="customer" label="ข้อมูลลูกค้า" iconName="user" [showIcon]="true" [valid]="customerValid"
-        [visited]="customerVisited">
-
-        <!-- <ng-template> -->
-        <app-customer-information-step [form]="asFormGroup(step2Form.get('customerInformation'))"
-          [titleOptions]="masterData()?.parameters?.titles ?? []"
-          [locations]="masterData()?.parameters?.locations ?? []" 
-          [marriedStatusOptions]="masterData()?.parameters?.marriedStatus ?? []"
+        <app-step
+          id="customer"
+          label="ข้อมูลลูกค้า"
+          iconName="user"
+          [showIcon]="true"
+          [valid]="customerValid"
+          [visited]="customerVisited"
+        >
+          <!-- <ng-template> -->
+          <app-customer-information-step
+            [form]="asFormGroup(step2Form.get('customerInformation'))"
+            [titleOptions]="masterData()?.parameters?.titles ?? []"
+            [locations]="masterData()?.parameters?.locations ?? []"
+            [marriedStatusOptions]="masterData()?.parameters?.marriedStatus ?? []"
           />
-        <!-- </ng-template> -->
+          <!-- </ng-template> -->
+        </app-step>
 
-      </app-step>
+        <!-- ===================================================== -->
+        <!-- Step 2: Loan Information   (ข้อมูลผลิดภัณฑ์เช่าชื้อ)        -->
+        <!-- ===================================================== -->
 
+        <app-step
+          id="loan"
+          label="ข้อมูลผลิดภัณฑ์เช่าชื้อ"
+          iconName="identification"
+          [showIcon]="true"
+          [valid]="loanValid"
+          [visited]="loanVisited"
+        >
+          <app-product-information-step
+            [form]="step2Form"
+            [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()"
+          />
+        </app-step>
 
-      <!-- ===================================================== -->
-      <!-- Step 2: Loan Information   (ข้อมูลผลิดภัณฑ์เช่าชื้อ)        -->
-      <!-- ===================================================== -->
+        <!-- ===================================================== -->
+        <!-- Step 3: Financial Assessment	การประเมินรายได้ (รวมต่อเดือน) -->
+        <!-- ===================================================== -->
 
-      <app-step id="loan" label="ข้อมูลผลิดภัณฑ์เช่าชื้อ" iconName="identification" [showIcon]="true"
-        [valid]="loanValid" [visited]="loanVisited">
+        <app-step
+          id="financial"
+          label="การประเมินรายได้ (รวมต่อเดือน)"
+          iconName="briefcase"
+          [showIcon]="true"
+          [valid]="financialValid"
+          [visited]="financialVisited"
+        >
+          <app-estimate-income-step [form]="step3Form" [items]="step3Fields()" />
+        </app-step>
 
-        <app-product-information-step [form]="step2Form" [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()" />
+        <!-- ===================================================== -->
+        <!-- Step 4: Documents  การประเมินค่าใช้จ่าย (รวมต่อเดือน)        -->
+        <!-- ===================================================== -->
 
-      </app-step>
+        <app-step
+          id="document"
+          label="การประเมินค่าใช้จ่าย (รวมต่อเดือน)"
+          iconName="payment"
+          [showIcon]="true"
+          [valid]="documentValid"
+          [visited]="documentVisited"
+        >
+          <app-estimate-payment-step [form]="step4Form" [categories]="step4Fields()" />
+        </app-step>
 
+        <!-- ===================================================== -->
+        <!-- Step 5: Reason	เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้  -->
+        <!-- ===================================================== -->
 
-      <!-- ===================================================== -->
-      <!-- Step 3: Financial Assessment	การประเมินรายได้ (รวมต่อเดือน) -->
-      <!-- ===================================================== -->
+        <app-step
+          id="summary"
+          label="เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้"
+          iconName="paper"
+          [showIcon]="true"
+          [valid]="summaryValid"
+          [visited]="summaryVisited"
+        >
+          <app-restructure-reason-step [form]="step5Form" [reasons]="restructureReasons()" />
+        </app-step>
 
-      <app-step id="financial" label="การประเมินรายได้ (รวมต่อเดือน)" iconName="briefcase" [showIcon]="true"
-        [valid]="financialValid" [visited]="financialVisited">
-        <app-estimate-income-step [form]="step3Form" [items]="step3Fields()" />
-      </app-step>
+        <!-- ===================================================== -->
+        <!-- Step 6: เอกสารประกอบการพิจารณา  -->
+        <!-- ===================================================== -->
 
+        <app-step
+          id="attachment"
+          label="เอกสารประกอบการพิจารณา"
+          iconName="magnifying"
+          [showIcon]="true"
+          [valid]="summaryValid"
+          [visited]="summaryVisited"
+        >
+          <app-document-attach-step [form]="step6Form" [attachments]="attachmentTypesDisplay()" />
+        </app-step>
+      </app-custom-stepper>
+    } @else if (isLoading()) {
+      <div class="flex min-h-80 w-full items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+          <z-spinner class="size-8" />
 
-      <!-- ===================================================== -->
-      <!-- Step 4: Documents  การประเมินค่าใช้จ่าย (รวมต่อเดือน)        -->
-      <!-- ===================================================== -->
-
-      <app-step id="document" label="การประเมินค่าใช้จ่าย (รวมต่อเดือน)" iconName="payment" [showIcon]="true"
-        [valid]="documentValid" [visited]="documentVisited">
-
-        <app-estimate-payment-step [form]="step4Form" [categories]="step4Fields()" />
-
-      </app-step>
-
-
-      <!-- ===================================================== -->
-      <!-- Step 5: Reason	เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้  -->
-      <!-- ===================================================== -->
-
-      <app-step id="summary" label="เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้" iconName="paper" [showIcon]="true"
-        [valid]="summaryValid" [visited]="summaryVisited">
-
-        <app-restructure-reason-step [form]="step5Form" [reasons]="restructureReasons()" />
-
-      </app-step>
-
-      <!-- ===================================================== -->
-      <!-- Step 6: เอกสารประกอบการพิจารณา  -->
-      <!-- ===================================================== -->
-
-      <app-step id="summary" label="เอกสารประกอบการพิจารณา" iconName="magnifying" [showIcon]="true"
-        [valid]="summaryValid" [visited]="summaryVisited">
-
-        <app-document-attach-step [form]="step6Form" [attachments]="attachmentTypesDisplay()" />
-
-      </app-step>
-
-
-    </app-custom-stepper>
-
-    }
-    @else if (isLoading()) {
-    <div class="flex min-h-80 w-full items-center justify-center">
-
-      <div class="flex flex-col items-center gap-4">
-
-        <z-spinner class="size-8" />
-
-        <span class="text-sm text-gray-500">
-          กำลังโหลดข้อมูล...
-        </span>
-
+          <span class="text-sm text-gray-500">กำลังโหลดข้อมูล...</span>
+        </div>
       </div>
-
-    </div>
-
     }
   </div>
-
 </div>

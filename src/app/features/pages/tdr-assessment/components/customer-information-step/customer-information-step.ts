@@ -1,35 +1,19 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, SimpleChanges } from '@angular/core';
 
-import {
-  AbstractControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
-import {
-  ZardInputComponent
-} from '@/shared/components/input';
+import { ZardInputComponent } from '@/shared/components/input';
 
-import {
-  ZardSelectImports
-} from '@/shared/components/select';
+import { ZardSelectImports } from '@/shared/components/select';
 
-import {
-  ZardCheckboxComponent
-} from '@/shared/components/checkbox';
+import { ZardCheckboxComponent } from '@/shared/components/checkbox';
 
 import {
   ITitleParameter,
   ILocationParameter,
   IMarriedStatusParameter,
 } from '../../interfaces/master-data.interface';
-import { AddressLocationFields } from "@/shared/components/address-location-fields/address-location-fields";
-
+import { AddressLocationFields } from '@/shared/components/address-location-fields/address-location-fields';
 
 @Component({
   selector: 'app-customer-information-step',
@@ -41,7 +25,7 @@ import { AddressLocationFields } from "@/shared/components/address-location-fiel
     ZardInputComponent,
     ZardSelectImports,
     ZardCheckboxComponent,
-    AddressLocationFields
+    AddressLocationFields,
   ],
 
   templateUrl: './customer-information-step.html',
@@ -51,8 +35,6 @@ import { AddressLocationFields } from "@/shared/components/address-location-fiel
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerInformationStep implements OnInit {
-
-
   // =========================================================
   // Inputs
   // =========================================================
@@ -61,7 +43,6 @@ export class CustomerInformationStep implements OnInit {
     required: true,
   })
   form!: FormGroup;
-
 
   /**
    * Title master data from API
@@ -79,7 +60,6 @@ export class CustomerInformationStep implements OnInit {
   @Input()
   marriedStatusOptions: IMarriedStatusParameter[] = [];
 
-
   /**
    * Location master data from API
    *
@@ -96,188 +76,99 @@ export class CustomerInformationStep implements OnInit {
   // Address Group
   // =========================================================
 
-  addressGroup(
-    addressName: string,
-  ): FormGroup {
-
-    return this.form.get(
-      addressName,
-    ) as FormGroup;
-
+  addressGroup(addressName: string): FormGroup {
+    return this.form.get(addressName) as FormGroup;
   }
-
 
   // =========================================================
   // Lifecycle
   // =========================================================
 
   ngOnInit(): void {
-
     this.setupAddressCopyHandlers();
-
   }
-
 
   // =========================================================
   // Address Copy
   // =========================================================
 
   private setupAddressCopyHandlers(): void {
+    this.form.get('registeredAddressSameAsIdCard')?.valueChanges.subscribe((checked) => {
+      if (checked) {
+        this.copyAddress('idCardAddress', 'registeredAddress');
 
-    this.form
-      .get('registeredAddressSameAsIdCard')
-      ?.valueChanges
-      .subscribe((checked) => {
+        this.form.get('registeredAddress')?.disable();
+      } else {
+        this.form.get('registeredAddress')?.enable();
+      }
+    });
 
-        if (checked) {
+    this.form.get('currentAddressSameAsIdCard')?.valueChanges.subscribe((checked) => {
+      if (checked) {
+        this.copyAddress('idCardAddress', 'currentAddress');
 
-          this.copyAddress(
-            'idCardAddress',
-            'registeredAddress'
-          );
-
-          this.form
-            .get('registeredAddress')
-            ?.disable();
-
-        } else {
-
-          this.form
-            .get('registeredAddress')
-            ?.enable();
-
-        }
-
-      });
-
-
-    this.form
-      .get('currentAddressSameAsIdCard')
-      ?.valueChanges
-      .subscribe((checked) => {
-
-        if (checked) {
-
-          this.copyAddress(
-            'idCardAddress',
-            'currentAddress'
-          );
-
-          this.form
-            .get('currentAddress')
-            ?.disable();
-
-        } else {
-
-          this.form
-            .get('currentAddress')
-            ?.enable();
-
-        }
-
-      });
-
+        this.form.get('currentAddress')?.disable();
+      } else {
+        this.form.get('currentAddress')?.enable();
+      }
+    });
   }
 
+  private copyAddress(source: string, target: string): void {
+    const sourceGroup = this.form.get(source);
 
-  private copyAddress(
-    source: string,
-    target: string
-  ): void {
+    const targetGroup = this.form.get(target);
 
-    const sourceGroup =
-      this.form.get(source);
-
-    const targetGroup =
-      this.form.get(target);
-
-
-    if (
-      !sourceGroup ||
-      !targetGroup
-    ) {
-
+    if (!sourceGroup || !targetGroup) {
       return;
-
     }
 
-
-    targetGroup.patchValue(
-      sourceGroup.getRawValue()
-    );
-
+    targetGroup.patchValue(sourceGroup.getRawValue());
   }
-
 
   // =========================================================
   // Form Helpers
   // =========================================================
 
-  control(
-    path: string
-  ): AbstractControl | null {
-
+  control(path: string): AbstractControl | null {
     return this.form.get(path);
-
   }
 
+  isInvalid(controlName: string): boolean {
+    const control = this.form.get(controlName);
 
-  isInvalid(
-    controlName: string
-  ): boolean {
-
-    const control =
-      this.form.get(controlName);
-
-
-    return !!control &&
-      control.invalid &&
-      (
-        control.touched ||
-        control.dirty
-      );
-
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
 
+  isAddressInvalid(address: string, controlName: string): boolean {
+    const control = this.form.get(`${address}.${controlName}`);
 
-  isAddressInvalid(
-    address: string,
-    controlName: string
-  ): boolean {
-
-    const control =
-      this.form.get(
-        `${address}.${controlName}`
-      );
-
-
-    return !!control &&
-      control.invalid &&
-      (
-        control.touched ||
-        control.dirty
-      );
-
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
-
 
   // =========================================================
   // Title Helper
   // =========================================================
 
-  getTitleLabel(
-    titleId: string
-  ): string {
-
-    const title =
-      this.titleOptions.find(
-        item =>
-          item.titleId === titleId
-      );
-
+  getTitleLabel(titleId: string): string {
+    const title = this.titleOptions.find((item) => item.titleId === titleId);
 
     return title?.titleName ?? '';
-
   }
 
+  /* ... for check duplicate master ... */
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['titleOptions']) {
+  //     const ids = this.titleOptions.map(t => t.titleId);
+  //     if (new Set(ids).size !== ids.length) {
+  //       console.warn('Duplicate titleId found:', ids);
+  //     }
+  //   }
+  //   if (changes['marriedStatusOptions']) {
+  //     const codes = this.marriedStatusOptions.map(m => m.code);
+  //     if (new Set(codes).size !== codes.length) {
+  //       console.warn('Duplicate code found:', codes);
+  //     }
+  //   }
+  // }
 }
