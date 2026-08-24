@@ -335,18 +335,25 @@ export class TdrAssessment implements OnInit {
   private createProductInformationGroup(): FormGroup {
     return this.fb.group({
       brand: ['', Validators.required],
-
       model: ['', Validators.required],
-
       color: ['', Validators.required],
-
       registrationNo: ['', Validators.required],
 
-      engineNo: ['', Validators.required],
+      purchaseStatus: ['', Validators.required],
+      additionalInfo: [{ value: '', disabled: true }],
 
-      chassisNo: ['', Validators.required],
+      currentUserName: ['', Validators.required],
+      relationship: ['', Validators.required],
+      currentUserPhone: ['', Validators.required],
 
-      // Dynamic motorcycle photo controls
+      currentAddress: ['', Validators.required],
+      province: ['', Validators.required],
+      postalCode: ['', Validators.required],
+      district: [''],
+
+      currentCondition: ['', Validators.required],
+      currentMileage: ['', Validators.required],
+
       motorcyclePhotos: this.fb.array([]),
     });
   }
