@@ -1,58 +1,51 @@
-<form [formGroup]="form" class="w-full">
-  <section formGroupName="productInformation" class="w-full">
-    <!-- ===================================================== -->
-    <!-- Header -->
-    <!-- ===================================================== -->
+<div [formGroup]="form" class="w-full">
+  <!-- ===================================================== -->
+  <!-- Product Information -->
+  <!-- ===================================================== -->
 
-    <div class="mb-8 text-center">
-      <h2 class="text-xl font-bold tracking-tight text-primary">ข้อมูลรถจักรยานยนต์คันเช่าซื้อ</h2>
+  <div class="w-full rounded-2xl border border-gray-300 p-6 md:p-8">
+    <section formGroupName="productInformation" class="w-full">
+      <!-- Header -->
 
-      <p class="mt-2 text-sm text-muted-foreground">กรุณาตรวจสอบและกรอกข้อมูลรถจักรยานยนต์</p>
-    </div>
+      <div class="mb-6">
+        <h2 class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl">
+          ข้อมูลรถจักรยานยนต์คันเช่าซื้อ
+        </h2>
+        <p class="mt-1 text-sm text-muted-foreground text-center">กรุณากรอกข้อมูลรถจักรยานยนต์</p>
+      </div>
 
-    <!-- ===================================================== -->
-    <!-- SECTION 1 -->
-    <!-- ข้อมูลรถจักรยานยนต์ -->
-    <!-- ===================================================== -->
+      <!-- =================================================== -->
+      <!-- Product fields -->
+      <!-- =================================================== -->
 
-    <section class="space-y-6">
-      <div class="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
-        <!-- ------------------------------------------------- -->
+      <div class="grid w-full grid-cols-1 gap-5 md:grid-cols-2">
         <!-- Brand -->
-        <!-- ------------------------------------------------- -->
 
-        <div class="space-y-2">
-          <label for="brand" class="text-sm font-medium">
-            ยี่ห้อ
+        <div>
+          <label for="brand" class="mb-2 block text-sm font-medium">
+            ยี่ห้อรถจักรยานยนต์
             <span class="text-destructive">*</span>
           </label>
 
-          <z-select
+          <input
+            id="brand"
+            z-input
+            type="text"
             formControlName="brand"
-            [zLabel]="control('productInformation.brand')?.value || 'เลือกยี่ห้อ'"
+            placeholder="กรุณาระบุยี่ห้อ"
             class="w-full"
-          >
-            <z-select-item zValue="Honda">Honda</z-select-item>
-
-            <z-select-item zValue="Yamaha">Yamaha</z-select-item>
-
-            <z-select-item zValue="Suzuki">Suzuki</z-select-item>
-
-            <z-select-item zValue="Kawasaki">Kawasaki</z-select-item>
-          </z-select>
+          />
 
           @if (isInvalid('productInformation.brand')) {
-            <p class="text-xs text-destructive">กรุณาเลือกยี่ห้อ</p>
+            <p class="mt-1 text-sm text-destructive">กรุณาระบุยี่ห้อรถจักรยานยนต์</p>
           }
         </div>
 
-        <!-- ------------------------------------------------- -->
         <!-- Model -->
-        <!-- ------------------------------------------------- -->
 
-        <div class="space-y-2">
-          <label for="model" class="text-sm font-medium">
-            รุ่น
+        <div>
+          <label for="model" class="mb-2 block text-sm font-medium">
+            รุ่นรถจักรยานยนต์
             <span class="text-destructive">*</span>
           </label>
 
@@ -61,22 +54,20 @@
             z-input
             type="text"
             formControlName="model"
-            placeholder="รุ่น"
+            placeholder="กรุณาระบุรุ่น"
             class="w-full"
           />
 
           @if (isInvalid('productInformation.model')) {
-            <p class="text-xs text-destructive">กรุณาระบุรุ่น</p>
+            <p class="mt-1 text-sm text-destructive">กรุณาระบุรุ่นรถจักรยานยนต์</p>
           }
         </div>
 
-        <!-- ------------------------------------------------- -->
         <!-- Color -->
-        <!-- ------------------------------------------------- -->
 
-        <div class="space-y-2">
-          <label for="color" class="text-sm font-medium">
-            สี
+        <div>
+          <label for="color" class="mb-2 block text-sm font-medium">
+            สีรถจักรยานยนต์
             <span class="text-destructive">*</span>
           </label>
 
@@ -85,17 +76,15 @@
             z-input
             type="text"
             formControlName="color"
-            placeholder="สี"
+            placeholder="กรุณาระบุสี"
             class="w-full"
           />
         </div>
 
-        <!-- ------------------------------------------------- -->
         <!-- Registration -->
-        <!-- ------------------------------------------------- -->
 
-        <div class="space-y-2">
-          <label for="registrationNo" class="text-sm font-medium">
+        <div>
+          <label for="registrationNo" class="mb-2 block text-sm font-medium">
             เลขทะเบียน
             <span class="text-destructive">*</span>
           </label>
@@ -105,57 +94,26 @@
             z-input
             type="text"
             formControlName="registrationNo"
-            placeholder="เลขทะเบียน"
+            placeholder="กรุณาระบุเลขทะเบียน"
             class="w-full"
           />
         </div>
 
-        <!-- ------------------------------------------------- -->
-        <!-- Purchase status -->
-        <!-- ------------------------------------------------- -->
+        <!-- Purchase Status -->
 
-        <div class="space-y-2">
-          <label class="text-sm font-medium">
-            สถานะการใช้รถ
+        <div>
+          <label class="mb-2 block text-sm font-medium">
+            สถานะการเช่าซื้อ
             <span class="text-destructive">*</span>
           </label>
 
-          <z-select
-            formControlName="purchaseStatus"
-            [zLabel]="control('productInformation.purchaseStatus')?.value || 'เลือกสถานะการใช้รถ'"
-            class="w-full"
-          >
-            <z-select-item zValue="owner">ผู้เช่าซื้อใช้เอง</z-select-item>
-
-            <z-select-item zValue="other">ผู้อื่นใช้รถ</z-select-item>
-          </z-select>
+          <!-- Keep your existing Zard select here -->
         </div>
 
-        <!-- ------------------------------------------------- -->
-        <!-- Additional -->
-        <!-- ------------------------------------------------- -->
+        <!-- Current User -->
 
-        <div class="space-y-2">
-          <label for="additionalInfo" class="text-sm font-medium text-muted-foreground">
-            เพิ่มเติม
-          </label>
-
-          <input
-            id="additionalInfo"
-            z-input
-            type="text"
-            formControlName="additionalInfo"
-            placeholder="เพิ่มเติม"
-            class="w-full"
-          />
-        </div>
-
-        <!-- ------------------------------------------------- -->
-        <!-- Current user -->
-        <!-- ------------------------------------------------- -->
-
-        <div class="space-y-2">
-          <label for="currentUserName" class="text-sm font-medium">
+        <div>
+          <label for="currentUserName" class="mb-2 block text-sm font-medium">
             ชื่อผู้ใช้รถปัจจุบัน
             <span class="text-destructive">*</span>
           </label>
@@ -170,12 +128,10 @@
           />
         </div>
 
-        <!-- ------------------------------------------------- -->
         <!-- Relationship -->
-        <!-- ------------------------------------------------- -->
 
-        <div class="space-y-2">
-          <label for="relationship" class="text-sm font-medium">
+        <div>
+          <label for="relationship" class="mb-2 block text-sm font-medium">
             ความสัมพันธ์
             <span class="text-destructive">*</span>
           </label>
@@ -190,12 +146,10 @@
           />
         </div>
 
-        <!-- ------------------------------------------------- -->
         <!-- Phone -->
-        <!-- ------------------------------------------------- -->
 
-        <div class="space-y-2">
-          <label for="currentUserPhone" class="text-sm font-medium">
+        <div>
+          <label for="currentUserPhone" class="mb-2 block text-sm font-medium">
             เบอร์โทรผู้ใช้รถ
             <span class="text-destructive">*</span>
           </label>
@@ -203,316 +157,180 @@
           <input
             id="currentUserPhone"
             z-input
-            type="tel"
+            type="text"
             formControlName="currentUserPhone"
-            placeholder="เบอร์โทรผู้ใช้รถ"
+            placeholder="เบอร์โทรศัพท์"
             class="w-full"
           />
         </div>
       </div>
-    </section>
 
-    <!-- ===================================================== -->
-    <!-- Divider -->
-    <!-- ===================================================== -->
+      <!-- =================================================== -->
+      <!-- Current Condition -->
+      <!-- =================================================== -->
 
-    <div class="my-8 border-t border-primary/40"></div>
+      <section class="mt-8 border-t pt-6">
+        <h3 class="mb-4 text-base font-semibold text-blue-900">สถานะการใช้งานปัจจุบัน</h3>
 
-    <!-- ===================================================== -->
-    <!-- SECTION 2 -->
-    <!-- สถานที่ใช้รถปัจจุบัน -->
-    <!-- ===================================================== -->
+        <div class="space-y-5">
+          <div>
+            <label for="currentCondition" class="mb-2 block text-sm font-medium">
+              ที่อยู่ปัจจุบัน
+              <span class="text-destructive">*</span>
+            </label>
 
-    <section>
-      <div class="mb-5">
-        <h3 class="text-base font-semibold underline underline-offset-4">สถานที่ใช้รถปัจจุบัน</h3>
-      </div>
+            <textarea
+              id="currentCondition"
+              formControlName="currentCondition"
+              rows="4"
+              class="w-full rounded-md border px-3 py-2 text-sm"
+              placeholder="กรุณาระบุรายละเอียด"
+            ></textarea>
+          </div>
 
-      <div class="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
-        <!-- ------------------------------------------------- -->
-        <!-- Current address -->
-        <!-- ------------------------------------------------- -->
+          <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div>
+              <label for="currentMileage" class="mb-2 block text-sm font-medium">
+                เลขไมล์ปัจจุบัน
+                <span class="text-destructive">*</span>
+              </label>
 
-        <div class="space-y-2 md:col-span-2">
-          <label for="currentAddress" class="text-sm font-medium">
-            ที่อยู่รถ
-            <span class="text-destructive">*</span>
-          </label>
-
-          <textarea
-            id="currentAddress"
-            formControlName="currentAddress"
-            rows="4"
-            placeholder="กรอกที่อยู่รถ"
-            class="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none transition placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-          ></textarea>
-
-          @if (isInvalid('productInformation.currentAddress')) {
-            <p class="text-xs text-destructive">กรุณาระบุที่อยู่รถ</p>
-          }
-        </div>
-
-        <!-- ------------------------------------------------- -->
-        <!-- Province -->
-        <!-- ------------------------------------------------- -->
-
-        <div class="space-y-2">
-          <label for="province" class="text-sm font-medium">
-            จังหวัด
-            <span class="text-destructive">*</span>
-          </label>
-
-          <input
-            id="province"
-            z-input
-            type="text"
-            formControlName="province"
-            placeholder="จังหวัด"
-            class="w-full"
-          />
-        </div>
-
-        <!-- ------------------------------------------------- -->
-        <!-- Postal code -->
-        <!-- ------------------------------------------------- -->
-
-        <div class="space-y-2">
-          <label for="postalCode" class="text-sm font-medium">
-            รหัสไปรษณีย์
-            <span class="text-destructive">*</span>
-          </label>
-
-          <input
-            id="postalCode"
-            z-input
-            type="text"
-            inputmode="numeric"
-            formControlName="postalCode"
-            placeholder="รหัสไปรษณีย์"
-            class="w-full"
-          />
-        </div>
-
-        <!-- ------------------------------------------------- -->
-        <!-- District -->
-        <!-- ------------------------------------------------- -->
-
-        <div class="space-y-2">
-          <label for="district" class="text-sm font-medium">พิกัด (ถ้ามี)</label>
-
-          <input
-            id="district"
-            z-input
-            type="text"
-            formControlName="district"
-            placeholder="พิกัด"
-            class="w-full"
-          />
-        </div>
-
-        <!-- ------------------------------------------------- -->
-        <!-- Current condition -->
-        <!-- ------------------------------------------------- -->
-
-        <div class="space-y-2">
-          <label class="text-sm font-medium">
-            สภาพรถปัจจุบัน
-            <span class="text-destructive">*</span>
-          </label>
-
-          <z-select
-            formControlName="currentCondition"
-            [zLabel]="
-              control('productInformation.currentCondition')?.value || 'เลือกสภาพรถปัจจุบัน'
-            "
-            class="w-full"
-          >
-            <z-select-item zValue="normal">ใช้งานปกติ</z-select-item>
-
-            <z-select-item zValue="damaged">มีความเสียหาย</z-select-item>
-
-            <z-select-item zValue="repair">อยู่ระหว่างซ่อม</z-select-item>
-          </z-select>
-        </div>
-
-        <!-- ------------------------------------------------- -->
-        <!-- Mileage -->
-        <!-- ------------------------------------------------- -->
-
-        <div class="space-y-2">
-          <label for="currentMileage" class="text-sm font-medium">
-            เลขไมล์ปัจจุบัน
-            <span class="text-destructive">*</span>
-          </label>
-
-          <div class="relative">
-            <input
-              id="currentMileage"
-              z-input
-              type="number"
-              formControlName="currentMileage"
-              placeholder="เลขไมล์ปัจจุบัน"
-              class="w-full pr-20"
-            />
-
-            <span
-              class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground"
-            >
-              กิโลเมตร
-            </span>
+              <input
+                id="currentMileage"
+                z-input
+                type="text"
+                formControlName="currentMileage"
+                placeholder="เลขไมล์"
+                class="w-full"
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ===================================================== -->
-    <!-- Divider -->
-    <!-- ===================================================== -->
-
-    <div class="my-8 border-t border-primary/40"></div>
-
-    <!-- ===================================================== -->
-    <!-- SECTION 3 -->
-    <!-- Motorcycle photos -->
-    <!-- ===================================================== -->
-
-    <section>
-      <div class="mb-5">
-        <h3 class="text-base font-semibold">
-          แนบรูปถ่ายรถจักรยานยนต์
-          <span class="text-muted-foreground">(ถ้ามี)</span>
-        </h3>
-      </div>
+      </section>
 
       <!-- =================================================== -->
-      <!-- Desktop table -->
+      <!-- MOTORCYCLE PHOTOS -->
+      <!-- IMPORTANT HIERARCHY -->
+      <!-- productInformation -->
+      <!--   -> motorcyclePhotos -->
+      <!--      -> index -->
       <!-- =================================================== -->
 
-      <div class="overflow-hidden rounded-lg border border-border">
-        <div class="overflow-x-auto">
-          <table z-table zType="bordered" class="min-w-[720px]">
-            <thead>
-              <tr>
-                <th class="text-center">ประเภทรูป</th>
+      <section class="mt-8 border-t pt-6">
+        <div class="mb-5">
+          <h3 class="text-lg font-semibold text-blue-900">แนบรูปถ่ายรถจักรยานยนต์</h3>
 
-                <th class="text-center">ความสำคัญ</th>
+          <p class="mt-1 text-sm text-muted-foreground">กรุณาแนบไฟล์ตามรายการ</p>
+        </div>
 
-                <th class="text-center">อัปโหลดไฟล์</th>
+        <!-- THIS IS REQUIRED -->
 
-                <th class="text-center">ชื่อไฟล์</th>
+        <div formArrayName="motorcyclePhotos" class="overflow-hidden rounded-lg border">
+          <div class="divide-y">
+            @for (photoType of motorcyclePhotoTypes; track photoType.code; let i = $index) {
+              <!-- THIS IS REQUIRED -->
 
-                <th class="text-center">สถานะ</th>
-              </tr>
-            </thead>
+              <div
+                [formGroupName]="i"
+                class="grid grid-cols-1 gap-4 p-5 md:grid-cols-[1fr_2fr] md:items-center"
+              >
+                <!-- Type -->
 
-            <tbody>
-              @for (photoType of motorcyclePhotoTypes; track photoType.code; let i = $index) {
-                <tr [formGroupName]="i" formArrayName="motorcyclePhotos">
-                  <!-- Type -->
-
-                  <td class="text-center font-medium">
+                <div>
+                  <p class="font-medium">
                     {{ photoType.name }}
-                  </td>
+                  </p>
 
-                  <!-- Required -->
+                  <p class="mt-1 text-xs text-muted-foreground">
+                    {{ photoType.code }}
+                  </p>
+                </div>
 
-                  <!-- <td class="text-center">
-                    @if (photoType.required) {
-                      <span class="font-medium">จำเป็น</span>
-                    } @else {
-                      <span class="text-muted-foreground">ไม่บังคับ</span>
-                    }
-                  </td> -->
+                <!-- Upload -->
 
-                  <!-- Upload -->
-
-                  <td class="text-center">
-                    <label class="inline-flex cursor-pointer items-center">
+                <div>
+                  @if (!getPhotoFile(i)) {
+                    <label
+                      class="flex min-h-24 cursor-pointer items-center justify-center rounded-md border-2 border-dashed p-4 text-center transition hover:bg-muted/50"
+                    >
                       <input
                         type="file"
                         class="hidden"
-                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                        accept="image/jpeg,image/png"
                         (change)="selectPhoto(i, $event)"
                       />
 
-                      <button
-                        type="button"
-                        z-button
-                        zType="outline"
-                        zSize="sm"
-                        class="pointer-events-none"
-                      >
-                        อัปโหลด
-                      </button>
+                      <div>
+                        <div class="text-sm font-medium">คลิกเพื่อแนบรูป</div>
+
+                        <div class="mt-1 text-xs text-muted-foreground">รองรับ JPG, JPEG, PNG</div>
+                      </div>
                     </label>
-                  </td>
+                  }
 
-                  <!-- File name -->
+                  @if (getPhotoFile(i)) {
+                    <div class="flex items-center justify-between gap-4 rounded-md border p-4">
+                      <div class="min-w-0">
+                        <p class="truncate text-sm font-medium">
+                          {{ getPhotoFile(i)?.name }}
+                        </p>
 
-                  <td class="max-w-48">
-                    @if (getPhotoFileName(i)) {
-                      <span
-                        class="block truncate text-center text-sm"
-                        [title]="getPhotoFileName(i)"
-                      >
-                        {{ getPhotoFileName(i) }}
-                      </span>
-                    } @else {
-                      <span class="block text-center text-sm text-muted-foreground">-</span>
-                    }
-                  </td>
+                        <p class="mt-1 text-xs text-muted-foreground">แนบไฟล์แล้ว</p>
+                      </div>
 
-                  <!-- Status -->
+                      <div class="flex shrink-0 gap-2">
+                        <label
+                          class="cursor-pointer rounded-md border px-3 py-2 text-sm hover:bg-muted"
+                        >
+                          <input
+                            type="file"
+                            class="hidden"
+                            accept="image/jpeg,image/png"
+                            (change)="selectPhoto(i, $event)"
+                          />
 
-                  <td class="text-center">
-                    @if (hasPhoto(i)) {
-                      <span class="font-medium text-green-600">อัปโหลดแล้ว</span>
-                    } @else {
-                      <span class="font-medium text-orange-500">กำลังรอ...</span>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
+                          เปลี่ยนรูป
+                        </label>
 
-      <!-- =================================================== -->
-      <!-- Upload information -->
-      <!-- =================================================== -->
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          (click)="previewPhoto(i)"
+                        >
+                          ดูรูป
+                        </button>
 
-      <div
-        class="mt-2 flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
-      >
-        <span>อัปโหลดไฟล์ได้สูงสุด 10 MB</span>
+                        <button
+                          type="button"
+                          class="rounded-md border px-3 py-2 text-sm text-destructive hover:bg-muted"
+                          (click)="removePhoto(i)"
+                        >
+                          ลบ
+                        </button>
+                      </div>
+                    </div>
+                  }
 
-        <span>สามารถอัปโหลดไฟล์: PDF, JPG, JPEG, PNG</span>
-      </div>
-
-      <!-- =================================================== -->
-      <!-- Note -->
-      <!-- =================================================== -->
-
-      <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
-        <div class="flex gap-3">
-          <div
-            class="flex size-7 shrink-0 items-center justify-center rounded-full bg-red-500 text-lg font-bold text-white"
-          >
-            !
-          </div>
-
-          <div class="text-sm">
-            <p class="font-semibold text-foreground">หมายเหตุ</p>
-
-            <p class="mt-1 leading-6">
-              เมื่อได้รับการอนุมัติ ลูกค้าต้องเข้าทำสัญญาใหม่ที่สาขาของบริษัท
-
-              <span class="font-semibold text-red-600">พร้อมนำรถจักรยานยนต์เข้ามาด้วยเท่านั้น</span>
-            </p>
+                  @if (
+                    motorcyclePhotos.at(i).get('file')?.invalid &&
+                    motorcyclePhotos.at(i).get('file')?.touched
+                  ) {
+                    <p class="mt-2 text-sm text-destructive">กรุณาแนบรูปภาพ</p>
+                  }
+                </div>
+              </div>
+            }
           </div>
         </div>
-      </div>
+
+        <!-- Upload note -->
+
+        <div class="mt-4 rounded-md border border-blue-200 bg-blue-50 p-4 text-sm">
+          <p class="font-medium text-blue-900">หมายเหตุ</p>
+
+          <p class="mt-1 text-blue-800">รองรับไฟล์ JPG, JPEG และ PNG ขนาดไม่เกิน 10 MB</p>
+        </div>
+      </section>
     </section>
-  </section>
-</form>
+  </div>
+</div>

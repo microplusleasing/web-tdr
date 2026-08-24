@@ -1,0 +1,33 @@
+<div class="w-full">
+  <!-- ===================================================== -->
+  <!-- Image -->
+  <!-- ===================================================== -->
+
+  <div
+    class="flex w-full items-center justify-center overflow-hidden rounded-lg border bg-muted/30 p-2 sm:p-4"
+  >
+    <img
+      [src]="previewUrl"
+      [alt]="data.photoTypeName"
+      class="max-h-[60vh] w-auto max-w-full rounded-md object-contain"
+    />
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- File information -->
+  <!-- ===================================================== -->
+
+  <div class="mt-4 flex flex-col gap-1 text-sm">
+    <span class="font-medium">
+      {{ data.photoTypeName }}
+    </span>
+
+    <span class="break-all text-muted-foreground">
+      {{ data.file.name }}
+    </span>
+
+    <span class="text-xs text-muted-foreground">
+      {{ formatFileSize(data.file.size) }}
+    </span>
+  </div>
+</div>
