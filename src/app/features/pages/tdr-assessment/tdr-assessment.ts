@@ -34,11 +34,13 @@ import {
   IMasterDataResponse,
   IMotorcyclePhotoTypeDisplay,
   IRestructureReasonDisplay,
+  ILocationParameter,
 } from './interfaces/master-data.interface';
 
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
 
 import { DataLoadError } from '@/shared/components/data-load-error/data-load-error';
+import { AddressForm } from './interfaces/location-lookup-form-field.interface';
 
 @Component({
   selector: 'app-tdr-assessment',
@@ -263,25 +265,24 @@ export class TdrAssessment implements OnInit {
   // Address Group
   // =========================================================
 
-  private createAddressGroup(): FormGroup {
+  private createAddressGroup(): FormGroup<AddressForm> {
     return this.fb.group({
-      postalCodeLookup: ['', Validators.required],
+      // postalCodeLookup: this.fb.control<ILocationParameter | null>(null, Validators.required),
+      postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
 
-      houseNo: ['', Validators.required],
+      houseNo: this.fb.nonNullable.control('', Validators.required),
+      alley: this.fb.nonNullable.control('', Validators.required),
+      soi: this.fb.nonNullable.control('', Validators.required),
+      road: this.fb.nonNullable.control('', Validators.required),
 
-      alley: ['', Validators.required],
+      postalCode: this.fb.nonNullable.control('', [
+        Validators.required,
+        Validators.pattern(/^\d{5}$/),
+      ]),
 
-      soi: ['', Validators.required],
-
-      road: ['', Validators.required],
-
-      postalCode: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
-
-      subDistrict: [''],
-
-      district: [''],
-
-      province: [''],
+      subDistrict: this.fb.nonNullable.control(''),
+      district: this.fb.nonNullable.control(''),
+      province: this.fb.nonNullable.control(''),
     });
   }
 

@@ -93,6 +93,21 @@ export class CustomerInformationStep implements OnInit {
   // =========================================================
 
   private setupAddressCopyHandlers(): void {
+    this.form.get('idCardAddress.subDistrict')?.disable();
+    this.form.get('idCardAddress.district')?.disable();
+    this.form.get('idCardAddress.province')?.disable();
+    this.form.get('idCardAddress.postalCode')?.disable();
+
+    this.form.get('registeredAddress.subDistrict')?.disable();
+    this.form.get('registeredAddress.district')?.disable();
+    this.form.get('registeredAddress.province')?.disable();
+    this.form.get('registeredAddress.postalCode')?.disable();
+
+    this.form.get('currentAddress.subDistrict')?.disable();
+    this.form.get('currentAddress.district')?.disable();
+    this.form.get('currentAddress.province')?.disable();
+    this.form.get('currentAddress.postalCode')?.disable();
+
     this.form.get('registeredAddressSameAsIdCard')?.valueChanges.subscribe((checked) => {
       if (checked) {
         this.copyAddress('idCardAddress', 'registeredAddress');

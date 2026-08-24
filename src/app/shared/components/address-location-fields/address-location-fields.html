@@ -1,37 +1,22 @@
-<div
-  [formGroup]="addressGroup"
-  class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-3"
->
-
+<div [formGroup]="addressGroup" class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-3">
   <!-- ===================================================== -->
   <!-- POST CODE / LOCATION SEARCH -->
   <!-- ===================================================== -->
 
   <div class="md:col-span-2">
-
-    <label
-      class="mb-2 block text-sm font-medium text-gray-800"
-    >
+    <label class="mb-2 block text-sm font-medium text-gray-800">
       ค้นหาพื้นที่จากรหัสไปรษณีย์
 
-      <span class="ml-1 text-red-500">
-        *
-      </span>
+      <span class="ml-1 text-red-500">*</span>
     </label>
-
 
     <z-combobox
       zWidth="full"
-
       zFilter="contains"
-
       [options]="locationOptions"
-
       formControlName="postalCodeLookup"
-
       (zComboSelected)="onSelected($event)"
     >
-
       <!-- ================================================= -->
       <!-- INPUT -->
       <!-- ================================================= -->
@@ -39,55 +24,33 @@
       <z-combobox-input
         placeholder="พิมพ์รหัสไปรษณีย์ 5 หลัก"
         searchPlaceholder="ค้นหารหัสไปรษณีย์..."
-
         (input)="onSearch($any($event.target).value)"
       />
-
 
       <!-- ================================================= -->
       <!-- CONTENT -->
       <!-- ================================================= -->
 
       <z-combobox-content>
-
         <!-- =============================================== -->
         <!-- LESS THAN 5 DIGITS -->
         <!-- =============================================== -->
 
-        @if (
-          searchValue.length > 0 &&
-          searchValue.length < minimumSearchLength
-        ) {
-
+        @if (searchValue.length > 0 && searchValue.length < minimumSearchLength) {
           <z-combobox-empty>
-
             กรุณากรอกรหัสไปรษณีย์
             {{ minimumSearchLength }}
             หลัก
-
           </z-combobox-empty>
-
         }
-
 
         <!-- =============================================== -->
         <!-- INVALID FORMAT -->
         <!-- =============================================== -->
 
-        @if (
-          searchValue.length > 0 &&
-          !/^\d+$/.test(searchValue)
-        ) {
-
-          <z-combobox-empty>
-
-            กรุณากรอกรหัสไปรษณีย์
-            เป็นตัวเลข 5 หลัก
-
-          </z-combobox-empty>
-
+        @if (searchValue.length > 0 && !/^\d+$/.test(searchValue)) {
+          <z-combobox-empty>กรุณากรอกรหัสไปรษณีย์ เป็นตัวเลข 5 หลัก</z-combobox-empty>
         }
-
 
         <!-- =============================================== -->
         <!-- NO RESULT -->
@@ -98,131 +61,73 @@
           /^\d+$/.test(searchValue) &&
           locationOptions.length === 0
         ) {
-
-          <z-combobox-empty>
-
-            ไม่พบรหัสไปรษณีย์นี้ในข้อมูลระบบ
-
-          </z-combobox-empty>
-
+          <z-combobox-empty>ไม่พบรหัสไปรษณีย์นี้ในข้อมูลระบบ</z-combobox-empty>
         }
-
 
         <!-- =============================================== -->
         <!-- RESULT LIST -->
         <!-- =============================================== -->
 
-        @if (
-          locationOptions.length > 0
-        ) {
-
+        @if (locationOptions.length > 0) {
           <z-combobox-list>
-
-            @for (
-              option of locationOptions;
-              track option.value
-            ) {
-
-              <z-combobox-item
-                [zValue]="option.value"
-                [zLabel]="option.label"
-              >
-
+            @for (option of locationOptions; track option.value) {
+              <z-combobox-item [zValue]="option.value" [zLabel]="option.label">
                 {{ option.label }}
-
               </z-combobox-item>
-
             }
-
           </z-combobox-list>
-
         }
-
       </z-combobox-content>
-
     </z-combobox>
-
 
     <!-- =================================================== -->
     <!-- ERROR -->
     <!-- =================================================== -->
 
     @if (showLocationError) {
-
-      <p
-        class="mt-1 text-sm text-red-500"
-      >
+      <p class="mt-1 text-sm text-red-500">
         {{ locationError }}
       </p>
-
     }
-
   </div>
-
 
   <!-- ===================================================== -->
   <!-- SUB DISTRICT -->
   <!-- ===================================================== -->
 
   <div>
+    <label class="mb-2 block text-sm font-medium text-gray-800">ตำบล / แขวง</label>
 
-    <label
-      class="mb-2 block text-sm font-medium text-gray-800"
-    >
-      ตำบล / แขวง
-    </label>
-
-    <input
-      type="text"
-      z-input
-      formControlName="subDistrict"
-      readonly
-    />
-
+    <input type="text" z-input formControlName="subDistrict" readonly />
   </div>
-
 
   <!-- ===================================================== -->
   <!-- DISTRICT -->
   <!-- ===================================================== -->
 
   <div>
+    <label class="mb-2 block text-sm font-medium text-gray-800">อำเภอ / เขต</label>
 
-    <label
-      class="mb-2 block text-sm font-medium text-gray-800"
-    >
-      อำเภอ / เขต
-    </label>
-
-    <input
-      type="text"
-      z-input
-      formControlName="district"
-      readonly
-    />
-
+    <input type="text" z-input formControlName="district" readonly />
   </div>
-
 
   <!-- ===================================================== -->
   <!-- PROVINCE -->
   <!-- ===================================================== -->
 
   <div>
+    <label class="mb-2 block text-sm font-medium text-gray-800">จังหวัด</label>
 
-    <label
-      class="mb-2 block text-sm font-medium text-gray-800"
-    >
-      จังหวัด
-    </label>
-
-    <input
-      type="text"
-      z-input
-      formControlName="province"
-      readonly
-    />
-
+    <input type="text" z-input formControlName="province" readonly />
   </div>
 
+  <!-- ===================================================== -->
+  <!-- POSTAL CODE -->
+  <!-- ===================================================== -->
+
+  <div>
+    <label class="mb-2 block text-sm font-medium text-gray-800">รหัสไปรษณีย์</label>
+
+    <input type="text" z-input formControlName="postalCode" readonly />
+  </div>
 </div>
