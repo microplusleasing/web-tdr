@@ -1,3 +1,4 @@
+<div class="mb-4 rounded bg-gray-100 p-3 text-sm">customerValid: {{ customerValid() }}</div>
 <div class="w-full space-y-4 mt-4">
   <div class="text-center">
     <span class="text-xl font-bold text-blue-800">แบบฟอร์มพิจารณาปรับโครงสร้างหนี้</span>
@@ -24,8 +25,8 @@
           label="ข้อมูลลูกค้า"
           iconName="user"
           [showIcon]="true"
-          [valid]="customerValid"
-          [visited]="customerVisited"
+          [valid]="customerValid()"
+          [visited]="customerVisited()"
         >
           <!-- <ng-template> -->
           <app-customer-information-step
@@ -36,7 +37,6 @@
           />
           <!-- </ng-template> -->
         </app-step>
-
         <!-- ===================================================== -->
         <!-- Step 2: Loan Information   (ข้อมูลผลิดภัณฑ์เช่าชื้อ)        -->
         <!-- ===================================================== -->
@@ -46,8 +46,8 @@
           label="ข้อมูลผลิดภัณฑ์เช่าชื้อ"
           iconName="identification"
           [showIcon]="true"
-          [valid]="loanValid"
-          [visited]="loanVisited"
+          [valid]="loanValid()"
+          [visited]="loanVisited()"
         >
           <app-product-information-step
             [form]="step2Form"
@@ -64,8 +64,8 @@
           label="การประเมินรายได้ (รวมต่อเดือน)"
           iconName="briefcase"
           [showIcon]="true"
-          [valid]="financialValid"
-          [visited]="financialVisited"
+          [valid]="financialValid()"
+          [visited]="financialVisited()"
         >
           <app-estimate-income-step [form]="step3Form" [items]="step3Fields()" />
         </app-step>
@@ -79,8 +79,8 @@
           label="การประเมินค่าใช้จ่าย (รวมต่อเดือน)"
           iconName="payment"
           [showIcon]="true"
-          [valid]="documentValid"
-          [visited]="documentVisited"
+          [valid]="documentValid()"
+          [visited]="documentVisited()"
         >
           <app-estimate-payment-step [form]="step4Form" [categories]="step4Fields()" />
         </app-step>
@@ -94,8 +94,8 @@
           label="เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้"
           iconName="paper"
           [showIcon]="true"
-          [valid]="summaryValid"
-          [visited]="summaryVisited"
+          [valid]="summaryValid()"
+          [visited]="summaryVisited()"
         >
           <app-restructure-reason-step [form]="step5Form" [reasons]="restructureReasons()" />
         </app-step>
@@ -109,8 +109,8 @@
           label="เอกสารประกอบการพิจารณา"
           iconName="magnifying"
           [showIcon]="true"
-          [valid]="summaryValid"
-          [visited]="summaryVisited"
+          [valid]="summaryValid()"
+          [visited]="summaryVisited()"
         >
           <app-document-attach-step [form]="step6Form" [attachments]="attachmentTypesDisplay()" />
         </app-step>

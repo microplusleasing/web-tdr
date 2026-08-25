@@ -1,18 +1,12 @@
-import {
-  Component,
-  TemplateRef,
-  ViewChild,
-  input
-} from '@angular/core';
+import { Component, TemplateRef, ViewChild, input } from '@angular/core';
 
 @Component({
   selector: 'app-step',
   standalone: true,
   templateUrl: './step.html',
-  styleUrl: './step.css'
+  styleUrl: './step.css',
 })
 export class Step {
-
   // Unique identifier for the step
   id = input.required<string>();
 

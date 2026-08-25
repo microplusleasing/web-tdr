@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 
 import {
   AbstractControl,
@@ -8,6 +8,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CustomerInformationStep } from './components/customer-information-step/customer-information-step';
 
@@ -40,7 +42,10 @@ import {
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
 
 import { DataLoadError } from '@/shared/components/data-load-error/data-load-error';
-import { AddressForm } from './interfaces/location-lookup-form-field.interface';
+import {
+  AddressForm,
+  WorkplaceAddressForm,
+} from './interfaces/location-lookup-form-field.interface';
 
 @Component({
   selector: 'app-tdr-assessment',
@@ -78,6 +83,8 @@ export class TdrAssessment implements OnInit {
   private readonly tdrAssessmentService = inject(TdrAssessmentService);
 
   private readonly LOADING_DELAY = 300;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   // =========================================================
   // Main Form
@@ -125,31 +132,54 @@ export class TdrAssessment implements OnInit {
   // Step states
   // =========================================================
 
-  customerValid = true;
-  customerVisited = true;
+  // =========================================================
+  // Step 1
+  // =========================================================
 
-  loanValid = true;
-  loanVisited = true;
+  customerValid = signal(false);
+  customerVisited = signal(false);
 
-  financialValid = true;
-  financialVisited = true;
+  // =========================================================
+  // Step 2
+  // =========================================================
 
-  documentValid = true;
-  documentVisited = true;
+  loanValid = signal(false);
+  loanVisited = signal(false);
 
-  summaryValid = true;
-  summaryVisited = true;
+  // =========================================================
+  // Step 3
+  // =========================================================
+
+  financialValid = signal(false);
+  financialVisited = signal(false);
+
+  // =========================================================
+  // Step 4
+  // =========================================================
+
+  documentValid = signal(false);
+  documentVisited = signal(false);
+
+  // =========================================================
+  // Step 5
+  // =========================================================
+
+  summaryValid = signal(false);
+  summaryVisited = signal(false);
 
   // =========================================================
   // Lifecycle
   // =========================================================
 
   ngOnInit(): void {
-    // IMPORTANT:
-    // Build the form before loading API data.
-
+    // 1. Build the form first
     this.buildForm();
 
+    // 2. Setup anything that depends on the form
+    this.setupAddressCopyHandlers();
+    this.setupStepValidityTracking();
+
+    // 3. Load API/master data
     this.loadMasterData();
   }
 
@@ -280,9 +310,9 @@ export class TdrAssessment implements OnInit {
         Validators.pattern(/^\d{5}$/),
       ]),
 
-      subDistrict: this.fb.nonNullable.control(''),
-      district: this.fb.nonNullable.control(''),
-      province: this.fb.nonNullable.control(''),
+      subDistrict: this.fb.nonNullable.control('', Validators.required),
+      district: this.fb.nonNullable.control('', Validators.required),
+      province: this.fb.nonNullable.control('', Validators.required),
     });
   }
 
@@ -290,27 +320,31 @@ export class TdrAssessment implements OnInit {
   // Workplace Address Group
   // =========================================================
 
-  private createWorkplaceAddressGroup(): FormGroup {
+  private createWorkplaceAddressGroup(): FormGroup<WorkplaceAddressForm> {
     return this.fb.group({
-      houseNo: ['', Validators.required],
+      postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
 
-      alley: ['', Validators.required],
+      houseNo: this.fb.nonNullable.control('', Validators.required),
+      alley: this.fb.nonNullable.control('', Validators.required),
+      soi: this.fb.nonNullable.control('', Validators.required),
+      road: this.fb.nonNullable.control('', Validators.required),
 
-      soi: ['', Validators.required],
+      postalCode: this.fb.nonNullable.control('', [
+        Validators.required,
+        Validators.pattern(/^\d{5}$/),
+      ]),
 
-      road: ['', Validators.required],
+      subDistrict: this.fb.nonNullable.control('', Validators.required),
+      district: this.fb.nonNullable.control('', Validators.required),
+      province: this.fb.nonNullable.control('', Validators.required),
 
-      postalCode: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+      workplacePhone: this.fb.nonNullable.control('', [
+        Validators.required,
+        Validators.pattern('^[0-9]{9,10}$'),
+        // Validators.pattern(/^0\d{9}$/),
+      ]),
 
-      subDistrict: [''],
-
-      district: [''],
-
-      province: [''],
-
-      workplacePhone: ['', [Validators.required, Validators.pattern(/^0\d{9}$/)]],
-
-      workplaceDescription: ['', Validators.required],
+      workplaceDescription: this.fb.nonNullable.control('', Validators.required),
     });
   }
 
@@ -322,7 +356,8 @@ export class TdrAssessment implements OnInit {
     return this.fb.group({
       name: ['', required ? Validators.required : []],
 
-      phone: ['', required ? [Validators.required, Validators.pattern(/^0\d{9}$/)] : []],
+      // phone: ['', required ? [Validators.required, Validators.pattern(/^0\d{9}$/)] : []],
+      phone: ['', required ? [Validators.required, Validators.pattern('^[0-9]{9,10}$')] : []],
 
       relationship: ['', required ? Validators.required : []],
     });
@@ -630,6 +665,41 @@ export class TdrAssessment implements OnInit {
   }
 
   // =========================================================
+  // Tracks Forms
+  // =========================================================
+  private trackFormValidity(controlName: string, validitySignal: WritableSignal<boolean>): void {
+    const control = this.step2Form.get(controlName);
+
+    if (!control) {
+      console.warn(`Cannot find form control: ${controlName}`);
+
+      return;
+    }
+
+    // Initial value
+    validitySignal.set(control.valid);
+
+    // Future changes
+    control.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      validitySignal.set(control.valid);
+    });
+  }
+
+  private setupStepValidityTracking(): void {
+    this.trackFormValidity('customerInformation', this.customerValid);
+    this.trackFormValidity('productInformation', this.loanValid);
+    this.trackFormValidity('financialInformation', this.financialValid);
+    this.trackFormValidity('documentInformation', this.documentValid);
+  }
+
+  // =========================================================
+  // Tracks State
+  // =========================================================
+  onCustomerValidChange(valid: boolean): void {
+    this.customerValid.set(valid);
+  }
+
+  // =========================================================
   // Build Dynamic Motorcycle Photo Forms
   // =========================================================
 
@@ -706,27 +776,27 @@ export class TdrAssessment implements OnInit {
 
     switch (event.currentStepIndex) {
       case 0:
-        this.customerVisited = true;
+        this.customerVisited.set(true);
 
         break;
 
       case 1:
-        this.loanVisited = true;
+        this.loanVisited.set(true);
 
         break;
 
       case 2:
-        this.financialVisited = true;
+        this.financialVisited.set(true);
 
         break;
 
       case 3:
-        this.documentVisited = true;
+        this.documentVisited.set(true);
 
         break;
 
       case 4:
-        this.summaryVisited = true;
+        this.summaryVisited.set(true);
 
         break;
     }

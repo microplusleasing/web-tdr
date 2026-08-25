@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
@@ -7,6 +15,8 @@ import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectImports } from '@/shared/components/select';
 
 import { ZardCheckboxComponent } from '@/shared/components/checkbox';
+
+import { ZardTextareaComponent } from '@/shared/components/textarea/textarea.component';
 
 import {
   ITitleParameter,
@@ -26,6 +36,7 @@ import { AddressLocationFields } from '@/shared/components/address-location-fiel
     ZardSelectImports,
     ZardCheckboxComponent,
     AddressLocationFields,
+    ZardTextareaComponent,
   ],
 
   templateUrl: './customer-information-step.html',
@@ -39,26 +50,23 @@ export class CustomerInformationStep implements OnInit {
   // Inputs
   // =========================================================
 
-  @Input({
-    required: true,
-  })
-  form!: FormGroup;
+  @Input({ required: true }) form!: FormGroup;
+
+  @Output() validChange = new EventEmitter<boolean>();
 
   /**
    * Title master data from API
    *
    * response.parameters.title
    */
-  @Input()
-  titleOptions: ITitleParameter[] = [];
+  @Input() titleOptions: ITitleParameter[] = [];
 
   /**
    * Married Status master data from API
    *
    * response.parameters.title
    */
-  @Input()
-  marriedStatusOptions: IMarriedStatusParameter[] = [];
+  @Input() marriedStatusOptions: IMarriedStatusParameter[] = [];
 
   /**
    * Location master data from API
@@ -69,8 +77,7 @@ export class CustomerInformationStep implements OnInit {
    * when postcode / district / province lookup
    * is implemented later.
    */
-  @Input()
-  locations: ILocationParameter[] = [];
+  @Input() locations: ILocationParameter[] = [];
 
   // =========================================================
   // Address Group
@@ -86,6 +93,14 @@ export class CustomerInformationStep implements OnInit {
 
   ngOnInit(): void {
     this.setupAddressCopyHandlers();
+
+    // Initial state
+    this.validChange.emit(this.form.valid);
+
+    // Update whenever user changes the form
+    this.form.statusChanges.subscribe(() => {
+      this.validChange.emit(this.form.valid);
+    });
   }
 
   // =========================================================
@@ -107,6 +122,27 @@ export class CustomerInformationStep implements OnInit {
     this.form.get('currentAddress.district')?.disable();
     this.form.get('currentAddress.province')?.disable();
     this.form.get('currentAddress.postalCode')?.disable();
+
+    this.form.get('workplaceAddress.subDistrict')?.disable();
+    this.form.get('workplaceAddress.district')?.disable();
+    this.form.get('workplaceAddress.province')?.disable();
+    this.form.get('workplaceAddress.postalCode')?.disable();
+
+    this.form.get('contractNo')?.valueChanges.subscribe((value) => {
+      // console.log(`hp_no value is : ${value}`);
+      Object.keys(this.form.controls).forEach((fieldName) => {
+        const control = this.form.get(fieldName);
+
+        console.log(fieldName, {
+          value: control?.value,
+          valid: control?.valid,
+          status: control?.status,
+          errors: control?.errors,
+        });
+      });
+
+      console.log('FORM VALID:', this.form.valid);
+    });
 
     this.form.get('registeredAddressSameAsIdCard')?.valueChanges.subscribe((checked) => {
       if (checked) {

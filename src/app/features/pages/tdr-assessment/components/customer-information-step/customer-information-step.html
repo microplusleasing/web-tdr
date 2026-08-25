@@ -167,6 +167,9 @@
             </label>
 
             <input type="text" z-input formControlName="houseNo" placeholder="ระบุบ้านเลขที่" />
+            @if (isInvalid('idCardAddress')) {
+              <p class="mt-1 text-sm text-red-500">กรุณากรอกบ้านเลขที่</p>
+            }
           </div>
 
           <!-- Alley / Soi / Road -->
@@ -440,68 +443,126 @@
           <!-- Workplace Address -->
 
           <div formGroupName="workplaceAddress" class="space-y-5">
-            <h4 class="text-base font-semibold text-gray-800">ที่อยู่สถานที่ทำงาน</h4>
-
             <div>
-              <label class="mb-2 block text-sm font-medium text-gray-800">บ้านเลขที่</label>
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                บ้านเลขที่
 
-              <input type="text" z-input formControlName="houseNo" />
+                <span class="ml-1 text-red-500">*</span>
+              </label>
+
+              <input type="text" z-input formControlName="houseNo" placeholder="ระบุบ้านเลขที่" />
+
+              @if (isInvalid('workplaceAddress.houseNo')) {
+                <p class="mt-1 text-sm text-red-500">กรุณาระบุบ้านเลขที่</p>
+              }
             </div>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <!-- หมู่ / ซอย -->
               <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">หมู่ / ซอย</label>
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  หมู่ / ซอย
 
-                <input type="text" z-input formControlName="alley" />
+                  <span class="ml-1 text-red-500">*</span>
+                </label>
+
+                <input type="text" z-input formControlName="alley" placeholder="ระบุหมู่ / ซอย" />
+
+                @if (isInvalid('workplaceAddress.alley')) {
+                  <p class="mt-1 text-sm text-red-500">กรุณาระบุหมู่ / ซอย</p>
+                }
               </div>
 
+              <!-- ซอย -->
               <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">ซอย</label>
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  ซอย
 
-                <input type="text" z-input formControlName="soi" />
+                  <span class="ml-1 text-red-500">*</span>
+                </label>
+
+                <input type="text" z-input formControlName="soi" placeholder="ระบุซอย" />
+
+                @if (isInvalid('workplaceAddress.soi')) {
+                  <p class="mt-1 text-sm text-red-500">กรุณาระบุซอย</p>
+                }
               </div>
 
+              <!-- ถนน -->
               <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">ถนน</label>
+                <label class="mb-2 block text-sm font-medium text-gray-800">
+                  ถนน
 
-                <input type="text" z-input formControlName="road" />
+                  <span class="ml-1 text-red-500">*</span>
+                </label>
+
+                <input type="text" z-input formControlName="road" placeholder="ระบุถนน" />
+
+                @if (isInvalid('workplaceAddress.road')) {
+                  <p class="mt-1 text-sm text-red-500">กรุณาระบุถนน</p>
+                }
               </div>
             </div>
 
-            <div>
-              <label class="mb-2 block text-sm font-medium text-gray-800">รหัสไปรษณีย์</label>
+            <!-- Location field component -->
+            <!-- ใช้สำหรับจัด format data ให้เข้ากับ master ของ database (oracle) -->
+
+            <app-address-location-fields
+              [addressGroup]="addressGroup('workplaceAddress')"
+              [locations]="locations"
+            />
+
+            <!-- Workplace information / Workplace description -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-12"></div>
+
+            <div class="md:col-span-12">
+              <!-- Workplace information -->
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                เบอร์โทรศัพท์สถานที่ทำงาน
+
+                <span class="ml-1 text-red-500">*</span>
+              </label>
 
               <input
                 type="text"
                 z-input
-                maxlength="5"
-                inputmode="numeric"
-                formControlName="postalCode"
+                maxlength="10"
+                inputmode="tel"
+                formControlName="workplacePhone"
+                placeholder="ระบุเบอร์โทรศัพท์สถานที่ทำงาน"
+                class="w-full"
               />
+
+              @if (isInvalid('workplaceAddress.workplacePhone')) {
+                <p class="mt-1 text-sm text-red-500">
+                  @if (control('workplaceAddress.workplacePhone')?.hasError('required')) {
+                    กรุณาระบุเบอร์โทรศัพท์สถานที่ทำงาน
+                  } @else {
+                    กรุณาระบุเบอร์โทรศัพท์สถานที่ทำงานให้ถูกต้อง
+                  }
+                </p>
+              }
             </div>
 
-            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">
-                  เบอร์โทรศัพท์สถานที่ทำงาน
-                </label>
+            <!-- Workplace description -->
 
-                <input
-                  type="text"
-                  z-input
-                  maxlength="10"
-                  inputmode="tel"
-                  formControlName="workplacePhone"
-                />
-              </div>
+            <div class="w-full">
+              <label class="mb-2 block text-sm font-medium text-gray-800">
+                รายละเอียดสถานที่ทำงาน
 
-              <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">
-                  รายละเอียดสถานที่ทำงาน
-                </label>
+                <span class="ml-1 text-red-500">*</span>
+              </label>
 
-                <input type="text" z-input formControlName="workplaceDescription" />
-              </div>
+              <textarea
+                z-textarea
+                formControlName="workplaceDescription"
+                placeholder="ระบุรายละเอียดสถานที่ทำงาน"
+                class="w-full min-h-32"
+              ></textarea>
+
+              @if (isInvalid('workplaceAddress.workplaceDescription')) {
+                <p class="mt-1 text-sm text-red-500">กรุณาระบุรายละเอียดสถานที่ทำงาน</p>
+              }
             </div>
           </div>
         </div>
@@ -514,23 +575,79 @@
       <div class="border-t border-gray-200 pt-6">
         <h3 class="mb-5 text-lg font-semibold text-gray-900">บุคคลอ้างอิง 1</h3>
 
-        <div formGroupName="reference1" class="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">ชื่อ-นามสกุล</label>
+        <div formGroupName="reference1" class="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <!-- NAME -->
+          <div class="md:col-span-5">
+            <label class="mb-2 block text-sm font-medium text-gray-800" for="reference1Name">
+              ชื่อ-นามสกุล
 
-            <input type="text" z-input formControlName="name" />
+              <span class="ml-1 text-red-500">*</span>
+            </label>
+
+            <input
+              id="reference1Name"
+              type="text"
+              z-input
+              formControlName="name"
+              placeholder="ระบุชื่อ-นามสกุล"
+            />
+
+            @if (isInvalid('reference1.name')) {
+              <p class="mt-1 text-sm text-red-500">กรุณาระบุชื่อ-นามสกุล</p>
+            }
           </div>
 
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">เบอร์โทรศัพท์</label>
+          <!-- PHONE -->
+          <div class="md:col-span-4">
+            <label class="mb-2 block text-sm font-medium text-gray-800" for="reference1Phone">
+              เบอร์โทรศัพท์
 
-            <input type="text" z-input maxlength="10" formControlName="phone" />
+              <span class="ml-1 text-red-500">*</span>
+            </label>
+
+            <input
+              id="reference1Phone"
+              type="text"
+              z-input
+              maxlength="10"
+              inputmode="numeric"
+              formControlName="phone"
+              placeholder="ระบุเบอร์โทรศัพท์"
+            />
+
+            @if (isInvalid('reference1.phone')) {
+              <p class="mt-1 text-sm text-red-500">
+                @if (control('reference1.phone')?.hasError('required')) {
+                  กรุณาระบุเบอร์โทรศัพท์
+                } @else {
+                  กรุณาระบุเบอร์โทรศัพท์ให้ถูกต้อง
+                }
+              </p>
+            }
           </div>
 
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">ความสัมพันธ์</label>
+          <!-- RELATIONSHIP -->
+          <div class="md:col-span-3">
+            <label
+              class="mb-2 block text-sm font-medium text-gray-800"
+              for="reference1Relationship"
+            >
+              ความสัมพันธ์
 
-            <input type="text" z-input formControlName="relationship" />
+              <span class="ml-1 text-red-500">*</span>
+            </label>
+
+            <input
+              id="reference1Relationship"
+              type="text"
+              z-input
+              formControlName="relationship"
+              placeholder="ระบุความสัมพันธ์"
+            />
+
+            @if (isInvalid('reference1.relationship')) {
+              <p class="mt-1 text-sm text-red-500">กรุณาระบุความสัมพันธ์</p>
+            }
           </div>
         </div>
       </div>
@@ -542,23 +659,79 @@
       <div class="border-t border-gray-200 pt-6">
         <h3 class="mb-5 text-lg font-semibold text-gray-900">บุคคลอ้างอิง 2</h3>
 
-        <div formGroupName="reference2" class="grid grid-cols-1 gap-5 md:grid-cols-3">
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">ชื่อ-นามสกุล</label>
+        <div formGroupName="reference2" class="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <!-- NAME -->
+          <div class="md:col-span-5">
+            <label class="mb-2 block text-sm font-medium text-gray-800" for="reference2Name">
+              ชื่อ-นามสกุล
 
-            <input type="text" z-input formControlName="name" />
+              <!-- <span class="ml-1 text-red-500">*</span> -->
+            </label>
+
+            <input
+              id="reference2Name"
+              type="text"
+              z-input
+              formControlName="name"
+              placeholder="ระบุชื่อ-นามสกุล"
+            />
+
+            @if (isInvalid('reference2.name')) {
+              <p class="mt-1 text-sm text-red-500">กรุณาระบุชื่อ-นามสกุล</p>
+            }
           </div>
 
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">เบอร์โทรศัพท์</label>
+          <!-- PHONE -->
+          <div class="md:col-span-4">
+            <label class="mb-2 block text-sm font-medium text-gray-800" for="reference2Phone">
+              เบอร์โทรศัพท์
 
-            <input type="text" z-input maxlength="10" formControlName="phone" />
+              <!-- <span class="ml-1 text-red-500">*</span> -->
+            </label>
+
+            <input
+              id="reference2Phone"
+              type="text"
+              z-input
+              maxlength="10"
+              inputmode="numeric"
+              formControlName="phone"
+              placeholder="ระบุเบอร์โทรศัพท์"
+            />
+
+            @if (isInvalid('reference2.phone')) {
+              <p class="mt-1 text-sm text-red-500">
+                @if (control('reference2.phone')?.hasError('required')) {
+                  กรุณาระบุเบอร์โทรศัพท์
+                } @else {
+                  กรุณาระบุเบอร์โทรศัพท์ให้ถูกต้อง
+                }
+              </p>
+            }
           </div>
 
-          <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">ความสัมพันธ์</label>
+          <!-- RELATIONSHIP -->
+          <div class="md:col-span-3">
+            <label
+              class="mb-2 block text-sm font-medium text-gray-800"
+              for="reference2Relationship"
+            >
+              ความสัมพันธ์
 
-            <input type="text" z-input formControlName="relationship" />
+              <!-- <span class="ml-1 text-red-500">*</span> -->
+            </label>
+
+            <input
+              id="reference2Relationship"
+              type="text"
+              z-input
+              formControlName="relationship"
+              placeholder="ระบุความสัมพันธ์"
+            />
+
+            @if (isInvalid('reference2.relationship')) {
+              <p class="mt-1 text-sm text-red-500">กรุณาระบุความสัมพันธ์</p>
+            }
           </div>
         </div>
       </div>

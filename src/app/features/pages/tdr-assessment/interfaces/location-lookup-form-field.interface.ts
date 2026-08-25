@@ -13,3 +13,8 @@ export interface AddressForm {
   district: FormControl<string>;
   province: FormControl<string>;
 }
+
+export interface WorkplaceAddressForm extends AddressForm {
+  workplacePhone: FormControl<string>;
+  workplaceDescription: FormControl<string>;
+}
