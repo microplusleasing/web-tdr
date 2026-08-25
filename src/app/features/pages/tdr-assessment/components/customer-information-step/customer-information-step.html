@@ -167,7 +167,7 @@
             </label>
 
             <input type="text" z-input formControlName="houseNo" placeholder="ระบุบ้านเลขที่" />
-            @if (isInvalid('idCardAddress')) {
+            @if (isInvalid('idCardAddress.houseNo')) {
               <p class="mt-1 text-sm text-red-500">กรุณากรอกบ้านเลขที่</p>
             }
           </div>
@@ -176,31 +176,19 @@
 
           <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <label class="mb-2 block text-sm font-medium text-gray-800">
-                หมู่ / ซอย
-
-                <span class="ml-1 text-red-500">*</span>
-              </label>
+              <label class="mb-2 block text-sm font-medium text-gray-800">หมู่ / ซอย</label>
 
               <input type="text" z-input formControlName="alley" />
             </div>
 
             <div>
-              <label class="mb-2 block text-sm font-medium text-gray-800">
-                ซอย
-
-                <span class="ml-1 text-red-500">*</span>
-              </label>
+              <label class="mb-2 block text-sm font-medium text-gray-800">ซอย</label>
 
               <input type="text" z-input formControlName="soi" />
             </div>
 
             <div>
-              <label class="mb-2 block text-sm font-medium text-gray-800">
-                ถนน
-
-                <span class="ml-1 text-red-500">*</span>
-              </label>
+              <label class="mb-2 block text-sm font-medium text-gray-800">ถนน</label>
 
               <input type="text" z-input formControlName="road" />
             </div>
@@ -236,9 +224,15 @@
 
         <div formGroupName="registeredAddress" class="space-y-5">
           <div>
-            <label class="mb-2 block text-sm font-medium text-gray-800">บ้านเลขที่</label>
+            <label class="mb-2 block text-sm font-medium text-gray-800">
+              บ้านเลขที่
+              <span class="ml-1 text-red-500">*</span>
+            </label>
 
             <input type="text" z-input formControlName="houseNo" />
+            @if (isInvalid('registeredAddress.houseNo')) {
+              <p class="mt-1 text-sm text-red-500">กรุณากรอกบ้านเลขที่</p>
+            }
           </div>
 
           <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -342,8 +336,17 @@
               maxlength="10"
               inputmode="tel"
               formControlName="phoneNo"
-              placeholder="0XXXXXXXXX"
+              placeholder="กรอกเบอร์โทรศัพท์"
             />
+            @if (isInvalid('phoneNo')) {
+              <p class="mt-1 text-sm text-red-500">
+                @if (control('phoneNo')?.hasError('required')) {
+                  กรุณาระบุเบอร์โทรศัพท์
+                } @else {
+                  กรุณาระบุเบอร์โทรศัพท์ให้ถูกต้อง
+                }
+              </p>
+            }
           </div>
 
           <!-- Marital -->
@@ -369,11 +372,12 @@
           <div>
             <label class="mb-2 block text-sm font-medium text-gray-800">
               จำนวนบุตร
-
               <span class="ml-1 text-red-500">*</span>
             </label>
-
             <input type="number" z-input min="0" formControlName="numberOfChildren" />
+            @if (isInvalid('numberOfChildren')) {
+              <p class="mt-1 text-sm text-red-500">กรุณากรอกจำนวนบุตร</p>
+            }
           </div>
 
           <!-- Dependents -->
@@ -381,11 +385,12 @@
           <div>
             <label class="mb-2 block text-sm font-medium text-gray-800">
               จำนวนผู้ที่อยู่ในอุปการะ
-
               <span class="ml-1 text-red-500">*</span>
             </label>
-
             <input type="number" z-input min="0" formControlName="dependents" />
+            @if (isInvalid('dependents')) {
+              <p class="mt-1 text-sm text-red-500">กรุณากรอกจำนวนผู้ที่อยู่ในอุปการะ</p>
+            }
           </div>
         </div>
       </div>
@@ -407,6 +412,9 @@
               </label>
 
               <input type="text" z-input formControlName="occupation" />
+              @if (isInvalid('occupation')) {
+                <p class="mt-1 text-sm text-red-500">กรุณากรอกอาชีพ</p>
+              }
             </div>
 
             <div>
@@ -417,6 +425,9 @@
               </label>
 
               <input type="text" z-input formControlName="position" />
+              @if (isInvalid('position')) {
+                <p class="mt-1 text-sm text-red-500">กรุณากรอกตำแหน่ง</p>
+              }
             </div>
           </div>
 
@@ -428,6 +439,9 @@
             </label>
 
             <input type="text" z-input formControlName="jobDescription" />
+            @if (isInvalid('jobDescription')) {
+              <p class="mt-1 text-sm text-red-500">กรุณากรอกลักษณะงาน</p>
+            }
           </div>
 
           <div>
@@ -438,6 +452,9 @@
             </label>
 
             <input type="text" z-input formControlName="workplaceName" />
+            @if (isInvalid('workplaceName')) {
+              <p class="mt-1 text-sm text-red-500">กรุณากรอกชื่อสถานที่ทำงาน</p>
+            }
           </div>
 
           <!-- Workplace Address -->
@@ -460,47 +477,23 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
               <!-- หมู่ / ซอย -->
               <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">
-                  หมู่ / ซอย
-
-                  <span class="ml-1 text-red-500">*</span>
-                </label>
+                <label class="mb-2 block text-sm font-medium text-gray-800">หมู่ / ซอย</label>
 
                 <input type="text" z-input formControlName="alley" placeholder="ระบุหมู่ / ซอย" />
-
-                @if (isInvalid('workplaceAddress.alley')) {
-                  <p class="mt-1 text-sm text-red-500">กรุณาระบุหมู่ / ซอย</p>
-                }
               </div>
 
               <!-- ซอย -->
               <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">
-                  ซอย
-
-                  <span class="ml-1 text-red-500">*</span>
-                </label>
+                <label class="mb-2 block text-sm font-medium text-gray-800">ซอย</label>
 
                 <input type="text" z-input formControlName="soi" placeholder="ระบุซอย" />
-
-                @if (isInvalid('workplaceAddress.soi')) {
-                  <p class="mt-1 text-sm text-red-500">กรุณาระบุซอย</p>
-                }
               </div>
 
               <!-- ถนน -->
               <div>
-                <label class="mb-2 block text-sm font-medium text-gray-800">
-                  ถนน
-
-                  <span class="ml-1 text-red-500">*</span>
-                </label>
+                <label class="mb-2 block text-sm font-medium text-gray-800">ถนน</label>
 
                 <input type="text" z-input formControlName="road" placeholder="ระบุถนน" />
-
-                @if (isInvalid('workplaceAddress.road')) {
-                  <p class="mt-1 text-sm text-red-500">กรุณาระบุถนน</p>
-                }
               </div>
             </div>
 

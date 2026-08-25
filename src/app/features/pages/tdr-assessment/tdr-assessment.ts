@@ -259,9 +259,9 @@ export class TdrAssessment implements OnInit {
 
       maritalStatus: ['', Validators.required],
 
-      numberOfChildren: [0, [Validators.required, Validators.min(0)]],
+      numberOfChildren: [null, [Validators.required, Validators.min(0)]],
 
-      dependents: [0, [Validators.required, Validators.min(0)]],
+      dependents: [null, [Validators.required, Validators.min(0)]],
 
       // -----------------------------------------------------
       // Employment
@@ -301,9 +301,9 @@ export class TdrAssessment implements OnInit {
       postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
 
       houseNo: this.fb.nonNullable.control('', Validators.required),
-      alley: this.fb.nonNullable.control('', Validators.required),
-      soi: this.fb.nonNullable.control('', Validators.required),
-      road: this.fb.nonNullable.control('', Validators.required),
+      alley: this.fb.nonNullable.control(''),
+      soi: this.fb.nonNullable.control(''),
+      road: this.fb.nonNullable.control(''),
 
       postalCode: this.fb.nonNullable.control('', [
         Validators.required,
@@ -325,9 +325,9 @@ export class TdrAssessment implements OnInit {
       postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
 
       houseNo: this.fb.nonNullable.control('', Validators.required),
-      alley: this.fb.nonNullable.control('', Validators.required),
-      soi: this.fb.nonNullable.control('', Validators.required),
-      road: this.fb.nonNullable.control('', Validators.required),
+      alley: this.fb.nonNullable.control(''),
+      soi: this.fb.nonNullable.control(''),
+      road: this.fb.nonNullable.control(''),
 
       postalCode: this.fb.nonNullable.control('', [
         Validators.required,
