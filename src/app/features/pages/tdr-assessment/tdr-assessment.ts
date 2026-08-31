@@ -37,6 +37,7 @@ import {
   IMotorcyclePhotoTypeDisplay,
   IRestructureReasonDisplay,
   ILocationParameter,
+  IVehicleUserTypeDisplay,
 } from './interfaces/master-data.interface';
 
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
@@ -109,6 +110,8 @@ export class TdrAssessment implements OnInit {
   masterData = signal<IMasterDataResponse | null>(null);
 
   motorcyclePhotoTypesDisplay = signal<IMotorcyclePhotoTypeDisplay[]>([]);
+
+  vehicleUserTypesDisplay = signal<IVehicleUserTypeDisplay[]>([]);
 
   step3Fields = signal<IAssessmentItemDisplay[]>([]);
 
@@ -219,7 +222,7 @@ export class TdrAssessment implements OnInit {
       // Customer information
       // -----------------------------------------------------
 
-      contractNo: ['', Validators.required],
+      contractNo: ['', [Validators.required, Validators.pattern(/^\d{15}$/)]],
 
       title: ['', Validators.required],
 
@@ -374,17 +377,17 @@ export class TdrAssessment implements OnInit {
       color: ['', Validators.required],
       registrationNo: ['', Validators.required],
 
-      purchaseStatus: ['', Validators.required],
+      vehicleUserType: ['', Validators.required],
       additionalInfo: [{ value: '', disabled: true }],
 
       currentUserName: ['', Validators.required],
       relationship: ['', Validators.required],
       currentUserPhone: ['', Validators.required],
 
-      currentAddress: ['', Validators.required],
-      province: ['', Validators.required],
-      postalCode: ['', Validators.required],
-      district: [''],
+      // currentAddress: ['', Validators.required],
+      // province: ['', Validators.required],
+      // postalCode: ['', Validators.required],
+      // district: [''],
 
       currentCondition: ['', Validators.required],
       currentMileage: ['', Validators.required],
@@ -574,6 +577,14 @@ export class TdrAssessment implements OnInit {
         this.motorcyclePhotoTypesDisplay.set(photoTypes);
 
         // -------------------------------------------------
+        // Vehicle User Types
+        // -------------------------------------------------
+
+        const vehicleUserTypes = response.display?.vehicleUserTypes ?? [];
+
+        this.vehicleUserTypesDisplay.set(vehicleUserTypes);
+
+        // -------------------------------------------------
         // Create dynamic photo controls
         // -------------------------------------------------
 
@@ -695,9 +706,9 @@ export class TdrAssessment implements OnInit {
   // =========================================================
   // Tracks State
   // =========================================================
-  onCustomerValidChange(valid: boolean): void {
-    this.customerValid.set(valid);
-  }
+  // onCustomerValidChange(valid: boolean): void {
+  //   this.customerValid.set(valid);
+  // }
 
   // =========================================================
   // Build Dynamic Motorcycle Photo Forms

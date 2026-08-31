@@ -6,7 +6,10 @@ import { ZardInputComponent } from '@/shared/components/input';
 
 import { ZardSelectImports } from '@/shared/components/select';
 
-import { IMotorcyclePhotoTypeDisplay } from '../../interfaces/master-data.interface';
+import {
+  IMotorcyclePhotoTypeDisplay,
+  IVehicleUserTypeDisplay,
+} from '../../interfaces/master-data.interface';
 
 import { PhotoPreviewDialog } from '@/shared/components/photo-preview-dialog/photo-preview-dialog';
 import { ZardDialogService } from '@/shared/components/dialog';
@@ -38,6 +41,9 @@ export class ProductInformationStep {
 
   @Input({ required: true })
   motorcyclePhotoTypes: IMotorcyclePhotoTypeDisplay[] = [];
+
+  @Input({ required: true })
+  vehicleUserTypes: IVehicleUserTypeDisplay[] = [];
 
   // =========================================================
   // Form helpers

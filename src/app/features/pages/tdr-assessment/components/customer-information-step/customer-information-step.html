@@ -19,23 +19,56 @@
       <!-- CONTRACT NO -->
       <!-- ================================================= -->
 
+      <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+
       <div>
         <label class="mb-2 block text-sm font-medium text-gray-800" for="contractNo">
-          เลขที่สัญญา
-
-          <span class="ml-1 text-red-500">*</span>
+          <div class="flex items-center gap-1">
+            @if (contractChecking()) {
+              <z-spinner class="size-4" />
+            }
+            เลขที่สัญญา
+            <span class="ml-1 text-red-500">*</span>
+          </div>
         </label>
 
-        <input
-          id="contractNo"
-          type="text"
-          z-input
-          formControlName="contractNo"
-          placeholder="ระบุเลขที่สัญญา"
-        />
+        <div class="relative">
+          <input
+            id="contractNo"
+            type="text"
+            inputmode="numeric"
+            maxlength="15"
+            z-input
+            formControlName="contractNo"
+            placeholder="ระบุเลขที่สัญญา"
+          />
+
+          @if (contractChecking()) {
+            <div class="absolute right-3 top-1/2 -translate-y-1/2">
+              <!-- Your existing Zard spinner -->
+              <div class="flex items-center gap-6">
+                <z-spinner class="size-4" />
+              </div>
+            </div>
+          }
+        </div>
 
         @if (isInvalid('contractNo')) {
-          <p class="mt-1 text-sm text-red-500">กรุณาระบุเลขที่สัญญา</p>
+          <p class="mt-1 text-sm text-red-500">
+            @if (control('contractNo')?.hasError('required')) {
+              กรุณาระบุเลขที่สัญญา
+            } @else if (control('contractNo')?.hasError('pattern')) {
+              กรุณาระบุเลขที่สัญญาให้ครบ 15 หลัก
+            } @else if (control('contractNo')?.hasError('contractNotFound')) {
+              ไม่พบเลขสัญญานี้
+            } @else if (control('contractNo')?.hasError('contractCheckFailed')) {
+              ไม่สามารถตรวจสอบเลขสัญญาได้ กรุณาลองใหม่อีกครั้ง
+            }
+          </p>
+        }
+
+        @if (contractNoValid()) {
+          <p class="mt-1 text-sm text-emerald-500">เจอเลขสัญญาในระบบ</p>
         }
       </div>
 

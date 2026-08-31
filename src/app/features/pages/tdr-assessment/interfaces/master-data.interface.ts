@@ -3,35 +3,28 @@
 // ============================================================
 
 export interface IMasterDataResponse {
-
   parameters: IMasterDataParameters;
 
   display: IMasterDataDisplay;
-
 }
-
 
 // ============================================================
 // Parameters
 // ============================================================
 
 export interface IMasterDataParameters {
-
   titles: ITitleParameter[];
 
   locations: ILocationParameter[];
 
   marriedStatus: IMarriedStatusParameter[];
-
 }
-
 
 // ============================================================
 // Title
 // ============================================================
 
 export interface ITitleParameter {
-
   titleId: string;
 
   titleName: string;
@@ -43,16 +36,13 @@ export interface ITitleParameter {
   statusShowVat: string | null;
 
   statusShowDealer: string | null;
-
 }
-
 
 // ============================================================
 // Location
 // ============================================================
 
 export interface ILocationParameter {
-
   postCode: string;
 
   subDistrict: string;
@@ -67,8 +57,7 @@ export interface ILocationParameter {
 
   floodEffect: string | null;
 
-  label_text: string
-
+  label_text: string;
 }
 
 // ============================================================
@@ -76,21 +65,19 @@ export interface ILocationParameter {
 // ============================================================
 
 export interface IMarriedStatusParameter {
-
   code: string;
 
   name: string;
-
 }
-
 
 // ============================================================
 // Display
 // ============================================================
 
 export interface IMasterDataDisplay {
-
   motorcyclePhotoTypes: IMotorcyclePhotoTypeDisplay[];
+
+  vehicleUserTypes: IVehicleUserTypeDisplay[];
 
   restructureReasons: IRestructureReasonDisplay[];
 
@@ -103,31 +90,39 @@ export interface IMasterDataDisplay {
   documentTypes: IDocumentTypeDisplay[];
 
   statusCodes: IStatusCodeDisplay[];
-
 }
-
 
 // ============================================================
 // Motorcycle Photo Type
 // ============================================================
 
 export interface IMotorcyclePhotoTypeDisplay {
+  code: string;
 
+  name: string;
+
+  displayOrder: number;
+}
+
+// ============================================================
+// Vehicle User Type
+// ============================================================
+
+export interface IVehicleUserTypeDisplay {
   code: string;
 
   name: string;
 
   displayOrder: number;
 
+  remarkTextType: string;
 }
-
 
 // ============================================================
 // Restructure Reason
 // ============================================================
 
 export interface IRestructureReasonDisplay {
-
   code: string;
 
   name: string;
@@ -135,31 +130,25 @@ export interface IRestructureReasonDisplay {
   requireRemark: boolean;
 
   displayOrder: number;
-
 }
-
 
 // ============================================================
 // Address
 // ============================================================
 
 export interface IAddressTypeDisplay {
-
   code: string;
 
   name: string;
 
   displayOrder: number;
-
 }
-
 
 // ============================================================
 // Attachment
 // ============================================================
 
 export interface IAttachmentTypeDisplay {
-
   attachmentTypeId: number;
 
   attachmentCode: string;
@@ -179,16 +168,13 @@ export interface IAttachmentTypeDisplay {
   labelRequired: string | null;
 
   labelRequiredColor: string | null;
-
 }
-
 
 // ============================================================
 // Document
 // ============================================================
 
 export interface IDocumentTypeDisplay {
-
   documentCode: string;
 
   documentName: string;
@@ -198,16 +184,13 @@ export interface IDocumentTypeDisplay {
   displayOrder: number;
 
   allowMultiple: boolean;
-
 }
-
 
 // ============================================================
 // Status
 // ============================================================
 
 export interface IStatusCodeDisplay {
-
   statusId: number;
 
   statusCode: string;
@@ -215,16 +198,13 @@ export interface IStatusCodeDisplay {
   statusName: string;
 
   displayOrder: number;
-
 }
-
 
 // ============================================================
 // Assessment
 // ============================================================
 
 export interface IAssessmentGroupDisplay {
-
   groupId: number;
 
   groupCode: string;
@@ -234,12 +214,9 @@ export interface IAssessmentGroupDisplay {
   displayOrder: number;
 
   categories: IAssessmentCategoryDisplay[];
-
 }
 
-
 export interface IAssessmentCategoryDisplay {
-
   categoryId: number;
 
   categoryCode: string;
@@ -249,12 +226,9 @@ export interface IAssessmentCategoryDisplay {
   displayOrder: number;
 
   items: IAssessmentItemDisplay[];
-
 }
 
-
 export interface IAssessmentItemDisplay {
-
   itemId: number;
 
   itemCode: string;
@@ -266,28 +240,18 @@ export interface IAssessmentItemDisplay {
   requireRemark: boolean;
 
   remarkTextType: string | null;
-
 }
-
 
 // ============================================================
 // Estimate Income Form
 // ============================================================
 
 export interface IIncomeFormValue {
-
   amount: number;
 
   remark: string | null;
-
 }
 
-
 export interface IEstimateIncomeFormValue {
-
-  incomes: Record<
-    string,
-    IIncomeFormValue
-  >;
-
+  incomes: Record<string, IIncomeFormValue>;
 }

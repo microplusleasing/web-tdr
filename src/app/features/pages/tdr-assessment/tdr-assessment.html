@@ -1,4 +1,5 @@
 <div class="mb-4 rounded bg-gray-100 p-3 text-sm">customerValid: {{ customerValid() }}</div>
+<div class="mb-4 rounded bg-gray-100 p-3 text-sm">loanValid: {{ loanValid() }}</div>
 <div class="w-full space-y-4 mt-4">
   <div class="text-center">
     <span class="text-xl font-bold text-blue-800">แบบฟอร์มพิจารณาปรับโครงสร้างหนี้</span>
@@ -26,6 +27,7 @@
           iconName="user"
           [showIcon]="true"
           [valid]="customerValid()"
+          /* [visited]="customerVisited()" */
           [visited]="customerVisited()"
         >
           <!-- <ng-template> -->
@@ -52,6 +54,7 @@
           <app-product-information-step
             [form]="step2Form"
             [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()"
+            [vehicleUserTypes]="vehicleUserTypesDisplay()"
           />
         </app-step>
 
