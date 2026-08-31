@@ -32,7 +32,7 @@
         >
           <!-- <ng-template> -->
           <app-customer-information-step
-            [form]="asFormGroup(step2Form.get('customerInformation'))"
+            [form]="asFormGroup(mainForm.get('customerInformation'))"
             [titleOptions]="masterData()?.parameters?.titles ?? []"
             [locations]="masterData()?.parameters?.locations ?? []"
             [marriedStatusOptions]="masterData()?.parameters?.marriedStatus ?? []"
@@ -52,7 +52,7 @@
           [visited]="loanVisited()"
         >
           <app-product-information-step
-            [form]="step2Form"
+            [form]="asFormGroup(mainForm.get('productInformation'))"
             [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()"
             [vehicleUserTypes]="vehicleUserTypesDisplay()"
           />

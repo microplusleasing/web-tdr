@@ -1,6 +1,12 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 
-import { AbstractControl, FormArray, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 import { ZardInputComponent } from '@/shared/components/input';
 
@@ -25,7 +31,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 
   styleUrl: './product-information-step.css',
 })
-export class ProductInformationStep {
+export class ProductInformationStep implements OnChanges {
   // =========================================================
   // Services
   // =========================================================
@@ -45,16 +51,89 @@ export class ProductInformationStep {
   @Input({ required: true })
   vehicleUserTypes: IVehicleUserTypeDisplay[] = [];
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['vehicleUserTypes']) {
+      this.updateAdditionalInfoState();
+    }
+
+    if (changes['form']) {
+      this.setupVehicleUserTypeHandler();
+      this.updateAdditionalInfoState();
+    }
+  }
+
+  get isAdditionalInfoRequired(): boolean {
+    const code = this.form.get('vehicleUserType')?.value;
+
+    return this.vehicleUserTypes.find((item) => item.code === code)?.remarkTextType === 'C';
+  }
+
+  private setupVehicleUserTypeHandler(): void {
+    const vehicleUserTypeControl = this.form.get('vehicleUserType');
+
+    if (!vehicleUserTypeControl) {
+      return;
+    }
+
+    vehicleUserTypeControl.valueChanges.subscribe(() => {
+      this.updateAdditionalInfoState();
+    });
+  }
+
+  private updateAdditionalInfoState(): void {
+    const vehicleUserTypeControl = this.form.get('vehicleUserType');
+
+    const additionalInfoControl = this.form.get('additionalInfo');
+
+    if (!vehicleUserTypeControl || !additionalInfoControl) {
+      return;
+    }
+
+    const selectedCode = vehicleUserTypeControl.value;
+
+    const selectedVehicleUserType = this.vehicleUserTypes.find(
+      (item) => item.code === selectedCode,
+    );
+
+    const requireRemark = selectedVehicleUserType?.remarkTextType === 'C';
+
+    if (requireRemark) {
+      additionalInfoControl.enable({
+        emitEvent: false,
+      });
+
+      additionalInfoControl.setValidators([Validators.required]);
+
+      additionalInfoControl.updateValueAndValidity({
+        emitEvent: false,
+      });
+    } else {
+      additionalInfoControl.clearValidators();
+
+      additionalInfoControl.reset('', {
+        emitEvent: false,
+      });
+
+      additionalInfoControl.disable({
+        emitEvent: false,
+      });
+
+      additionalInfoControl.updateValueAndValidity({
+        emitEvent: false,
+      });
+    }
+  }
+
   // =========================================================
   // Form helpers
   // =========================================================
 
-  get productInformation(): FormGroup {
-    return this.form.get('productInformation') as FormGroup;
-  }
+  // get productInformation(): FormGroup {
+  //   return this.form.get('productInformation') as FormGroup;
+  // }
 
   get motorcyclePhotos(): FormArray {
-    return this.productInformation.get('motorcyclePhotos') as FormArray;
+    return this.form.get('motorcyclePhotos') as FormArray;
   }
 
   control(path: string): AbstractControl | null {
@@ -175,8 +254,8 @@ export class ProductInformationStep {
   // =========================================================
 
   validateStep(): boolean {
-    this.productInformation.markAllAsTouched();
+    this.form.markAllAsTouched();
 
-    return this.productInformation.valid;
+    return this.form.valid;
   }
 }

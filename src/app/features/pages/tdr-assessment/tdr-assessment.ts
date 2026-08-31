@@ -91,7 +91,7 @@ export class TdrAssessment implements OnInit {
   // Main Form
   // =========================================================
 
-  step2Form!: FormGroup;
+  mainForm!: FormGroup;
   step3Form!: FormGroup;
   step4Form!: FormGroup;
   step5Form!: FormGroup;
@@ -191,7 +191,7 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   private buildForm(): void {
-    this.step2Form = this.fb.group({
+    this.mainForm = this.fb.group({
       // =====================================================
       // STEP 1
       // Customer Information
@@ -401,7 +401,7 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   get motorcyclePhotos(): FormArray {
-    return this.step2Form.get('productInformation.motorcyclePhotos') as FormArray;
+    return this.mainForm.get('productInformation.motorcyclePhotos') as FormArray;
   }
 
   // step 3
@@ -603,7 +603,7 @@ export class TdrAssessment implements OnInit {
         this.step3Form = this.createStep3Form(step3Items);
 
         // Add Step 3 form into the main form
-        this.step2Form.addControl('estimateIncome', this.step3Form);
+        this.mainForm.addControl('estimateIncome', this.step3Form);
 
         // -------------------------------------------------
         // Create dynamic estimate payment controls
@@ -619,7 +619,7 @@ export class TdrAssessment implements OnInit {
 
         this.step4Form = this.createAssessmentForm(step4Categories);
 
-        this.step2Form.addControl('estimatePayment', this.step4Form);
+        this.mainForm.addControl('estimatePayment', this.step4Form);
 
         // -------------------------------------------------
         // Restructure Reasons
@@ -633,7 +633,7 @@ export class TdrAssessment implements OnInit {
 
         this.step5Form = this.createStep5Form(restructureReasons);
 
-        this.step2Form.addControl('restructureReasons', this.step5Form);
+        this.mainForm.addControl('restructureReasons', this.step5Form);
 
         this.setupRestructureReasonValidators();
 
@@ -649,7 +649,7 @@ export class TdrAssessment implements OnInit {
 
         this.step6Form = this.createStep6Form(attachmentTypes);
 
-        this.step2Form.addControl('documentAttachments', this.step6Form);
+        this.mainForm.addControl('documentAttachments', this.step6Form);
 
         // -------------------------------------------------
         // Loading complete
@@ -679,7 +679,7 @@ export class TdrAssessment implements OnInit {
   // Tracks Forms
   // =========================================================
   private trackFormValidity(controlName: string, validitySignal: WritableSignal<boolean>): void {
-    const control = this.step2Form.get(controlName);
+    const control = this.mainForm.get(controlName);
 
     if (!control) {
       console.warn(`Cannot find form control: ${controlName}`);
@@ -715,7 +715,7 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   private buildMotorcyclePhotoForms(photoTypes: IMotorcyclePhotoTypeDisplay[]): void {
-    const photos = this.step2Form.get('productInformation.motorcyclePhotos') as FormArray;
+    const photos = this.mainForm.get('productInformation.motorcyclePhotos') as FormArray;
 
     // Clear existing controls
     photos.clear();
@@ -741,7 +741,7 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   setupAddressCopyHandlers(): void {
-    const customer = this.step2Form.get('customerInformation') as FormGroup;
+    const customer = this.mainForm.get('customerInformation') as FormGroup;
 
     customer.get('registeredAddressSameAsIdCard')?.valueChanges.subscribe((checked) => {
       if (checked) {
@@ -817,17 +817,17 @@ export class TdrAssessment implements OnInit {
   // Submit
   // =========================================================
 
-  submitStep2Form(): void {
-    this.step2Form.markAllAsTouched();
+  submitmainForm(): void {
+    this.mainForm.markAllAsTouched();
 
-    if (this.step2Form.invalid) {
+    if (this.mainForm.invalid) {
       console.log('TDR Assessment form is invalid');
 
-      console.log(this.step2Form);
+      console.log(this.mainForm);
 
       return;
     }
 
-    console.log('TDR Assessment:', this.step2Form.getRawValue());
+    console.log('TDR Assessment:', this.mainForm.getRawValue());
   }
 }

@@ -4,7 +4,7 @@
   <!-- ===================================================== -->
 
   <div class="w-full rounded-2xl border border-gray-300 p-6 md:p-8">
-    <section formGroupName="productInformation" class="w-full">
+    <section class="w-full">
       <!-- Header -->
 
       <div class="mb-6">
@@ -36,7 +36,7 @@
             class="w-full"
           />
 
-          @if (isInvalid('productInformation.brand')) {
+          @if (isInvalid('brand')) {
             <p class="mt-1 text-sm text-destructive">กรุณาระบุยี่ห้อรถจักรยานยนต์</p>
           }
         </div>
@@ -58,7 +58,7 @@
             class="w-full"
           />
 
-          @if (isInvalid('productInformation.model')) {
+          @if (isInvalid('model')) {
             <p class="mt-1 text-sm text-destructive">กรุณาระบุรุ่นรถจักรยานยนต์</p>
           }
         </div>
@@ -108,7 +108,42 @@
           </label>
 
           <!-- Keep your existing Zard select here -->
+          <z-select
+            class="w-full min-w-48"
+            zPlaceholder="เลือกสถานะการเช่าซื้อ"
+            formControlName="vehicleUserType"
+          >
+            <z-select-label>สถานะการเช่าซื้อ</z-select-label>
+            @for (vus of vehicleUserTypes; track vus.code; let vus.order = $index) {
+              <z-select-item [zValue]="vus.code">
+                {{ vus.name }}
+              </z-select-item>
+            }
+          </z-select>
         </div>
+
+        <!-- additionnalInfo field -->
+        @if (form.get('additionalInfo')?.enabled) {
+          <div>
+            <label class="mb-2 block text-sm font-medium">
+              เพิ่มเติม
+              <span class="text-destructive">*</span>
+            </label>
+
+            <input
+              id="additionalInfo"
+              z-input
+              type="text"
+              formControlName="additionalInfo"
+              placeholder="ระบุรายละเอียดเพิ่มเติม"
+              class="w-full"
+            />
+
+            @if (isInvalid('productInformation.additionalInfo')) {
+              <p class="mt-1 text-sm text-destructive">กรุณาระบุรายละเอียดเพิ่มเติม</p>
+            }
+          </div>
+        }
 
         <!-- Current User -->
 
