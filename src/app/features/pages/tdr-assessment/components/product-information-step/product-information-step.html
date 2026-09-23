@@ -14,6 +14,10 @@
         <p class="mt-1 text-sm text-muted-foreground text-center">กรุณากรอกข้อมูลรถจักรยานยนต์</p>
       </div>
 
+      <div class="mb-4">
+        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+      </div>
+
       <!-- =================================================== -->
       <!-- Product fields -->
       <!-- =================================================== -->
@@ -22,19 +26,24 @@
         <!-- Brand -->
 
         <div>
-          <label for="brand" class="mb-2 block text-sm font-medium">
-            ยี่ห้อรถจักรยานยนต์
+          <label if="brand-label" class="mb-2 block text-sm font-medium">
+            ยี่ห้อ
             <span class="text-destructive">*</span>
           </label>
 
-          <input
-            id="brand"
-            z-input
-            type="text"
+          <z-select
+            aria-labelledby="brand-label"
+            class="w-full min-w-48"
+            zPlaceholder="เลือกยี่ห้อ"
             formControlName="brand"
-            placeholder="กรุณาระบุยี่ห้อ"
-            class="w-full"
-          />
+          >
+            <z-select-label>ยี่ห้อ</z-select-label>
+            @for (bc of brands; track bc.brand_code; let i = $index) {
+              <z-select-item [zValue]="bc.brand_code">
+                {{ bc.brand_name }}
+              </z-select-item>
+            }
+          </z-select>
 
           @if (isInvalid('brand')) {
             <p class="mt-1 text-sm text-destructive">กรุณาระบุยี่ห้อรถจักรยานยนต์</p>
@@ -44,19 +53,24 @@
         <!-- Model -->
 
         <div>
-          <label for="model" class="mb-2 block text-sm font-medium">
-            รุ่นรถจักรยานยนต์
+          <label id="model-label" class="mb-2 block text-sm font-medium">
+            รุ่น
             <span class="text-destructive">*</span>
           </label>
 
-          <input
-            id="model"
-            z-input
-            type="text"
+          <z-select
+            aria-labelledby="model-label"
+            class="w-full min-w-48"
+            zPlaceholder="เลือกรุ่น"
             formControlName="model"
-            placeholder="กรุณาระบุรุ่น"
-            class="w-full"
-          />
+          >
+            <z-select-label>รุ่น</z-select-label>
+            @for (mc of filteredModels; track mc.model_key; let i = $index) {
+              <z-select-item [zValue]="mc.model_code">
+                {{ mc.model_name }}
+              </z-select-item>
+            }
+          </z-select>
 
           @if (isInvalid('model')) {
             <p class="mt-1 text-sm text-destructive">กรุณาระบุรุ่นรถจักรยานยนต์</p>
@@ -222,6 +236,13 @@
               placeholder="กรุณาระบุรายละเอียด"
             ></textarea>
           </div>
+
+          <!-- Location field component (ใช้สำหรับจัด format data ให้เข้ากับ master ของ database (oracle)) -->
+
+          <app-address-location-fields
+            [addressGroup]="addressGroup('carUserAddress')"
+            [locations]="locations"
+          />
 
           <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>

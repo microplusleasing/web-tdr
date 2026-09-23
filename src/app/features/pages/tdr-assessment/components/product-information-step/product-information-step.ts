@@ -8,24 +8,33 @@ import {
   Validators,
 } from '@angular/forms';
 
+import { AddressLocationFields } from '@/shared/components/address-location-fields/address-location-fields';
 import { ZardInputComponent } from '@/shared/components/input';
-
 import { ZardSelectImports } from '@/shared/components/select';
-
 import {
+  IBrandsParameter,
+  ILocationParameter,
+  IModelsParameter,
   IMotorcyclePhotoTypeDisplay,
   IVehicleUserTypeDisplay,
 } from '../../interfaces/master-data.interface';
-
 import { PhotoPreviewDialog } from '@/shared/components/photo-preview-dialog/photo-preview-dialog';
 import { ZardDialogService } from '@/shared/components/dialog';
+import { ZardButtonComponent } from '@/shared/components/button';
+import { ImageService } from '../../services/image.service';
 
 @Component({
   selector: 'app-product-information-step',
 
   standalone: true,
 
-  imports: [ReactiveFormsModule, ZardInputComponent, ZardSelectImports],
+  imports: [
+    AddressLocationFields,
+    ReactiveFormsModule,
+    ZardInputComponent,
+    ZardSelectImports,
+    ZardButtonComponent,
+  ],
 
   templateUrl: './product-information-step.html',
 
@@ -37,6 +46,7 @@ export class ProductInformationStep implements OnChanges {
   // =========================================================
 
   private readonly dialogService = inject(ZardDialogService);
+  private readonly imageService = inject(ImageService);
 
   // =========================================================
   // Inputs
@@ -51,6 +61,19 @@ export class ProductInformationStep implements OnChanges {
   @Input({ required: true })
   vehicleUserTypes: IVehicleUserTypeDisplay[] = [];
 
+  @Input({ required: true }) locations: ILocationParameter[] = [];
+  @Input({ required: true }) brands: IBrandsParameter[] = [];
+  @Input({ required: true }) models: IModelsParameter[] = [];
+  filteredModels: IModelsParameter[] = [];
+
+  // =========================================================
+  // Address Group
+  // =========================================================
+
+  addressGroup(addressName: string): FormGroup {
+    return this.form.get(addressName) as FormGroup;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['vehicleUserTypes']) {
       this.updateAdditionalInfoState();
@@ -58,8 +81,73 @@ export class ProductInformationStep implements OnChanges {
 
     if (changes['form']) {
       this.setupVehicleUserTypeHandler();
+      this.setupBrandModelHandler();
       this.updateAdditionalInfoState();
     }
+
+    if (changes['models']) {
+      this.updateFilteredModels();
+    }
+
+    Object.keys(this.form.controls).forEach((fieldName) => {
+      const control = this.form.get(fieldName);
+
+      console.log(fieldName, {
+        value: control?.value,
+        valid: control?.valid,
+        invalid: control?.invalid,
+        status: control?.status,
+        errors: control?.errors,
+        touched: control?.touched,
+        dirty: control?.dirty,
+        disabled: control?.disabled,
+        enabled: control?.enabled,
+      });
+    });
+  }
+
+  mockData() {
+    this.form.get('brand')?.setValue('01');
+    this.form.get('model')?.setValue('0001');
+    this.form.get('color')?.setValue('ดำ');
+    this.form.get('registrationNo')?.setValue('ปค1311');
+    this.form.get('vehicleUserType')?.setValue('VUS01');
+    this.form.get('additionalInfo')?.setValue('');
+    this.form.get('currentUserName')?.setValue('สมปอง');
+    this.form.get('relationship')?.setValue('เพื่อน');
+    this.form.get('currentUserPhone')?.setValue('0999999999');
+    this.form.get('currentCondition')?.setValue('93/1 หมู่ 3 ซ.วัดใหญ่');
+
+    this.form.get('carUserAddress.postalCodeLookup')?.setValue('110504');
+
+    this.form.get('currentMileage')?.setValue('200000');
+
+    this.mockMotorcyclePhotos();
+  }
+
+  private mockMotorcyclePhotos(): void {
+    this.motorcyclePhotos.controls.forEach((control, index) => {
+      const photoType = this.motorcyclePhotoTypes[index];
+
+      if (!photoType) {
+        return;
+      }
+
+      const file = this.imageService.createMockImageFile(
+        `${photoType.code}-${photoType.name}.jpg`,
+        index === 0 ? '#2563eb' : '#16a34a',
+      );
+
+      control.patchValue({
+        file,
+        fileName: file.name,
+      });
+
+      control.get('file')?.markAsTouched();
+      control.get('file')?.markAsDirty();
+    });
+
+    this.motorcyclePhotos.updateValueAndValidity();
   }
 
   get isAdditionalInfoRequired(): boolean {
@@ -75,6 +163,11 @@ export class ProductInformationStep implements OnChanges {
       return;
     }
 
+    this.form.get('carUserAddress.subDistrict')?.disable();
+    this.form.get('carUserAddress.district')?.disable();
+    this.form.get('carUserAddress.province')?.disable();
+    this.form.get('carUserAddress.postalCode')?.disable();
+    /* ... เงื่อนไขเมื่อเปลี่ยนสถานะการเช่าซื้อ ... */
     vehicleUserTypeControl.valueChanges.subscribe(() => {
       this.updateAdditionalInfoState();
     });
@@ -122,15 +215,60 @@ export class ProductInformationStep implements OnChanges {
         emitEvent: false,
       });
     }
+
+    Object.keys(this.form.controls).forEach((fieldName) => {
+      const control = this.form.get(fieldName);
+
+      console.log(fieldName, {
+        value: control?.value,
+        valid: control?.valid,
+        invalid: control?.invalid,
+        status: control?.status,
+        errors: control?.errors,
+        touched: control?.touched,
+        dirty: control?.dirty,
+        disabled: control?.disabled,
+        enabled: control?.enabled,
+      });
+    });
+  }
+
+  private setupBrandModelHandler(): void {
+    const brandControl = this.form.get('brand');
+    const modelControl = this.form.get('model');
+
+    if (!brandControl || !modelControl) {
+      return;
+    }
+
+    brandControl.valueChanges.subscribe((brandCode) => {
+      // Clear currently selected model
+      modelControl.reset('', {
+        emitEvent: false,
+      });
+
+      // Filter models based on selected brand
+      this.filteredModels = this.models.filter((model) => model.brand_code === brandCode);
+    });
+
+    // Initial filtering
+    this.filteredModels = this.models.filter((model) => model.brand_code === brandControl.value);
+  }
+
+  private updateFilteredModels(): void {
+    const brandCode = this.form.get('brand')?.value;
+
+    if (!brandCode) {
+      this.filteredModels = [];
+      return;
+    }
+
+    this.filteredModels = this.models.filter((model) => model.brand_code === brandCode);
   }
 
   // =========================================================
   // Form helpers
   // =========================================================
-
-  // get productInformation(): FormGroup {
-  //   return this.form.get('productInformation') as FormGroup;
-  // }
 
   get motorcyclePhotos(): FormArray {
     return this.form.get('motorcyclePhotos') as FormArray;

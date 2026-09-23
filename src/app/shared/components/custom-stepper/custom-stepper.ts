@@ -292,9 +292,63 @@ export class CustomStepper implements AfterContentInit, OnDestroy {
     return !!previousStep && !previousStep.disabled();
   }
 
+  /**
+   * Set style of next topic when previos is valid.
+   */
+  canNavigateToStep(index: number): boolean {
+    if (index < 0 || index >= this.stepsArray.length) {
+      return false;
+    }
+
+    const step = this.stepsArray[index];
+
+    if (!step || step.disabled()) {
+      return false;
+    }
+
+    // Current step
+    if (index === this.currentStepIndex) {
+      return true;
+    }
+
+    // Going backward is always allowed
+    if (index < this.currentStepIndex) {
+      return true;
+    }
+
+    // Going forward:
+    // every step before target must be valid
+    return this.canNavigateForward(index);
+  }
+
   // =========================================================
   // Step status
   // =========================================================
+
+  isStepEnabled(index: number): boolean {
+    if (index < 0 || index >= this.stepsArray.length) {
+      return false;
+    }
+
+    const step = this.stepsArray[index];
+
+    if (!step || step.disabled()) {
+      return false;
+    }
+
+    // Current step
+    if (index === this.currentStepIndex) {
+      return true;
+    }
+
+    // Going backward is always allowed
+    if (index < this.currentStepIndex) {
+      return true;
+    }
+
+    // Going forward requires all previous steps to be valid
+    return this.canNavigateForward(index);
+  }
 
   getStepColor(index: number): string {
     const step = this.stepsArray[index];
@@ -308,17 +362,18 @@ export class CustomStepper implements AfterContentInit, OnDestroy {
       return this.stepCurrentColor;
     }
 
-    // Not visited yet
-    if (!step.visited()) {
-      return this.stepDefaultColor;
+    // Already visited
+    if (step.visited()) {
+      return step.valid() ? this.stepValidColor : this.stepInvalidColor;
     }
 
-    // Visited + valid / invalid
-    return step.valid() ? this.stepValidColor : this.stepInvalidColor;
-  }
+    // Not visited, but unlocked
+    if (this.isStepEnabled(index)) {
+      return this.stepValidColor;
+    }
 
-  isStepValid(index: number): boolean {
-    return this.stepsArray[index]?.valid() ?? false;
+    // Locked
+    return this.stepDefaultColor;
   }
 
   isStepVisited(index: number): boolean {

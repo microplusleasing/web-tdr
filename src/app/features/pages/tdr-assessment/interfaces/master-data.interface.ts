@@ -18,6 +18,10 @@ export interface IMasterDataParameters {
   locations: ILocationParameter[];
 
   marriedStatus: IMarriedStatusParameter[];
+
+  brands: IBrandsParameter[];
+
+  models: IModelsParameter[];
 }
 
 // ============================================================
@@ -71,6 +75,27 @@ export interface IMarriedStatusParameter {
 }
 
 // ============================================================
+// Brands
+// ============================================================
+
+export interface IBrandsParameter {
+  brand_code: string;
+
+  brand_name: string;
+}
+
+// ============================================================
+// Models
+// ============================================================
+
+export interface IModelsParameter {
+  brand_code: string;
+  model_code: string;
+  model_name: string;
+  model_key: string;
+}
+
+// ============================================================
 // Display
 // ============================================================
 
@@ -86,8 +111,6 @@ export interface IMasterDataDisplay {
   assessment: IAssessmentGroupDisplay[];
 
   attachmentTypes: IAttachmentTypeDisplay[];
-
-  documentTypes: IDocumentTypeDisplay[];
 
   statusCodes: IStatusCodeDisplay[];
 }
@@ -168,22 +191,6 @@ export interface IAttachmentTypeDisplay {
   labelRequired: string | null;
 
   labelRequiredColor: string | null;
-}
-
-// ============================================================
-// Document
-// ============================================================
-
-export interface IDocumentTypeDisplay {
-  documentCode: string;
-
-  documentName: string;
-
-  requireRemark: boolean;
-
-  displayOrder: number;
-
-  allowMultiple: boolean;
 }
 
 // ============================================================

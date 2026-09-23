@@ -6,6 +6,8 @@ import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 
@@ -38,13 +40,19 @@ import {
   IRestructureReasonDisplay,
   ILocationParameter,
   IVehicleUserTypeDisplay,
+  IModelsParameter,
+  IBrandsParameter,
+  ITitleParameter,
+  IMarriedStatusParameter,
 } from './interfaces/master-data.interface';
 
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
+import { ZardButtonComponent } from '@/shared/components/button';
 
 import { DataLoadError } from '@/shared/components/data-load-error/data-load-error';
 import {
   AddressForm,
+  carUserAddress,
   WorkplaceAddressForm,
 } from './interfaces/location-lookup-form-field.interface';
 
@@ -67,6 +75,7 @@ import {
     DocumentAttachStep,
 
     ZardSpinnerComponent,
+    ZardButtonComponent,
     DataLoadError,
   ],
 
@@ -92,10 +101,10 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   mainForm!: FormGroup;
-  step3Form!: FormGroup;
-  step4Form!: FormGroup;
-  step5Form!: FormGroup;
-  step6Form!: FormGroup;
+  estimateIncomeForm!: FormGroup;
+  estimatePaymentForm!: FormGroup;
+  reStructureReasonForm!: FormGroup;
+  documentAttachForm!: FormGroup;
 
   // =========================================================
   // Current step
@@ -108,17 +117,16 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   masterData = signal<IMasterDataResponse | null>(null);
-
-  motorcyclePhotoTypesDisplay = signal<IMotorcyclePhotoTypeDisplay[]>([]);
-
-  vehicleUserTypesDisplay = signal<IVehicleUserTypeDisplay[]>([]);
-
-  step3Fields = signal<IAssessmentItemDisplay[]>([]);
-
-  step4Fields = signal<IAssessmentCategoryDisplay[]>([]);
-
+  titles = signal<ITitleParameter[]>([]);
+  marriedStatus = signal<IMarriedStatusParameter[]>([]);
+  locations = signal<ILocationParameter[]>([]);
+  motocyclePhotoTypes = signal<IMotorcyclePhotoTypeDisplay[]>([]);
+  vehicleUserTypes = signal<IVehicleUserTypeDisplay[]>([]);
+  brands = signal<IBrandsParameter[]>([]);
+  models = signal<IModelsParameter[]>([]);
+  assessmentIncome = signal<IAssessmentItemDisplay[]>([]);
+  categories = signal<IAssessmentCategoryDisplay[]>([]);
   restructureReasons = signal<IRestructureReasonDisplay[]>([]);
-
   attachmentTypesDisplay = signal<IAttachmentTypeDisplay[]>([]);
 
   // =========================================================
@@ -140,35 +148,42 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   customerValid = signal(false);
-  customerVisited = signal(false);
+  customerVisited = signal(true);
 
   // =========================================================
   // Step 2
   // =========================================================
 
-  loanValid = signal(false);
-  loanVisited = signal(false);
+  productInformationValid = signal(false);
+  productInformationVisited = signal(false);
 
   // =========================================================
   // Step 3
   // =========================================================
 
-  financialValid = signal(false);
-  financialVisited = signal(false);
+  estimateIncomeValid = signal(false);
+  estimateIncomeVisited = signal(false);
 
   // =========================================================
   // Step 4
   // =========================================================
 
-  documentValid = signal(false);
-  documentVisited = signal(false);
+  estimatePaymentValid = signal(false);
+  estimatePaymentVisited = signal(false);
 
   // =========================================================
   // Step 5
   // =========================================================
 
-  summaryValid = signal(false);
-  summaryVisited = signal(false);
+  restuructureReasonValid = signal(false);
+  restuructureReasonVisited = signal(false);
+
+  // =========================================================
+  // Step 6 Document-attach
+  // =========================================================
+
+  documentAttachValid = signal(false);
+  documentAttachVisited = signal(false);
 
   // =========================================================
   // Lifecycle
@@ -320,6 +335,26 @@ export class TdrAssessment implements OnInit {
   }
 
   // =========================================================
+  // car user Address Group
+  // =========================================================
+
+  private createCarUserAddressGroup(): FormGroup<carUserAddress> {
+    return this.fb.group({
+      // postalCodeLookup: this.fb.control<ILocationParameter | null>(null, Validators.required),
+      postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
+
+      postalCode: this.fb.nonNullable.control('', [
+        Validators.required,
+        Validators.pattern(/^\d{5}$/),
+      ]),
+
+      subDistrict: this.fb.nonNullable.control('', Validators.required),
+      district: this.fb.nonNullable.control('', Validators.required),
+      province: this.fb.nonNullable.control('', Validators.required),
+    });
+  }
+
+  // =========================================================
   // Workplace Address Group
   // =========================================================
 
@@ -384,12 +419,8 @@ export class TdrAssessment implements OnInit {
       relationship: ['', Validators.required],
       currentUserPhone: ['', Validators.required],
 
-      // currentAddress: ['', Validators.required],
-      // province: ['', Validators.required],
-      // postalCode: ['', Validators.required],
-      // district: [''],
-
       currentCondition: ['', Validators.required],
+      carUserAddress: this.createCarUserAddressGroup(),
       currentMileage: ['', Validators.required],
 
       motorcyclePhotos: this.fb.array([]),
@@ -406,7 +437,7 @@ export class TdrAssessment implements OnInit {
 
   // step 3
 
-  private createStep3Form(items: IAssessmentItemDisplay[]): FormGroup {
+  private createestimateIncomeForm(items: IAssessmentItemDisplay[]): FormGroup {
     const incomes = this.fb.group({});
 
     for (const item of items) {
@@ -466,27 +497,43 @@ export class TdrAssessment implements OnInit {
     return assessmentForm;
   }
 
-  /* ... create form step 5 ... */
-  private createStep5Form(reasons: IRestructureReasonDisplay[]): FormGroup {
+  /* ... create Restructure Reason Form ... */
+  private createRestructureReasonForm(reasons: IRestructureReasonDisplay[]): FormGroup {
     const reasonControls = reasons
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .map((reason) => {
         return this.fb.group({
           reasonCode: [reason.code, Validators.required],
-
           selected: [false],
-
           otherReason: [''],
         });
       });
 
+    const reasonsFormArray = this.fb.array(reasonControls, [this.atLeastOneSelectedValidator()]);
+
     return this.fb.group({
-      reasons: this.fb.array(reasonControls),
+      reasons: reasonsFormArray,
     });
   }
 
   get restructureReasonForms(): FormArray {
-    return this.step5Form.get('reasons') as FormArray;
+    return this.reStructureReasonForm.get('reasons') as FormArray;
+  }
+
+  // =========================================================
+  // Motorcycle Photos FormArray
+  // =========================================================
+
+  private atLeastOneSelectedValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const formArray = control as FormArray;
+
+      const hasSelected = formArray.controls.some(
+        (control) => control.get('selected')?.value === true,
+      );
+
+      return hasSelected ? null : { atLeastOneRequired: true };
+    };
   }
 
   private setupRestructureReasonValidators(): void {
@@ -494,7 +541,6 @@ export class TdrAssessment implements OnInit {
       const reason = this.restructureReasons()[index];
 
       const selectedControl = control.get('selected');
-
       const otherReasonControl = control.get('otherReason');
 
       if (!selectedControl || !otherReasonControl) {
@@ -512,13 +558,20 @@ export class TdrAssessment implements OnInit {
           });
         }
 
-        otherReasonControl.updateValueAndValidity();
+        otherReasonControl.updateValueAndValidity({
+          emitEvent: false,
+        });
+
+        // Recalculate the FormArray validation
+        this.restructureReasonForms.updateValueAndValidity({
+          emitEvent: false,
+        });
       });
     });
   }
 
   /* ... create form step 6 ... */
-  private createStep6Form(attachmentTypes: IAttachmentTypeDisplay[]): FormGroup {
+  private createdocumentAttachForm(attachmentTypes: IAttachmentTypeDisplay[]): FormGroup {
     const attachments = attachmentTypes.map((attachment) =>
       this.fb.group({
         attachmentCode: [attachment.attachmentCode, Validators.required],
@@ -536,7 +589,7 @@ export class TdrAssessment implements OnInit {
   }
 
   get attachmentForms(): FormArray {
-    return this.step6Form.get('attachments') as FormArray;
+    return this.documentAttachForm.get('attachments') as FormArray;
   }
 
   // =========================================================
@@ -569,24 +622,19 @@ export class TdrAssessment implements OnInit {
         this.masterData.set(response);
 
         // -------------------------------------------------
-        // Motorcycle photo types
-        // -------------------------------------------------
-
-        const photoTypes = response.display?.motorcyclePhotoTypes ?? [];
-
-        this.motorcyclePhotoTypesDisplay.set(photoTypes);
-
-        // -------------------------------------------------
-        // Vehicle User Types
-        // -------------------------------------------------
-
-        const vehicleUserTypes = response.display?.vehicleUserTypes ?? [];
-
-        this.vehicleUserTypesDisplay.set(vehicleUserTypes);
-
-        // -------------------------------------------------
         // Create dynamic photo controls
         // -------------------------------------------------
+        const titles = response.parameters?.titles ?? [];
+        const marriedStatus = response.parameters?.marriedStatus ?? [];
+        const locations = response.parameters?.locations ?? [];
+        const photoTypes = response.display?.motorcyclePhotoTypes ?? [];
+        const vehicleUserTypes = response.display?.vehicleUserTypes ?? [];
+
+        this.titles.set(titles);
+        this.marriedStatus.set(marriedStatus);
+        this.locations.set(locations);
+        this.motocyclePhotoTypes.set(photoTypes);
+        this.vehicleUserTypes.set(vehicleUserTypes);
 
         this.buildMotorcyclePhotoForms(photoTypes);
 
@@ -594,16 +642,18 @@ export class TdrAssessment implements OnInit {
         // Create dynamic estimate income controls
         // -------------------------------------------------
 
-        const step3Items = response.display.assessment[0].categories[0].items.sort(
+        const assessmentIncomeItems = response.display.assessment[0].categories[0].items.sort(
           (a, b) => a.displayOrder - b.displayOrder,
         );
 
-        this.step3Fields.set(step3Items);
+        this.assessmentIncome.set(assessmentIncomeItems);
 
-        this.step3Form = this.createStep3Form(step3Items);
+        this.estimateIncomeForm = this.createestimateIncomeForm(assessmentIncomeItems);
 
         // Add Step 3 form into the main form
-        this.mainForm.addControl('estimateIncome', this.step3Form);
+        this.mainForm.addControl('estimateIncome', this.estimateIncomeForm);
+
+        this.trackFormValidity('estimateIncome', this.estimateIncomeValid);
 
         // -------------------------------------------------
         // Create dynamic estimate payment controls
@@ -615,11 +665,13 @@ export class TdrAssessment implements OnInit {
           (a, b) => a.displayOrder - b.displayOrder,
         );
 
-        this.step4Fields.set(step4Categories);
+        this.categories.set(step4Categories);
 
-        this.step4Form = this.createAssessmentForm(step4Categories);
+        this.estimatePaymentForm = this.createAssessmentForm(step4Categories);
 
-        this.mainForm.addControl('estimatePayment', this.step4Form);
+        this.mainForm.addControl('estimatePayment', this.estimatePaymentForm);
+
+        this.trackFormValidity('estimatePayment', this.estimatePaymentValid);
 
         // -------------------------------------------------
         // Restructure Reasons
@@ -631,11 +683,13 @@ export class TdrAssessment implements OnInit {
 
         this.restructureReasons.set(restructureReasons);
 
-        this.step5Form = this.createStep5Form(restructureReasons);
+        this.reStructureReasonForm = this.createRestructureReasonForm(restructureReasons);
 
-        this.mainForm.addControl('restructureReasons', this.step5Form);
+        this.mainForm.addControl('restructureReason', this.reStructureReasonForm);
 
         this.setupRestructureReasonValidators();
+
+        this.trackFormValidity('restructureReason', this.restuructureReasonValid);
 
         // -------------------------------------------------
         // Attachment Types
@@ -647,9 +701,11 @@ export class TdrAssessment implements OnInit {
 
         this.attachmentTypesDisplay.set(attachmentTypes);
 
-        this.step6Form = this.createStep6Form(attachmentTypes);
+        this.documentAttachForm = this.createdocumentAttachForm(attachmentTypes);
 
-        this.mainForm.addControl('documentAttachments', this.step6Form);
+        this.mainForm.addControl('documentAttachments', this.documentAttachForm);
+
+        this.trackFormValidity('documentAttachments', this.documentAttachValid);
 
         // -------------------------------------------------
         // Loading complete
@@ -698,9 +754,9 @@ export class TdrAssessment implements OnInit {
 
   private setupStepValidityTracking(): void {
     this.trackFormValidity('customerInformation', this.customerValid);
-    this.trackFormValidity('productInformation', this.loanValid);
-    this.trackFormValidity('financialInformation', this.financialValid);
-    this.trackFormValidity('documentInformation', this.documentValid);
+    this.trackFormValidity('productInformation', this.productInformationValid);
+    // this.trackFormValidity('estimateIncome', this.estimateIncomeValid);
+    // this.trackFormValidity('documentInformation', this.estimatePaymentValid);
   }
 
   // =========================================================
@@ -792,22 +848,22 @@ export class TdrAssessment implements OnInit {
         break;
 
       case 1:
-        this.loanVisited.set(true);
+        this.productInformationVisited.set(true);
 
         break;
 
       case 2:
-        this.financialVisited.set(true);
+        this.estimateIncomeVisited.set(true);
 
         break;
 
       case 3:
-        this.documentVisited.set(true);
+        this.estimatePaymentVisited.set(true);
 
         break;
 
       case 4:
-        this.summaryVisited.set(true);
+        this.restuructureReasonVisited.set(true);
 
         break;
     }

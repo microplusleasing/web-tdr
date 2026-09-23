@@ -1,366 +1,174 @@
-<div
-  class="w-full"
-  [formGroup]="form"
->
-
-  <div
-    class="w-full rounded-2xl border border-gray-300 p-6 md:p-8"
-  >
-
+<div class="w-full" [formGroup]="form">
+  <div class="w-full rounded-2xl border border-gray-300 p-6 md:p-8">
     <!-- ===================================================== -->
     <!-- TITLE -->
     <!-- ===================================================== -->
 
-    <h2
-      class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl"
-    >
+    <h2 class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl">
       เอกสารประกอบการพิจารณา
     </h2>
-
 
     <!-- ===================================================== -->
     <!-- DOCUMENT TABLE -->
     <!-- ===================================================== -->
 
-    <div
-      class="w-full overflow-x-auto rounded-xl border border-gray-300"
-    >
-
-      <table
-        class="w-full min-w-[850px] border-collapse"
-      >
-
+    <div class="w-full overflow-x-auto rounded-xl border border-gray-300">
+      <table class="w-full min-w-[850px] border-collapse">
         <!-- ================================================= -->
         <!-- HEADER -->
         <!-- ================================================= -->
 
         <thead>
+          <tr class="border-b-2 border-gray-300">
+            <th class="px-5 py-4 text-left text-sm font-semibold text-gray-800">ประเภทเอกสาร</th>
 
-          <tr
-            class="border-b-2 border-gray-300"
-          >
-
-            <th
-              class="px-5 py-4 text-left text-sm font-semibold text-gray-800"
-            >
-              ประเภทเอกสาร
-            </th>
-
-
-            <th
-              class="w-28 px-5 py-4 text-center text-sm font-semibold text-gray-800"
-            >
+            <th class="w-28 px-5 py-4 text-center text-sm font-semibold text-gray-800">
               ความสำคัญ
             </th>
 
-
-            <th
-              class="w-36 px-5 py-4 text-center text-sm font-semibold text-gray-800"
-            >
+            <th class="w-36 px-5 py-4 text-center text-sm font-semibold text-gray-800">
               อัปโหลดไฟล์
             </th>
 
+            <th class="w-56 px-5 py-4 text-left text-sm font-semibold text-gray-800">ชื่อไฟล์</th>
 
-            <th
-              class="w-56 px-5 py-4 text-left text-sm font-semibold text-gray-800"
-            >
-              ชื่อไฟล์
-            </th>
-
-
-            <th
-              class="w-32 px-5 py-4 text-center text-sm font-semibold text-gray-800"
-            >
-              สถานะ
-            </th>
-
+            <th class="w-32 px-5 py-4 text-center text-sm font-semibold text-gray-800">สถานะ</th>
           </tr>
-
         </thead>
-
 
         <!-- ================================================= -->
         <!-- BODY -->
         <!-- ================================================= -->
 
-        <tbody
-          formArrayName="attachments"
-        >
-
-          @for (
-            attachment of attachments;
-            track attachment.attachmentTypeId;
-            let i = $index
-          ) {
-
-            <tr
-              class="border-b border-gray-200 last:border-b-0"
-              [formGroupName]="i"
-            >
-
+        <tbody formArrayName="attachments">
+          @for (attachment of attachments; track attachment.attachmentTypeId; let i = $index) {
+            <tr class="border-b border-gray-200 last:border-b-0" [formGroupName]="i">
               <!-- =========================================== -->
               <!-- DOCUMENT NAME -->
               <!-- =========================================== -->
 
-              <td
-                class="px-5 py-5 align-middle"
-              >
-
-                <div
-                  class="text-sm font-medium leading-6 text-gray-800"
-                >
+              <td class="px-5 py-5 align-middle">
+                <div class="text-sm font-medium leading-6 text-gray-800">
                   {{ attachment.attachmentName }}
                 </div>
-
               </td>
-
 
               <!-- =========================================== -->
               <!-- IMPORTANCE -->
               <!-- =========================================== -->
 
-              <td
-                class="px-5 py-5 text-center align-middle"
-              >
-
-                @if (
-                  attachment.labelRequired
-                ) {
-
+              <td class="px-5 py-5 text-center align-middle">
+                @if (attachment.labelRequired) {
                   <span
                     class="text-sm font-medium"
-                    [style.color]="
-                      attachment.labelRequiredColor ||
-                      '#111827'
-                    "
+                    [style.color]="attachment.labelRequiredColor || '#111827'"
                   >
                     {{ attachment.labelRequired }}
                   </span>
-
                 } @else {
-
-                  <span
-                    class="text-sm text-gray-400"
-                  >
-                    -
-                  </span>
-
+                  <span class="text-sm text-gray-400">-</span>
                 }
-
               </td>
-
 
               <!-- =========================================== -->
               <!-- UPLOAD -->
               <!-- =========================================== -->
 
-              <td
-                class="px-5 py-5 text-center align-middle"
-              >
-
+              <td class="px-5 py-5 text-center align-middle">
                 <input
                   class="hidden"
                   type="file"
-                  [id]="
-                    'attachment-' +
-                    attachment.attachmentCode
-                  "
-                  [accept]="
-                    getAcceptAttribute(
-                      attachment
-                    )
-                  "
-                  [multiple]="
-                    attachment.allowMultiple
-                  "
-                  (change)="
-                    onFilesSelected(
-                      $event,
-                      i
-                    )
-                  "
+                  [id]="'attachment-' + attachment.attachmentCode"
+                  [accept]="getAcceptAttribute(attachment)"
+                  [multiple]="attachment.allowMultiple"
+                  (change)="onFilesSelected($event, i)"
                 />
 
-
                 <label
-                  [for]="
-                    'attachment-' +
-                    attachment.attachmentCode
-                  "
+                  [for]="'attachment-' + attachment.attachmentCode"
                   class="inline-flex cursor-pointer items-center justify-center rounded-md border border-blue-500 px-5 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
                 >
                   อัปโหลด
                 </label>
-
               </td>
-
 
               <!-- =========================================== -->
               <!-- FILE NAME -->
               <!-- =========================================== -->
 
-              <td
-                class="px-5 py-5 align-middle"
-              >
-
-                @if (
-                  hasFiles(i)
-                ) {
-
-                  <div
-                    class="space-y-1"
-                  >
-
-                    @for (
-                      fileName of getFileNames(i);
-                      track fileName
-                    ) {
-
+              <td class="px-5 py-5 align-middle">
+                @if (hasFiles(i)) {
+                  <div class="space-y-1">
+                    @for (fileName of getFileNames(i); track fileName) {
                       <div
                         class="inline-block rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-700"
                       >
                         {{ fileName }}
                       </div>
-
                     }
-
                   </div>
-
                 } @else {
-
-                  <span
-                    class="text-sm text-gray-400"
-                  >
-                    -
-                  </span>
-
+                  <span class="text-sm text-gray-400">-</span>
                 }
-
               </td>
-
 
               <!-- =========================================== -->
               <!-- STATUS -->
               <!-- =========================================== -->
 
-              <td
-                class="px-5 py-5 text-center align-middle"
-              >
-
-                @if (
-                  getStatus(i) === 'uploaded'
-                ) {
-
-                  <span
-                    class="text-sm font-medium text-green-600"
-                  >
-                    อัปโหลดแล้ว
-                  </span>
-
+              <td class="px-5 py-5 text-center align-middle">
+                @if (getStatus(i) === 'uploaded') {
+                  <span class="text-sm font-medium text-green-600">อัปโหลดแล้ว</span>
                 } @else {
-
-                  <span
-                    class="text-sm font-medium text-orange-500"
-                  >
-                    กำลังรอ...
-                  </span>
-
+                  <span class="text-sm font-medium text-orange-500">กำลังรอ...</span>
                 }
-
               </td>
-
             </tr>
-
 
             <!-- ============================================= -->
             <!-- VALIDATION ERROR -->
             <!-- ============================================= -->
 
-            @if (
-              isInvalid(i)
-            ) {
-
+            @if (isInvalid(i)) {
               <tr>
-
-                <td
-                  colspan="5"
-                  class="px-5 pb-3 pt-0"
-                >
-
-                  @if (
-                    hasFileInvalidError(i)
-                  ) {
-
-                    <p
-                      class="text-sm text-red-500"
-                    >
-                      {{
-                        getFileErrorMessage(
-                          attachment
-                        )
-                      }}
+                <td colspan="5" class="px-5 pb-3 pt-0">
+                  @if (hasFileInvalidError(i)) {
+                    <p class="text-sm text-red-500">
+                      {{ getFileErrorMessage(attachment) }}
                     </p>
-
                   } @else {
-
-                    <p
-                      class="text-sm text-red-500"
-                    >
+                    <p class="text-sm text-red-500">
                       กรุณาอัปโหลด
                       {{ attachment.attachmentName }}
                     </p>
-
                   }
-
                 </td>
-
               </tr>
-
             }
-
           }
-
         </tbody>
-
       </table>
-
     </div>
-
 
     <!-- ===================================================== -->
     <!-- FOOTER INFORMATION -->
     <!-- ===================================================== -->
 
-    <div
-      class="mt-4 flex flex-col justify-between gap-2 text-sm text-gray-700 md:flex-row"
-    >
-
-      @if (
-        getMaxFileSize() !== null
-      ) {
-
+    <div class="mt-4 flex flex-col justify-between gap-2 text-sm text-gray-700 md:flex-row">
+      @if (getMaxFileSize() !== null) {
         <span>
           อัปโหลดไฟล์ได้สูงสุด
           {{ getMaxFileSize() }}
           MB
         </span>
-
       }
 
-
-      @if (
-        getAllowedFileTypes()
-      ) {
-
+      @if (getAllowedFileTypes()) {
         <span>
           สามารถอัปโหลดไฟล์:
           {{ getAllowedFileTypes() }}
         </span>
-
       }
-
     </div>
-
   </div>
-
 </div>

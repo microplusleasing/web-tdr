@@ -1,5 +1,6 @@
-<div class="mb-4 rounded bg-gray-100 p-3 text-sm">customerValid: {{ customerValid() }}</div>
-<div class="mb-4 rounded bg-gray-100 p-3 text-sm">loanValid: {{ loanValid() }}</div>
+<!-- <div class="mb-4 rounded bg-gray-100 p-3 text-sm">customerValid: {{ customerValid() }}</div>
+<div class="mb-4 rounded bg-gray-100 p-3 text-sm">productInformationValid: {{ productInformationValid() }}</div>
+<div class="mb-4 rounded bg-gray-100 p-3 text-sm">estimateIncomeValid: {{ estimateIncomeValid() }}</div> -->
 <div class="w-full space-y-4 mt-4">
   <div class="text-center">
     <span class="text-xl font-bold text-blue-800">แบบฟอร์มพิจารณาปรับโครงสร้างหนี้</span>
@@ -33,9 +34,9 @@
           <!-- <ng-template> -->
           <app-customer-information-step
             [form]="asFormGroup(mainForm.get('customerInformation'))"
-            [titleOptions]="masterData()?.parameters?.titles ?? []"
-            [locations]="masterData()?.parameters?.locations ?? []"
-            [marriedStatusOptions]="masterData()?.parameters?.marriedStatus ?? []"
+            [titleOptions]="titles()"
+            [locations]="locations()"
+            [marriedStatusOptions]="marriedStatus()"
           />
           <!-- </ng-template> -->
         </app-step>
@@ -48,18 +49,21 @@
           label="ข้อมูลผลิดภัณฑ์เช่าชื้อ"
           iconName="identification"
           [showIcon]="true"
-          [valid]="loanValid()"
-          [visited]="loanVisited()"
+          [valid]="productInformationValid()"
+          [visited]="productInformationVisited()"
         >
           <app-product-information-step
             [form]="asFormGroup(mainForm.get('productInformation'))"
-            [motorcyclePhotoTypes]="motorcyclePhotoTypesDisplay()"
-            [vehicleUserTypes]="vehicleUserTypesDisplay()"
+            [locations]="locations()"
+            [motorcyclePhotoTypes]="motocyclePhotoTypes()"
+            [vehicleUserTypes]="vehicleUserTypes()"
+            [brands]="brands()"
+            [models]="models()"
           />
         </app-step>
 
         <!-- ===================================================== -->
-        <!-- Step 3: Financial Assessment	การประเมินรายได้ (รวมต่อเดือน) -->
+        <!-- Step 3: Estimate Income	การประเมินรายได้ (รวมต่อเดือน) -->
         <!-- ===================================================== -->
 
         <app-step
@@ -67,14 +71,17 @@
           label="การประเมินรายได้ (รวมต่อเดือน)"
           iconName="briefcase"
           [showIcon]="true"
-          [valid]="financialValid()"
-          [visited]="financialVisited()"
+          [valid]="estimateIncomeValid()"
+          [visited]="estimateIncomeVisited()"
         >
-          <app-estimate-income-step [form]="step3Form" [items]="step3Fields()" />
+          <app-estimate-income-step
+            [form]="asFormGroup(mainForm.get('estimateIncome'))"
+            [assessment]="assessmentIncome()"
+          />
         </app-step>
 
         <!-- ===================================================== -->
-        <!-- Step 4: Documents  การประเมินค่าใช้จ่าย (รวมต่อเดือน)        -->
+        <!-- Step 4: Estimate Payment การประเมินค่าใช้จ่าย (รวมต่อเดือน)        -->
         <!-- ===================================================== -->
 
         <app-step
@@ -82,10 +89,13 @@
           label="การประเมินค่าใช้จ่าย (รวมต่อเดือน)"
           iconName="payment"
           [showIcon]="true"
-          [valid]="documentValid()"
-          [visited]="documentVisited()"
+          [valid]="estimatePaymentValid()"
+          [visited]="estimatePaymentVisited()"
         >
-          <app-estimate-payment-step [form]="step4Form" [categories]="step4Fields()" />
+          <app-estimate-payment-step
+            [form]="asFormGroup(mainForm.get('estimatePayment'))"
+            [categories]="categories()"
+          />
         </app-step>
 
         <!-- ===================================================== -->
@@ -97,14 +107,17 @@
           label="เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้"
           iconName="paper"
           [showIcon]="true"
-          [valid]="summaryValid()"
-          [visited]="summaryVisited()"
+          [valid]="restuructureReasonValid()"
+          [visited]="restuructureReasonValid()"
         >
-          <app-restructure-reason-step [form]="step5Form" [reasons]="restructureReasons()" />
+          <app-restructure-reason-step
+            [form]="asFormGroup(mainForm.get('restructureReason'))"
+            [reasons]="restructureReasons()"
+          />
         </app-step>
 
         <!-- ===================================================== -->
-        <!-- Step 6: เอกสารประกอบการพิจารณา  -->
+        <!-- Step 6: Document Attach เอกสารประกอบการพิจารณา  -->
         <!-- ===================================================== -->
 
         <app-step
@@ -112,12 +125,30 @@
           label="เอกสารประกอบการพิจารณา"
           iconName="magnifying"
           [showIcon]="true"
-          [valid]="summaryValid()"
-          [visited]="summaryVisited()"
+          [valid]="documentAttachValid()"
+          [visited]="documentAttachVisited()"
         >
-          <app-document-attach-step [form]="step6Form" [attachments]="attachmentTypesDisplay()" />
+          <app-document-attach-step
+            [form]="asFormGroup(mainForm.get('documentAttachments'))"
+            [attachments]="attachmentTypesDisplay()"
+          />
         </app-step>
       </app-custom-stepper>
+
+      <!-- Bottom action button -->
+      @if (documentAttachValid()) {
+        <div class="flex w-full justify-center mt-6">
+          <button
+            z-button
+            [zSize]="'lg'"
+            type="button"
+            class="px-6 py-2 mb-4 font-semibold bg-emerald-600"
+            (click)="submitmainForm()"
+          >
+            บันทึกข้อมูล
+          </button>
+        </div>
+      }
     } @else if (isLoading()) {
       <div class="flex min-h-80 w-full items-center justify-center">
         <div class="flex flex-col items-center gap-4">

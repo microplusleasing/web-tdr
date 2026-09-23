@@ -18,3 +18,11 @@ export interface WorkplaceAddressForm extends AddressForm {
   workplacePhone: FormControl<string>;
   workplaceDescription: FormControl<string>;
 }
+
+export interface carUserAddress {
+  postalCodeLookup: FormControl<string>;
+  postalCode: FormControl<string>;
+  subDistrict: FormControl<string>;
+  district: FormControl<string>;
+  province: FormControl<string>;
+}
