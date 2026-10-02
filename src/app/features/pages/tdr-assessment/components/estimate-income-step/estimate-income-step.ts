@@ -7,6 +7,7 @@ import {
   OnInit,
   SimpleChange,
   SimpleChanges,
+  isDevMode,
 } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ import { ZardButtonComponent } from '@/shared/components/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstimateIncomeStep implements OnInit, OnChanges, OnDestroy {
+  readonly showMock = isDevMode();
   @Input({ required: true }) form!: FormGroup;
 
   @Input({ required: true }) assessment: IAssessmentItemDisplay[] = [];
@@ -58,6 +60,7 @@ export class EstimateIncomeStep implements OnInit, OnChanges, OnDestroy {
   }
 
   mockData() {
+    if (!this.showMock) return;
     this.form.patchValue({
       incomes: {
         PRIMARY_INCOME: {

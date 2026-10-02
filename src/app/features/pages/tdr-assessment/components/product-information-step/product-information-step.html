@@ -14,9 +14,11 @@
         <p class="mt-1 text-sm text-muted-foreground text-center">กรุณากรอกข้อมูลรถจักรยานยนต์</p>
       </div>
 
-      <div class="mb-4">
-        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
-      </div>
+      @if (showMock) {
+        <div class="mb-4">
+          <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+        </div>
+      }
 
       <!-- =================================================== -->
       <!-- Product fields -->
@@ -223,14 +225,14 @@
 
         <div class="space-y-5">
           <div>
-            <label for="currentCondition" class="mb-2 block text-sm font-medium">
+            <label for="vehicleUsageAddress" class="mb-2 block text-sm font-medium">
               ที่อยู่ปัจจุบัน
               <span class="text-destructive">*</span>
             </label>
 
             <textarea
-              id="currentCondition"
-              formControlName="currentCondition"
+              id="vehicleUsageAddress"
+              formControlName="vehicleUsageAddress"
               rows="4"
               class="w-full rounded-md border px-3 py-2 text-sm"
               placeholder="กรุณาระบุรายละเอียด"
@@ -245,6 +247,32 @@
           />
 
           <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <!-- สภาพรถปัจจุบัน -->
+            <div>
+              <label for="currentMileage" class="mb-2 block text-sm font-medium">
+                สภาพรถปัจจุบัน
+                <span class="text-destructive">*</span>
+              </label>
+
+              <z-select
+                aria-labelledby="brand-label"
+                class="w-full min-w-48"
+                zPlaceholder="เลือกสภาพรถปัจจุบัน"
+                formControlName="currentVehicleCondition"
+              >
+                <z-select-label>สภาพรถปัจจุบัน</z-select-label>
+                @for (cvc of currentVehicleConditionTypes; track cvc.code; let i = $index) {
+                  <z-select-item [zValue]="cvc.code">
+                    {{ cvc.name }}
+                  </z-select-item>
+                }
+              </z-select>
+
+              @if (isInvalid('brand')) {
+                <p class="mt-1 text-sm text-destructive">กรุณาเลือกสภาพรถปัจจุบัน</p>
+              }
+            </div>
+            <!-- เลขไมล์ปัจจุบัน -->
             <div>
               <label for="currentMileage" class="mb-2 block text-sm font-medium">
                 เลขไมล์ปัจจุบัน
@@ -268,7 +296,7 @@
       <!-- MOTORCYCLE PHOTOS -->
       <!-- IMPORTANT HIERARCHY -->
       <!-- productInformation -->
-      <!--   -> motorcyclePhotos -->
+      <!--   -> motorcyclePhoto -->
       <!--      -> index -->
       <!-- =================================================== -->
 
@@ -281,7 +309,7 @@
 
         <!-- THIS IS REQUIRED -->
 
-        <div formArrayName="motorcyclePhotos" class="overflow-hidden rounded-lg border">
+        <div formArrayName="motorcyclePhoto" class="overflow-hidden rounded-lg border">
           <div class="divide-y">
             @for (photoType of motorcyclePhotoTypes; track photoType.code; let i = $index) {
               <!-- THIS IS REQUIRED -->
@@ -368,8 +396,8 @@
                   }
 
                   @if (
-                    motorcyclePhotos.at(i).get('file')?.invalid &&
-                    motorcyclePhotos.at(i).get('file')?.touched
+                    motorcyclePhoto.at(i).get('file')?.invalid &&
+                    motorcyclePhoto.at(i).get('file')?.touched
                   ) {
                     <p class="mt-2 text-sm text-destructive">กรุณาแนบรูปภาพ</p>
                   }

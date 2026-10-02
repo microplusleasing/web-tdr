@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   SimpleChanges,
+  isDevMode,
 } from '@angular/core';
 
 import { DecimalPipe } from '@angular/common';
@@ -33,6 +34,7 @@ import { Subscription } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EstimatePaymentStep implements OnInit, OnChanges, OnDestroy {
+  readonly showMock = isDevMode();
   @Input({
     required: true,
   })
@@ -97,6 +99,7 @@ export class EstimatePaymentStep implements OnInit, OnChanges, OnDestroy {
     //   },
     // });
 
+    if (!this.showMock) return;
     this.form.patchValue({
       NECESSARY_EXPENSE: {
         EDUCATION_EXPENSE: {

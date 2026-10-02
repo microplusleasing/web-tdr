@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "builduat": "ng build --configuration uat --output-hashing none",
+    "buildprod": "ng build --configuration production --output-hashing none"
   },
   "private": true,
   "packageManager": "npm@11.13.0",

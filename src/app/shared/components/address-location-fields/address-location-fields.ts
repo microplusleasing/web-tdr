@@ -215,6 +215,7 @@ export class AddressLocationFields implements OnInit, OnChanges {
       subDistrict: selected.subDistrict,
       district: selected.district,
       province: selected.province,
+      provCode: selected.provinceCode,
     });
 
     // -------------------------------------------------------
@@ -302,6 +303,7 @@ export class AddressLocationFields implements OnInit, OnChanges {
       subDistrict: '',
       district: '',
       province: '',
+      provCode: '',
     });
   }
 

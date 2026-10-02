@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   SimpleChanges,
+  isDevMode,
 } from '@angular/core';
 
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -28,6 +29,7 @@ import { Subscription } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RestructureReasonStep implements OnInit, OnChanges, OnDestroy {
+  readonly showMock = isDevMode();
   // =========================================================
   // Form
   // =========================================================
@@ -75,6 +77,7 @@ export class RestructureReasonStep implements OnInit, OnChanges, OnDestroy {
   }
 
   mockData() {
+    if (!this.showMock) return;
     const reasons = this.form.get('reasons') as FormArray;
 
     reasons.controls.forEach((control) => {

@@ -3,6 +3,23 @@
   <!-- Desktop / Tablet Stepper Header                       -->
   <!-- ===================================================== -->
 
+  <!-- <div
+    #stickyHeader
+    class="hidden sm:block"
+    [class.fixed]="isSticky"
+    [class.left-0]="isSticky"
+    [class.right-0]="isSticky"
+    [class.bg-white]="isSticky"
+    [class.z-50]="isSticky"
+    [class.mb-3]="!isSticky"
+    [class.p-3]="isSticky"
+    [class.shadow-md]="isSticky"
+    [class.border-b]="isSticky"
+    [ngClass]="{
+      'top-0': isSticky && isHideHeader,
+      'top-8': isSticky && !isHideHeader,
+    }"
+  > -->
   <div
     #stickyHeader
     class="hidden sm:block"
@@ -16,8 +33,12 @@
     [class.p-3]="isSticky"
     [class.shadow-md]="isSticky"
     [class.border-b]="isSticky"
-    [class.top-8]="!isHideHeader"
   >
+    @if (isSticky) {
+      <div class="mb-3 text-center text-sm font-semibold text-gray-800">
+        {{ getCurrentStep()?.label() }}
+      </div>
+    }
     <div class="relative flex w-full items-start">
       <!-- Background line -->
 
@@ -103,6 +124,24 @@
   <!-- Mobile Sticky Header                                  -->
   <!-- ===================================================== -->
 
+  <!-- <div
+    #stickyHeaderMobile
+    class="block sm:hidden"
+    [class.fixed]="isSticky"
+    [class.left-0]="isSticky"
+    [class.right-0]="isSticky"
+    [class.bg-white]="isSticky"
+    [class.z-50]="isSticky"
+    [class.mb-3]="!isSticky"
+    [class.p-3]="isSticky"
+    [class.shadow-md]="isSticky"
+    [class.border-b]="isSticky"
+    [ngClass]="{
+      'top-0': isSticky && isHideHeader,
+      'top-8': isSticky && !isHideHeader,
+    }"
+  > -->
+
   <div
     #stickyHeaderMobile
     class="block sm:hidden"
@@ -112,11 +151,9 @@
     [class.right-0]="isSticky"
     [class.bg-white]="isSticky"
     [class.z-50]="isSticky"
-    [class.mb-3]="!isSticky"
     [class.p-3]="isSticky"
     [class.shadow-md]="isSticky"
     [class.border-b]="isSticky"
-    [class.top-8]="!isHideHeader"
   >
     <!-- Current step label -->
 
@@ -210,14 +247,16 @@
   <!-- Step Content                                          -->
   <!-- ===================================================== -->
 
-  <div class="mt-6 min-h-[200px] rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:mb-0">
+  <div
+    #stepContent
+    class="mt-6 min-h-[200px] rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:mb-0"
+  >
     @if (getCurrentStep(); as currentStep) {
       <ng-container *ngTemplateOutlet="currentStep.content"></ng-container>
     } @else {
       <div class="py-10 text-center text-gray-500">No content available for this step.</div>
     }
   </div>
-
   <!-- ===================================================== -->
   <!-- Desktop / Tablet Navigation                           -->
   <!-- ===================================================== -->

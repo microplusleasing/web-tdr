@@ -9,6 +9,7 @@ import {
   Output,
   signal,
   SimpleChanges,
+  isDevMode,
 } from '@angular/core';
 
 import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -56,6 +57,7 @@ import { ZardButtonComponent } from '@/shared/components/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerInformationStep implements OnInit {
+  readonly showMock = isDevMode();
   // =========================================================
   // Inputs
   // =========================================================
@@ -123,6 +125,8 @@ export class CustomerInformationStep implements OnInit {
   // Mock data button (remove on production)
   // =========================================================
   mockData() {
+    if (!this.showMock) return;
+
     this.form.get('contractNo')?.setValue('110202206010013');
     this.form.get('title')?.setValue('001');
     this.form.get('firstName')?.setValue('ณภัทร');
@@ -134,6 +138,7 @@ export class CustomerInformationStep implements OnInit {
     this.form.get('idCardAddress.subDistrict')?.setValue('ในคลองบางปลากด');
     this.form.get('idCardAddress.district')?.setValue('พระสมุทรเจดีย์');
     this.form.get('idCardAddress.province')?.setValue('สมุทรปราการ');
+    this.form.get('idCardAddress.provCode')?.setValue('11');
     this.form.get('idCardAddress.postalCode')?.setValue('10290');
 
     this.form.get('registeredAddressSameAsIdCard')?.setValue(true);
@@ -144,6 +149,7 @@ export class CustomerInformationStep implements OnInit {
     this.form.get('registeredAddress.subDistrict')?.setValue('ในคลองบางปลากด');
     this.form.get('registeredAddress.district')?.setValue('พระสมุทรเจดีย์');
     this.form.get('registeredAddress.province')?.setValue('สมุทรปราการ');
+    this.form.get('registeredAddress.provCode')?.setValue('11');
     this.form.get('registeredAddress.postalCode')?.setValue('10290');
 
     this.form.get('currentAddress.houseNo')?.setValue('309');
@@ -151,6 +157,7 @@ export class CustomerInformationStep implements OnInit {
     this.form.get('currentAddress.subDistrict')?.setValue('ในคลองบางปลากด');
     this.form.get('currentAddress.district')?.setValue('พระสมุทรเจดีย์');
     this.form.get('currentAddress.province')?.setValue('สมุทรปราการ');
+    this.form.get('currentAddress.provCode')?.setValue('11');
     this.form.get('currentAddress.postalCode')?.setValue('10290');
 
     this.form.get('phoneNo')?.setValue('0952483338');
@@ -170,6 +177,7 @@ export class CustomerInformationStep implements OnInit {
     this.form.get('workplaceAddress.district')?.setValue('บางแค');
     this.form.get('workplaceAddress.province')?.setValue('กรุงเทพฯ');
     this.form.get('workplaceAddress.postalCode')?.setValue('10160');
+    this.form.get('workplaceAddress.provCode')?.setValue('10');
     this.form.get('workplaceAddress.workplacePhone')?.setValue('021143459');
     this.form.get('workplaceAddress.workplaceDescription')?.setValue('ใหญ่โต อลังการ');
 

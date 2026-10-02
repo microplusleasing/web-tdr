@@ -6,9 +6,11 @@
         การประเมินรายได้ (รวมต่อเดือน)
       </h2>
 
-      <div class="mb-4">
-        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
-      </div>
+      @if (showMock) {
+        <div class="mb-4">
+          <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+        </div>
+      }
 
       <!-- Zero income notice -->
       <div class="mb-6">

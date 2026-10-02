@@ -19,7 +19,9 @@
       <!-- CONTRACT NO -->
       <!-- ================================================= -->
 
-      <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+      @if (showMock) {
+        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+      }
 
       <div>
         <label class="mb-2 block text-sm font-medium text-gray-800" for="contractNo">

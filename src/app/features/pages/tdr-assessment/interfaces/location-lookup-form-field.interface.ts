@@ -12,6 +12,7 @@ export interface AddressForm {
   subDistrict: FormControl<string>;
   district: FormControl<string>;
   province: FormControl<string>;
+  provCode: FormControl<string>;
 }
 
 export interface WorkplaceAddressForm extends AddressForm {
@@ -25,4 +26,5 @@ export interface carUserAddress {
   subDistrict: FormControl<string>;
   district: FormControl<string>;
   province: FormControl<string>;
+  provCode: FormControl<string>;
 }

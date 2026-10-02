@@ -29,4 +29,10 @@ export class TdrAssessmentService {
 
     return this.http.get<IContractExistResponse>(url);
   }
+
+  createAssessment(formData: FormData) {
+    const url = `${this.baseUrl}/tdr-assessment`;
+
+    return this.http.post(url, formData);
+  }
 }

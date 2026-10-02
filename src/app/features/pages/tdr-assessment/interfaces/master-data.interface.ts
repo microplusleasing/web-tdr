@@ -22,6 +22,8 @@ export interface IMasterDataParameters {
   brands: IBrandsParameter[];
 
   models: IModelsParameter[];
+
+  currentVehicleConditionTypes: ICurrentVehicleConditionTypeParameter[];
 }
 
 // ============================================================
@@ -93,6 +95,16 @@ export interface IModelsParameter {
   model_code: string;
   model_name: string;
   model_key: string;
+}
+
+// ============================================================
+// Vehicle User Type
+// ============================================================
+
+export interface ICurrentVehicleConditionTypeParameter {
+  code: string;
+  name: string;
+  order_index: number;
 }
 
 // ============================================================

@@ -8,9 +8,11 @@
       การประเมินค่าใช้จ่ายและภาระหนี้
     </h2>
 
-    <div class="mb-4">
-      <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
-    </div>
+    @if (showMock) {
+      <div class="mb-4">
+        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+      </div>
+    }
 
     <!-- ===================================================== -->
     <!-- NOTICE -->

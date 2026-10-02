@@ -44,6 +44,7 @@ import {
   IBrandsParameter,
   ITitleParameter,
   IMarriedStatusParameter,
+  ICurrentVehicleConditionTypeParameter,
 } from './interfaces/master-data.interface';
 
 import { ZardSpinnerComponent } from '@/shared/components/spinner';
@@ -55,6 +56,14 @@ import {
   carUserAddress,
   WorkplaceAddressForm,
 } from './interfaces/location-lookup-form-field.interface';
+
+// inteface form typesafe
+import {
+  MotorcyclePhoto,
+  Attachment,
+  // AttachmentFile,
+} from './interfaces/tdr-assessment-form.interface';
+import { ZardDialogService } from '@/shared/components/dialog';
 
 @Component({
   selector: 'app-tdr-assessment',
@@ -89,12 +98,14 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   private readonly fb = inject(FormBuilder);
-
   private readonly tdrAssessmentService = inject(TdrAssessmentService);
-
+  private readonly dialogService = inject(ZardDialogService);
   private readonly LOADING_DELAY = 300;
-
   private readonly destroyRef = inject(DestroyRef);
+
+  isSubmitting = signal(false);
+  isSubmitted = signal(false);
+  isSuccessSubmitted = signal(false);
 
   // =========================================================
   // Main Form
@@ -120,10 +131,11 @@ export class TdrAssessment implements OnInit {
   titles = signal<ITitleParameter[]>([]);
   marriedStatus = signal<IMarriedStatusParameter[]>([]);
   locations = signal<ILocationParameter[]>([]);
-  motocyclePhotoTypes = signal<IMotorcyclePhotoTypeDisplay[]>([]);
+  motorcyclePhotoTypes = signal<IMotorcyclePhotoTypeDisplay[]>([]);
   vehicleUserTypes = signal<IVehicleUserTypeDisplay[]>([]);
   brands = signal<IBrandsParameter[]>([]);
   models = signal<IModelsParameter[]>([]);
+  currentVehicleConditionTypes = signal<ICurrentVehicleConditionTypeParameter[]>([]);
   assessmentIncome = signal<IAssessmentItemDisplay[]>([]);
   categories = signal<IAssessmentCategoryDisplay[]>([]);
   restructureReasons = signal<IRestructureReasonDisplay[]>([]);
@@ -185,6 +197,9 @@ export class TdrAssessment implements OnInit {
   documentAttachValid = signal(false);
   documentAttachVisited = signal(false);
 
+  // Drives the save button: true only when EVERY step is valid
+  mainFormValid = signal(false);
+
   // =========================================================
   // Lifecycle
   // =========================================================
@@ -192,6 +207,10 @@ export class TdrAssessment implements OnInit {
   ngOnInit(): void {
     // 1. Build the form first
     this.buildForm();
+
+    this.mainForm.statusChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.mainFormValid.set(this.mainForm.valid));
 
     // 2. Setup anything that depends on the form
     this.setupAddressCopyHandlers();
@@ -331,6 +350,7 @@ export class TdrAssessment implements OnInit {
       subDistrict: this.fb.nonNullable.control('', Validators.required),
       district: this.fb.nonNullable.control('', Validators.required),
       province: this.fb.nonNullable.control('', Validators.required),
+      provCode: this.fb.nonNullable.control('', Validators.required),
     });
   }
 
@@ -351,6 +371,7 @@ export class TdrAssessment implements OnInit {
       subDistrict: this.fb.nonNullable.control('', Validators.required),
       district: this.fb.nonNullable.control('', Validators.required),
       province: this.fb.nonNullable.control('', Validators.required),
+      provCode: this.fb.nonNullable.control('', Validators.required),
     });
   }
 
@@ -375,6 +396,7 @@ export class TdrAssessment implements OnInit {
       subDistrict: this.fb.nonNullable.control('', Validators.required),
       district: this.fb.nonNullable.control('', Validators.required),
       province: this.fb.nonNullable.control('', Validators.required),
+      provCode: this.fb.nonNullable.control('', Validators.required),
 
       workplacePhone: this.fb.nonNullable.control('', [
         Validators.required,
@@ -419,11 +441,14 @@ export class TdrAssessment implements OnInit {
       relationship: ['', Validators.required],
       currentUserPhone: ['', Validators.required],
 
-      currentCondition: ['', Validators.required],
+      vehicleUsageAddress: ['', Validators.required],
+
+      currentVehicleCondition: ['', Validators.required],
+
       carUserAddress: this.createCarUserAddressGroup(),
       currentMileage: ['', Validators.required],
 
-      motorcyclePhotos: this.fb.array([]),
+      motorcyclePhoto: this.fb.array([]),
     });
   }
 
@@ -431,8 +456,8 @@ export class TdrAssessment implements OnInit {
   // Motorcycle Photos FormArray
   // =========================================================
 
-  get motorcyclePhotos(): FormArray {
-    return this.mainForm.get('productInformation.motorcyclePhotos') as FormArray;
+  get motorcyclePhoto(): FormArray {
+    return this.mainForm.get('productInformation.motorcyclePhoto') as FormArray;
   }
 
   // step 3
@@ -575,6 +600,7 @@ export class TdrAssessment implements OnInit {
     const attachments = attachmentTypes.map((attachment) =>
       this.fb.group({
         attachmentCode: [attachment.attachmentCode, Validators.required],
+        attachmentTypeId: [attachment.attachmentTypeId, Validators.required],
 
         files: this.fb.control<File[] | null>(
           null,
@@ -629,12 +655,18 @@ export class TdrAssessment implements OnInit {
         const locations = response.parameters?.locations ?? [];
         const photoTypes = response.display?.motorcyclePhotoTypes ?? [];
         const vehicleUserTypes = response.display?.vehicleUserTypes ?? [];
+        const brands = response.parameters.brands ?? [];
+        const models = response.parameters.models ?? [];
+        const currentVehicleConditionTypes = response.parameters.currentVehicleConditionTypes ?? [];
 
         this.titles.set(titles);
         this.marriedStatus.set(marriedStatus);
         this.locations.set(locations);
-        this.motocyclePhotoTypes.set(photoTypes);
+        this.motorcyclePhotoTypes.set(photoTypes);
         this.vehicleUserTypes.set(vehicleUserTypes);
+        this.brands.set(brands);
+        this.models.set(models);
+        this.currentVehicleConditionTypes.set(currentVehicleConditionTypes);
 
         this.buildMotorcyclePhotoForms(photoTypes);
 
@@ -738,8 +770,6 @@ export class TdrAssessment implements OnInit {
     const control = this.mainForm.get(controlName);
 
     if (!control) {
-      console.warn(`Cannot find form control: ${controlName}`);
-
       return;
     }
 
@@ -771,7 +801,7 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   private buildMotorcyclePhotoForms(photoTypes: IMotorcyclePhotoTypeDisplay[]): void {
-    const photos = this.mainForm.get('productInformation.motorcyclePhotos') as FormArray;
+    const photos = this.mainForm.get('productInformation.motorcyclePhoto') as FormArray;
 
     // Clear existing controls
     photos.clear();
@@ -874,16 +904,102 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   submitmainForm(): void {
+    // Block double click / re-entry
+    if (this.isSubmitting() || this.isSubmitted()) {
+      return;
+    }
+
     this.mainForm.markAllAsTouched();
 
     if (this.mainForm.invalid) {
       console.log('TDR Assessment form is invalid');
-
       console.log(this.mainForm);
-
       return;
     }
 
-    console.log('TDR Assessment:', this.mainForm.getRawValue());
+    const value = this.mainForm.getRawValue();
+
+    const formData = new FormData();
+
+    formData.append(
+      'data',
+      JSON.stringify({
+        ...value,
+        productInformation: {
+          ...value.productInformation,
+          motorcyclePhoto: value.productInformation.motorcyclePhoto.map(
+            (photo: MotorcyclePhoto) => ({
+              photoType: photo.photoType,
+              fileName: photo.fileName,
+            }),
+          ),
+          documentAttachments: value.documentAttachments.attachments.map(
+            (attachment: Attachment) => ({
+              attachmentTypeId: attachment.attachmentTypeId,
+              fileName: attachment.fileName,
+            }),
+          ),
+        },
+      }),
+    );
+
+    value.productInformation.motorcyclePhoto.forEach((photo: MotorcyclePhoto) => {
+      if (photo.file instanceof File) {
+        const extension = photo.file.name.split('.').pop()?.toLowerCase() ?? '';
+
+        const fileName = `${photo.photoType}.${extension}`;
+
+        formData.append('motorcyclePhoto', photo.file, fileName);
+      }
+    });
+
+    value.documentAttachments.attachments.forEach((attachment: Attachment) => {
+      if (!attachment.files || attachment.files.length === 0) {
+        return;
+      }
+
+      const file = attachment.files[0];
+
+      if (!(file instanceof File)) {
+        return;
+      }
+
+      const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+
+      const fileName = `${attachment.attachmentTypeId}.${extension}`;
+
+      formData.append('documentAttach', file, fileName);
+    });
+
+    this.tdrAssessmentService
+      .createAssessment(formData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          console.log('TDR Assessment created:', response);
+          this.isSubmitting.set(false);
+          this.isSubmitted.set(true); // hides the steps (see template)
+          this.isSuccessSubmitted.set(true);
+          this.dialogService.create({
+            zTitle: 'สำเร็จ',
+            zDescription: 'ส่งใบคำขอเรียบร้อยแล้ว',
+            zOkText: 'ตกลง',
+            zCancelText: null,
+            zClosable: false,
+            zMaskClosable: false,
+          });
+        },
+        error: (error) => {
+          console.error('Create TDR Assessment failed:', error);
+          this.isSubmitting.set(false); // allow retry
+
+          this.dialogService.create({
+            zTitle: 'เกิดข้อผิดพลาด',
+            zDescription: 'ไม่สามารถส่งใบคำขอได้ กรุณาลองใหม่อีกครั้ง',
+            zOkText: 'ตกลง',
+            zCancelText: null,
+          });
+        },
+      });
   }
 }

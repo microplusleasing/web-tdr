@@ -8,9 +8,11 @@
       เหตุผลและความจำเป็นในการขอปรับโครงสร้างหนี้
     </h2>
 
-    <div class="mb-4">
-      <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
-    </div>
+    @if (showMock) {
+      <div class="mb-4">
+        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+      </div>
+    }
 
     <!-- ===================================================== -->
     <!-- DESCRIPTION -->

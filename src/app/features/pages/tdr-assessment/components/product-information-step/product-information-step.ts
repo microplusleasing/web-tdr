@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject, isDevMode } from '@angular/core';
 
 import {
   AbstractControl,
@@ -13,6 +13,7 @@ import { ZardInputComponent } from '@/shared/components/input';
 import { ZardSelectImports } from '@/shared/components/select';
 import {
   IBrandsParameter,
+  ICurrentVehicleConditionTypeParameter,
   ILocationParameter,
   IModelsParameter,
   IMotorcyclePhotoTypeDisplay,
@@ -41,6 +42,7 @@ import { ImageService } from '../../services/image.service';
   styleUrl: './product-information-step.css',
 })
 export class ProductInformationStep implements OnChanges {
+  readonly showMock = isDevMode();
   // =========================================================
   // Services
   // =========================================================
@@ -64,6 +66,8 @@ export class ProductInformationStep implements OnChanges {
   @Input({ required: true }) locations: ILocationParameter[] = [];
   @Input({ required: true }) brands: IBrandsParameter[] = [];
   @Input({ required: true }) models: IModelsParameter[] = [];
+  @Input({ required: true }) currentVehicleConditionTypes: ICurrentVehicleConditionTypeParameter[] =
+    [];
   filteredModels: IModelsParameter[] = [];
 
   // =========================================================
@@ -107,6 +111,7 @@ export class ProductInformationStep implements OnChanges {
   }
 
   mockData() {
+    if (!this.showMock) return;
     this.form.get('brand')?.setValue('01');
     this.form.get('model')?.setValue('0001');
     this.form.get('color')?.setValue('ดำ');
@@ -116,17 +121,17 @@ export class ProductInformationStep implements OnChanges {
     this.form.get('currentUserName')?.setValue('สมปอง');
     this.form.get('relationship')?.setValue('เพื่อน');
     this.form.get('currentUserPhone')?.setValue('0999999999');
-    this.form.get('currentCondition')?.setValue('93/1 หมู่ 3 ซ.วัดใหญ่');
-
+    this.form.get('vehicleUsageAddress')?.setValue('93/1 หมู่ 3 ซ.วัดใหญ่');
     this.form.get('carUserAddress.postalCodeLookup')?.setValue('110504');
-
+    this.form.get('carUserAddress.provCode')?.setValue('11');
     this.form.get('currentMileage')?.setValue('200000');
+    this.form.get('currentVehicleCondition')?.setValue('CV01');
 
-    this.mockMotorcyclePhotos();
+    this.mockMotorcyclePhoto();
   }
 
-  private mockMotorcyclePhotos(): void {
-    this.motorcyclePhotos.controls.forEach((control, index) => {
+  private mockMotorcyclePhoto(): void {
+    this.motorcyclePhoto.controls.forEach((control, index) => {
       const photoType = this.motorcyclePhotoTypes[index];
 
       if (!photoType) {
@@ -147,7 +152,7 @@ export class ProductInformationStep implements OnChanges {
       control.get('file')?.markAsDirty();
     });
 
-    this.motorcyclePhotos.updateValueAndValidity();
+    this.motorcyclePhoto.updateValueAndValidity();
   }
 
   get isAdditionalInfoRequired(): boolean {
@@ -270,8 +275,8 @@ export class ProductInformationStep implements OnChanges {
   // Form helpers
   // =========================================================
 
-  get motorcyclePhotos(): FormArray {
-    return this.form.get('motorcyclePhotos') as FormArray;
+  get motorcyclePhoto(): FormArray {
+    return this.form.get('motorcyclePhoto') as FormArray;
   }
 
   control(path: string): AbstractControl | null {
@@ -305,7 +310,7 @@ export class ProductInformationStep implements OnChanges {
       return;
     }
 
-    const photoGroup = this.motorcyclePhotos.at(index) as FormGroup;
+    const photoGroup = this.motorcyclePhoto.at(index) as FormGroup;
 
     photoGroup.patchValue({
       file,
@@ -328,7 +333,7 @@ export class ProductInformationStep implements OnChanges {
   // =========================================================
 
   removePhoto(index: number): void {
-    const photoGroup = this.motorcyclePhotos.at(index) as FormGroup;
+    const photoGroup = this.motorcyclePhoto.at(index) as FormGroup;
 
     photoGroup.patchValue({
       file: null,
@@ -343,7 +348,7 @@ export class ProductInformationStep implements OnChanges {
   // =========================================================
 
   getPhotoFile(index: number): File | null {
-    return this.motorcyclePhotos.at(index)?.get('file')?.value ?? null;
+    return this.motorcyclePhoto.at(index)?.get('file')?.value ?? null;
   }
 
   // =========================================================

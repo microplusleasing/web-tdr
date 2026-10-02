@@ -143,6 +143,9 @@ export class CustomStepper implements AfterContentInit, OnDestroy {
   @ViewChild('stickyHeaderMobile', { read: ElementRef })
   stickyHeaderMobileRef?: ElementRef;
 
+  @ViewChild('stepContent', { read: ElementRef })
+  stepContentRef?: ElementRef;
+
   // =========================================================
   // Lifecycle
   // =========================================================
@@ -527,14 +530,18 @@ export class CustomStepper implements AfterContentInit, OnDestroy {
 
   private scrollContentToTop(): void {
     setTimeout(() => {
-      const headerOffset = this.isSticky ? this.stickyHeaderHeight + 16 : 16;
+      const element = this.stepContentRef?.nativeElement;
 
-      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (!element) {
+        return;
+      }
 
-      const targetScroll = Math.max(0, currentScroll - headerOffset);
+      // const headerOffset = this.isSticky ? this.stickyHeaderHeight + 16 : 16;
+
+      // const top = element.getBoundingClientRect().top + window.scrollY - headerOffset;
 
       window.scrollTo({
-        top: targetScroll,
+        top: Math.max(0, 0),
         behavior: 'smooth',
       });
     });

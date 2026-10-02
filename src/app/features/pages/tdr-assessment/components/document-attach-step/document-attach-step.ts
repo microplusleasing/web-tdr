@@ -1,30 +1,36 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   SimpleChanges,
+  isDevMode,
 } from '@angular/core';
 
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
+import { ZardButtonComponent } from '@/shared/components/button';
+
 import { IAttachmentTypeDisplay } from '../../interfaces/master-data.interface';
 import { Subscription } from 'rxjs';
+import { ImageService } from '../../services/image.service';
 
 @Component({
   selector: 'app-document-attach-step',
 
   standalone: true,
 
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ZardButtonComponent],
 
   templateUrl: './document-attach-step.html',
 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DocumentAttachStep implements OnInit, OnChanges, OnDestroy {
+  readonly showMock = isDevMode();
   // =========================================================
   // Form
   // =========================================================
@@ -38,6 +44,8 @@ export class DocumentAttachStep implements OnInit, OnChanges, OnDestroy {
   @Input({ required: true }) attachments: IAttachmentTypeDisplay[] = [];
 
   private formSub?: Subscription;
+
+  private readonly imageService = inject(ImageService);
 
   ngOnInit(): void {
     if (this.form) {
@@ -63,6 +71,34 @@ export class DocumentAttachStep implements OnInit, OnChanges, OnDestroy {
         enabled: control?.enabled,
       });
     });
+  }
+
+  mockData() {
+    if (!this.showMock) return;
+    this.mockAttachments();
+  }
+
+  private mockAttachments(): void {
+    this.attachmentForms.controls.forEach((control, index) => {
+      const attachmentType = this.attachments[index];
+
+      if (!attachmentType) {
+        return;
+      }
+
+      const file = this.imageService.createMockImageFile(
+        `${attachmentType.attachmentCode}.jpg`,
+        index % 2 === 0 ? '#2563eb' : '#16a34a',
+      );
+
+      // In this form, `files` is File[] (not a single `file` like the motorcycle photos)
+      control.patchValue({ files: [file] });
+
+      control.get('files')?.markAsTouched();
+      control.get('files')?.markAsDirty();
+    });
+
+    this.attachmentForms.updateValueAndValidity();
   }
 
   private logFormState(): void {
