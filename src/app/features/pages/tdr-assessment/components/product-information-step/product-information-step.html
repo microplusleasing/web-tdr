@@ -95,6 +95,15 @@
             placeholder="กรุณาระบุสี"
             class="w-full"
           />
+          @if (isInvalid('color')) {
+            <p class="mt-1 text-sm text-red-500">
+              @if (control('color')?.hasError('required')) {
+                กรุณาระบุสีรถจักรยานยนต์
+              } @else if (control('color')?.hasError('maxlength')) {
+                ข้อความยาวเกินกำหนด
+              }
+            </p>
+          }
         </div>
 
         <!-- Registration -->
@@ -113,6 +122,15 @@
             placeholder="กรุณาระบุเลขทะเบียน"
             class="w-full"
           />
+          @if (isInvalid('registrationNo')) {
+            <p class="mt-1 text-sm text-red-500">
+              @if (control('registrationNo')?.hasError('required')) {
+                กรุณาระบุเลขทะเบียน
+              } @else if (control('registrationNo')?.hasError('maxlength')) {
+                ข้อความยาวเกินกำหนด
+              }
+            </p>
+          }
         </div>
 
         <!-- Purchase Status -->
@@ -130,12 +148,19 @@
             formControlName="vehicleUserType"
           >
             <z-select-label>สถานะการเช่าซื้อ</z-select-label>
-            @for (vus of vehicleUserTypes; track vus.code; let vus.order = $index) {
+            @for (vus of vehicleUserTypes; track vus.code; let i = $index) {
               <z-select-item [zValue]="vus.code">
                 {{ vus.name }}
               </z-select-item>
             }
           </z-select>
+          @if (isInvalid('vehicleUserType')) {
+            <p class="mt-1 text-sm text-red-500">
+              @if (control('vehicleUserType')?.hasError('required')) {
+                กรุณาระบุสถานะการเช่าซื้อ
+              }
+            </p>
+          }
         </div>
 
         <!-- additionnalInfo field -->
@@ -177,13 +202,22 @@
             placeholder="ชื่อผู้ใช้รถปัจจุบัน"
             class="w-full"
           />
+          @if (isInvalid('currentUserName')) {
+            <p class="mt-1 text-sm text-red-500">
+              @if (control('currentUserName')?.hasError('required')) {
+                กรุณาระบุชื่อผู้ใช้รถปัจจุบัน
+              } @else if (control('currentUserName')?.hasError('maxlength')) {
+                ข้อความยาวเกินกำหนด
+              }
+            </p>
+          }
         </div>
 
         <!-- Relationship -->
 
         <div>
           <label for="relationship" class="mb-2 block text-sm font-medium">
-            ความสัมพันธ์
+            ความสัมพันธ์กับผู้ขอสินเชื่อ
             <span class="text-destructive">*</span>
           </label>
 
@@ -201,7 +235,7 @@
 
         <div>
           <label for="currentUserPhone" class="mb-2 block text-sm font-medium">
-            เบอร์โทรผู้ใช้รถ
+            เบอร์โทรผู้ใช้รถปัจจุบัน
             <span class="text-destructive">*</span>
           </label>
 
@@ -210,9 +244,19 @@
             z-input
             type="text"
             formControlName="currentUserPhone"
-            placeholder="เบอร์โทรศัพท์"
+            placeholder="เบอร์โทรผู้ใช้รถปัจจุบัน"
             class="w-full"
           />
+
+          @if (isInvalid('currentUserPhone')) {
+            <p class="mt-1 text-sm text-red-500">
+              @if (control('currentUserPhone')?.hasError('required')) {
+                กรุณาระบุเบอร์โทรผู้ใช้รถปัจจุบัน
+              } @else if (control('currentUserPhone')?.hasError('pattern')) {
+                กรอกเบอร์โทรศัพท์ให้ถูกต้อง
+              }
+            </p>
+          }
         </div>
       </div>
 
@@ -226,7 +270,7 @@
         <div class="space-y-5">
           <div>
             <label for="vehicleUsageAddress" class="mb-2 block text-sm font-medium">
-              ที่อยู่ปัจจุบัน
+              ที่อยู่ (สถานที่ใช้รถปัจจุบัน)
               <span class="text-destructive">*</span>
             </label>
 
@@ -237,6 +281,15 @@
               class="w-full rounded-md border px-3 py-2 text-sm"
               placeholder="กรุณาระบุรายละเอียด"
             ></textarea>
+            @if (isInvalid('vehicleUsageAddress')) {
+              <p class="mt-1 text-sm text-red-500">
+                @if (control('vehicleUsageAddress')?.hasError('required')) {
+                  กรุณาระบุที่อยู่ (สถานที่ใช้รถปัจจุบัน)
+                } @else if (control('vehicleUsageAddress')?.hasError('maxlength')) {
+                  ข้อความยาวเกินกำหนด
+                }
+              </p>
+            }
           </div>
 
           <!-- Location field component (ใช้สำหรับจัด format data ให้เข้ากับ master ของ database (oracle)) -->
@@ -268,7 +321,7 @@
                 }
               </z-select>
 
-              @if (isInvalid('brand')) {
+              @if (isInvalid('currentVehicleCondition')) {
                 <p class="mt-1 text-sm text-destructive">กรุณาเลือกสภาพรถปัจจุบัน</p>
               }
             </div>
@@ -287,6 +340,19 @@
                 placeholder="เลขไมล์"
                 class="w-full"
               />
+              @if (isInvalid('currentMileage')) {
+                <p class="mt-1 text-sm text-red-500">
+                  @if (control('currentMileage')?.hasError('required')) {
+                    กรุณาระบุเลขไมล์ปัจจุบัน
+                  } @else if (control('currentMileage')?.hasError('min')) {
+                    เลขไมล์ปัจจุบันต้องไม่น้อยกว่า 0
+                  } @else if (control('currentMileage')?.hasError('max')) {
+                    เลขไมล์ปัจจุบันต้องไม่เกิน 9,999,999,999
+                  } @else if (control('currentMileage')?.hasError('pattern')) {
+                    กรุณาระบุจำนวนบุตรเป็นจำนวนเต็มเท่านั้น
+                  }
+                </p>
+              }
             </div>
           </div>
         </div>

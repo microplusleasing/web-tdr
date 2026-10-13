@@ -260,9 +260,9 @@ export class TdrAssessment implements OnInit {
 
       title: ['', Validators.required],
 
-      firstName: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.maxLength(50)]],
 
-      lastName: ['', Validators.required],
+      lastName: ['', [Validators.required, Validators.maxLength(50)]],
 
       citizenId: ['', [Validators.required, Validators.pattern(/^\d{13}$/)]],
 
@@ -296,21 +296,27 @@ export class TdrAssessment implements OnInit {
 
       maritalStatus: ['', Validators.required],
 
-      numberOfChildren: [null, [Validators.required, Validators.min(0)]],
+      numberOfChildren: [
+        null,
+        [Validators.required, Validators.min(0), Validators.max(99), Validators.pattern(/^\d+$/)],
+      ],
 
-      dependents: [null, [Validators.required, Validators.min(0)]],
+      dependents: [
+        null,
+        [Validators.required, Validators.min(0), Validators.max(99), Validators.pattern(/^\d+$/)],
+      ],
 
       // -----------------------------------------------------
       // Employment
       // -----------------------------------------------------
 
-      occupation: ['', Validators.required],
+      occupation: ['', [Validators.required, Validators.maxLength(50)]],
 
-      position: ['', Validators.required],
+      position: ['', [Validators.required, Validators.maxLength(50)]],
 
-      jobDescription: ['', Validators.required],
+      jobDescription: ['', [Validators.required, Validators.maxLength(150)]],
 
-      workplaceName: ['', Validators.required],
+      workplaceName: ['', [Validators.required, Validators.maxLength(150)]],
 
       // -----------------------------------------------------
       // Workplace Address
@@ -337,10 +343,10 @@ export class TdrAssessment implements OnInit {
       // postalCodeLookup: this.fb.control<ILocationParameter | null>(null, Validators.required),
       postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
 
-      houseNo: this.fb.nonNullable.control('', Validators.required),
-      alley: this.fb.nonNullable.control(''),
-      soi: this.fb.nonNullable.control(''),
-      road: this.fb.nonNullable.control(''),
+      houseNo: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
+      alley: this.fb.nonNullable.control('', [Validators.maxLength(50)]),
+      soi: this.fb.nonNullable.control('', [Validators.maxLength(50)]),
+      road: this.fb.nonNullable.control('', [Validators.maxLength(50)]),
 
       postalCode: this.fb.nonNullable.control('', [
         Validators.required,
@@ -383,10 +389,10 @@ export class TdrAssessment implements OnInit {
     return this.fb.group({
       postalCodeLookup: this.fb.nonNullable.control<string>('', Validators.required),
 
-      houseNo: this.fb.nonNullable.control('', Validators.required),
-      alley: this.fb.nonNullable.control(''),
-      soi: this.fb.nonNullable.control(''),
-      road: this.fb.nonNullable.control(''),
+      houseNo: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
+      alley: this.fb.nonNullable.control('', [Validators.maxLength(50)]),
+      soi: this.fb.nonNullable.control('', [Validators.maxLength(50)]),
+      road: this.fb.nonNullable.control('', [Validators.maxLength(50)]),
 
       postalCode: this.fb.nonNullable.control('', [
         Validators.required,
@@ -404,8 +410,38 @@ export class TdrAssessment implements OnInit {
         // Validators.pattern(/^0\d{9}$/),
       ]),
 
-      workplaceDescription: this.fb.nonNullable.control('', Validators.required),
+      workplaceDescription: this.fb.nonNullable.control('', [
+        Validators.required,
+        Validators.maxLength(250),
+      ]),
     });
+  }
+
+  // =========================================================
+  // Reference Group Validator
+  // =========================================================
+  private referenceGroupValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const { name, phone, relationship } = control.value;
+
+      const hasAnyValue = [name, phone, relationship].some(
+        (value) => value != null && String(value).trim() !== '',
+      );
+
+      if (!hasAnyValue) {
+        return null;
+      }
+
+      const missingFields = {
+        name: !name?.trim(),
+        phone: !phone?.trim(),
+        relationship: !relationship?.trim(),
+      };
+
+      return Object.values(missingFields).some(Boolean)
+        ? { referenceFieldsRequired: missingFields }
+        : null;
+    };
   }
 
   // =========================================================
@@ -413,14 +449,32 @@ export class TdrAssessment implements OnInit {
   // =========================================================
 
   private createReferenceGroup(required: boolean): FormGroup {
-    return this.fb.group({
-      name: ['', required ? Validators.required : []],
+    return this.fb.group(
+      {
+        /* ชื่อ-นามสกุล */
+        name: [
+          '',
+          required ? [Validators.required, Validators.maxLength(60)] : [Validators.maxLength(60)],
+        ],
 
-      // phone: ['', required ? [Validators.required, Validators.pattern(/^0\d{9}$/)] : []],
-      phone: ['', required ? [Validators.required, Validators.pattern('^[0-9]{9,10}$')] : []],
+        /* เบอร์โทรศัพท์ */
+        phone: [
+          '',
+          required
+            ? [Validators.required, Validators.pattern('^[0-9]{9,10}$')]
+            : [Validators.pattern('^[0-9]{9,10}$')],
+        ],
 
-      relationship: ['', required ? Validators.required : []],
-    });
+        /* ความสัมพันธ์ */
+        relationship: [
+          '',
+          required ? [Validators.required, Validators.maxLength(60)] : [Validators.maxLength(60)],
+        ],
+      },
+      {
+        validators: required ? [] : [this.referenceGroupValidator()],
+      },
+    );
   }
 
   // =========================================================
@@ -429,24 +483,47 @@ export class TdrAssessment implements OnInit {
 
   private createProductInformationGroup(): FormGroup {
     return this.fb.group({
-      brand: ['', Validators.required],
-      model: ['', Validators.required],
-      color: ['', Validators.required],
-      registrationNo: ['', Validators.required],
+      brand: ['', Validators.required] /* maxLength(15) */,
+      model: ['', Validators.required] /* maxLength(15) */,
+      color: ['', [Validators.required, Validators.maxLength(20)]],
+      registrationNo: ['', [Validators.required, Validators.maxLength(100)]],
 
-      vehicleUserType: ['', Validators.required],
+      vehicleUserType: ['', Validators.required] /* maxLength(20) */,
       additionalInfo: [{ value: '', disabled: true }],
 
-      currentUserName: ['', Validators.required],
-      relationship: ['', Validators.required],
-      currentUserPhone: ['', Validators.required],
+      currentUserName: [
+        '',
+        [Validators.required, Validators.maxLength(200)],
+      ] /* ชื่อผู้ใช้รถปัจจุบัน */,
+      relationship: [
+        '',
+        [Validators.required, Validators.maxLength(100)],
+      ] /* ความสัมพันธ์กับผู้ขอสินเชื่อ */,
+      currentUserPhone: [
+        '',
+        [Validators.required, Validators.pattern('^[0-9]{9,10}$')],
+      ] /* เบอร์โทรผู้ใช้รถปัจจุบัน */,
 
-      vehicleUsageAddress: ['', Validators.required],
+      vehicleUsageAddress: [
+        '',
+        [Validators.required, Validators.maxLength(500)],
+      ] /* สถานที่ใช้รถปัจจุบัน */,
 
-      currentVehicleCondition: ['', Validators.required],
+      currentVehicleCondition: [
+        '',
+        [Validators.required],
+      ] /* สภาพรถปัจจุบัน (Validators.maxLength(200)) */,
 
       carUserAddress: this.createCarUserAddressGroup(),
-      currentMileage: ['', Validators.required],
+      currentMileage: [
+        '',
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.max(9999999999),
+          Validators.pattern(/^\d+$/),
+        ],
+      ],
 
       motorcyclePhoto: this.fb.array([]),
     });

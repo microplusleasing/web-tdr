@@ -355,7 +355,15 @@ export class CustomerInformationStep implements OnInit {
   isInvalid(controlName: string): boolean {
     const control = this.form.get(controlName);
 
-    return !!control && control.invalid && (control.touched || control.dirty);
+    if (!control) return false;
+
+    const interacted = control.touched || control.dirty;
+
+    const parentError = control.parent?.getError('referenceFieldsRequired');
+
+    const fieldName = controlName.split('.').pop();
+
+    return interacted && (control.invalid || !!(fieldName && parentError?.[fieldName]));
   }
 
   isAddressInvalid(address: string, controlName: string): boolean {
