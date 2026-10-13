@@ -4,6 +4,7 @@ import {
   AbstractControl,
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   ValidationErrors,
@@ -18,6 +19,11 @@ import { CustomerInformationStep } from './components/customer-information-step/
 import { ProductInformationStep } from './components/product-information-step/product-information-step';
 
 import { EstimateIncomeStep } from './components/estimate-income-step/estimate-income-step';
+
+import {
+  oracleNumberValidator,
+  requiredWhenSiblingFilled,
+} from './validators/oracle-number.validator';
 
 import { EstimatePaymentStep } from './components/estimate-payment-step/estimate-payment-step';
 
@@ -537,25 +543,55 @@ export class TdrAssessment implements OnInit {
     return this.mainForm.get('productInformation.motorcyclePhoto') as FormArray;
   }
 
+  /**
+   * Shared by step 3 (income) and step 4 (payment).
+   * - Amount always fits Oracle NUMBER(14,2) and is >= 0.
+   * - requireRemark = false -> amount is required, remark is not used.
+   * - requireRemark = true  -> amount and remark are optional, but if EITHER one is
+   *                            filled, the other becomes required (both ways).
+   */
+  private createAmountRemarkControls(item: IAssessmentItemDisplay): {
+    amount: FormControl<number | null>;
+    remark: FormControl<string | null>;
+  } {
+    const amountValidators: ValidatorFn[] = [
+      item.requireRemark ? requiredWhenSiblingFilled('remark') : Validators.required,
+      Validators.min(0),
+      oracleNumberValidator(14, 2),
+    ];
+
+    const amount = this.fb.control<number | null>(null, amountValidators);
+
+    const remark = this.fb.control<string | null>(
+      null,
+      item.requireRemark ? [requiredWhenSiblingFilled('amount')] : [],
+    );
+
+    if (item.requireRemark) {
+      // Re-evaluate the other field whenever one changes.
+      // emitEvent:false prevents the two subscriptions from triggering each other forever;
+      // the field being edited still emits, so parent/step validity updates normally.
+      amount.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+        remark.updateValueAndValidity({ emitEvent: false });
+      });
+
+      remark.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+        amount.updateValueAndValidity({ emitEvent: false });
+      });
+    }
+
+    return { amount, remark };
+  }
+
   // step 3
 
   private createestimateIncomeForm(items: IAssessmentItemDisplay[]): FormGroup {
     const incomes = this.fb.group({});
 
     for (const item of items) {
-      incomes.addControl(
-        item.itemCode,
-        this.fb.group({
-          amount: this.fb.nonNullable.control<number | null>(null, {
-            validators: [Validators.required, Validators.min(0)],
-          }),
+      const { amount, remark } = this.createAmountRemarkControls(item);
 
-          remark: this.fb.control<string | null>(
-            null,
-            item.requireRemark ? [Validators.required] : [],
-          ),
-        }),
-      );
+      incomes.addControl(item.itemCode, this.fb.group({ amount, remark }));
     }
 
     return this.fb.group({
@@ -575,20 +611,17 @@ export class TdrAssessment implements OnInit {
       const sortedItems = [...category.items].sort((a, b) => a.displayOrder - b.displayOrder);
 
       for (const item of sortedItems) {
+        const { amount, remark } = this.createAmountRemarkControls(item);
+
         categoryForm.addControl(
           item.itemCode,
 
           this.fb.group({
             itemId: this.fb.nonNullable.control(item.itemId),
 
-            amount: this.fb.control<number | null>(null, {
-              validators: [Validators.required, Validators.min(0)],
-            }),
+            amount,
 
-            remark: this.fb.control<string | null>(
-              null,
-              item.requireRemark ? [Validators.required] : [],
-            ),
+            remark,
           }),
         );
       }
@@ -994,6 +1027,9 @@ export class TdrAssessment implements OnInit {
       return;
     }
 
+    // Disable the button + show spinner immediately (before any heavy work / request)
+    this.isSubmitting.set(true);
+
     const value = this.mainForm.getRawValue();
 
     const formData = new FormData();
@@ -1056,15 +1092,8 @@ export class TdrAssessment implements OnInit {
           console.log('TDR Assessment created:', response);
           this.isSubmitting.set(false);
           this.isSubmitted.set(true); // hides the steps (see template)
-          this.isSuccessSubmitted.set(true);
-          this.dialogService.create({
-            zTitle: 'สำเร็จ',
-            zDescription: 'ส่งใบคำขอเรียบร้อยแล้ว',
-            zOkText: 'ตกลง',
-            zCancelText: null,
-            zClosable: false,
-            zMaskClosable: false,
-          });
+          this.isSuccessSubmitted.set(true); // template shows the success card
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         error: (error) => {
           console.error('Create TDR Assessment failed:', error);
@@ -1079,4 +1108,9 @@ export class TdrAssessment implements OnInit {
         },
       });
   }
+
+  /** Success card -> start a fresh form (reloads the page so every step is reset) */
+  // startNewAssessment(): void {
+  //   window.location.reload();
+  // }
 }

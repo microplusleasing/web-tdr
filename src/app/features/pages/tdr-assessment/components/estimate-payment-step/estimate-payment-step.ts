@@ -206,6 +206,44 @@ export class EstimatePaymentStep implements OnInit, OnChanges, OnDestroy {
   }
 
   // =========================================================
+  // Validation messages
+  // =========================================================
+
+  /** Error message (Thai) for the amount field, or null when it should not be shown. */
+  getAmountErrorMessage(categoryCode: string, itemCode: string): string | null {
+    const control = this.getAmountControl(categoryCode, itemCode);
+    const remark = this.getRemarkControl(categoryCode, itemCode);
+
+    if (!(control.touched || remark.touched) || !control.errors) return null;
+
+    if (control.errors['required']) return 'กรุณาระบุจำนวนเงิน';
+    if (control.errors['min']) return 'จำนวนเงินต้องไม่ติดลบ';
+
+    const oracle = control.errors['oracleNumber'];
+
+    if (oracle) {
+      if (oracle.reason === 'precision') {
+        return `จำนวนเงินต้องไม่เกิน ${oracle.maxIntegerDigits} หลักก่อนจุดทศนิยม`;
+      }
+      if (oracle.reason === 'scale') {
+        return `ทศนิยมต้องไม่เกิน ${oracle.maxScale} ตำแหน่ง`;
+      }
+      return 'รูปแบบจำนวนเงินไม่ถูกต้อง';
+    }
+
+    return 'จำนวนเงินไม่ถูกต้อง';
+  }
+
+  /** Remark/amount errors are shown once either of the pair was touched. */
+  showRemarkError(categoryCode: string, itemCode: string): boolean {
+    const remark = this.getRemarkControl(categoryCode, itemCode);
+
+    return (
+      remark.invalid && (remark.touched || this.getAmountControl(categoryCode, itemCode).touched)
+    );
+  }
+
+  // =========================================================
   // Category Total
   // =========================================================
 

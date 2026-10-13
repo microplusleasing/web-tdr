@@ -28,18 +28,20 @@
             <label class="mb-2 block text-sm font-medium text-gray-800" [for]="item.itemCode">
               {{ item.itemName }}
 
-              <span class="ml-1 text-red-500">*</span>
+              @if (!item.requireRemark) {
+                <span class="ml-1 text-red-500">*</span>
+              }
             </label>
 
-            <!-- Other income -->
-            @if (item.itemCode === 'OTHER_INCOME') {
+            <!-- Item with remark field (requireRemark = true) -->
+            @if (item.requireRemark) {
               <div class="flex w-full flex-col gap-3 md:flex-row">
                 <!-- Remark -->
                 <div class="w-full md:w-1/2">
                   <input
                     type="text"
                     class="w-full rounded-md border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    placeholder="รายได้อื่นๆ"
+                    [placeholder]="item.itemName"
                     [formControl]="getRemarkControl(item.itemCode)"
                   />
                 </div>
@@ -50,6 +52,7 @@
                     [id]="item.itemCode"
                     type="number"
                     min="0"
+                    step="0.01"
                     inputmode="decimal"
                     class="w-full rounded-md border border-gray-300 px-4 py-3 pr-16 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     placeholder="จำนวนเงิน"
@@ -68,9 +71,10 @@
                   [id]="item.itemCode"
                   type="number"
                   min="0"
+                  step="0.01"
                   inputmode="decimal"
                   class="w-full rounded-md border border-gray-300 px-4 py-3 pr-16 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="รายได้หลัก"
+                  placeholder="จำนวนเงิน"
                   [formControl]="getAmountControl(item.itemCode)"
                 />
 
@@ -80,20 +84,14 @@
               </div>
             }
 
-            <!-- Remark validation -->
-            @if (
-              item.requireRemark &&
-              getRemarkControl(item.itemCode).touched &&
-              getRemarkControl(item.itemCode).invalid
-            ) {
+            <!-- Remark validation (required only when amount is filled) -->
+            @if (item.requireRemark && showRemarkError(item.itemCode)) {
               <p class="mt-1 text-sm text-red-500">กรุณาระบุรายละเอียด</p>
             }
 
             <!-- Amount validation -->
-            @if (
-              getAmountControl(item.itemCode).touched && getAmountControl(item.itemCode).invalid
-            ) {
-              <p class="mt-1 text-sm text-red-500">กรุณาระบุจำนวนเงิน</p>
+            @if (getAmountErrorMessage(item.itemCode); as amountError) {
+              <p class="mt-1 text-sm text-red-500">{{ amountError }}</p>
             }
           </div>
         }

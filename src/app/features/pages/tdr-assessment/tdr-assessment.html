@@ -144,11 +144,17 @@
               z-button
               [zSize]="'lg'"
               type="button"
-              class="px-6 py-2 mb-4 font-semibold bg-emerald-600"
-              [disabled]="!mainFormValid()"
+              class="mb-4 min-w-44 gap-2 bg-emerald-600 px-6 py-2 font-semibold disabled:cursor-not-allowed disabled:opacity-70"
+              [disabled]="!mainFormValid() || isSubmitting()"
+              [attr.aria-busy]="isSubmitting()"
               (click)="submitmainForm()"
             >
-              บันทึกข้อมูล
+              @if (isSubmitting()) {
+                <z-spinner class="size-4" />
+                <span>กำลังบันทึก...</span>
+              } @else {
+                <span>บันทึกข้อมูล</span>
+              }
             </button>
           </div>
         }
@@ -161,6 +167,54 @@
           </div>
         </div>
       }
+    </div>
+  } @else {
+    <!-- Success card -->
+    <div class="flex w-full justify-center px-4 py-10">
+      <div
+        role="status"
+        class="animate-in fade-in zoom-in-95 w-full max-w-md overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-lg duration-300"
+      >
+        <div
+          class="h-1.5 w-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500"
+        ></div>
+
+        <div class="flex flex-col items-center gap-4 px-8 py-10 text-center">
+          <div class="flex size-20 items-center justify-center rounded-full bg-emerald-50">
+            <div
+              class="flex size-14 items-center justify-center rounded-full bg-emerald-500 shadow-md"
+            >
+              <svg
+                class="size-8 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <h2 class="text-xl font-bold text-gray-900">บันทึกข้อมูลสำเร็จ</h2>
+            <p class="text-sm text-gray-500">ส่งใบคำขอพิจารณาปรับโครงสร้างหนี้เรียบร้อยแล้ว</p>
+          </div>
+
+          <!-- <button
+            z-button
+            zType="outline"
+            type="button"
+            class="mt-2 px-6"
+            (click)="startNewAssessment()"
+          >
+            กรอกใบคำขอใหม่
+          </button> -->
+        </div>
+      </div>
     </div>
   }
 </div>
