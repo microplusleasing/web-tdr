@@ -583,15 +583,24 @@ export class TdrAssessment implements OnInit {
     return { amount, remark };
   }
 
-  // step 3
+  /* create form on step 3 (estimate income) */
 
   private createestimateIncomeForm(items: IAssessmentItemDisplay[]): FormGroup {
     const incomes = this.fb.group({});
 
-    for (const item of items) {
+    const sortedItems = [...items].sort((a, b) => a.displayOrder - b.displayOrder);
+
+    for (const item of sortedItems) {
       const { amount, remark } = this.createAmountRemarkControls(item);
 
-      incomes.addControl(item.itemCode, this.fb.group({ amount, remark }));
+      incomes.addControl(
+        item.itemCode,
+        this.fb.group({
+          itemId: this.fb.nonNullable.control(item.itemId),
+          amount,
+          remark,
+        }),
+      );
     }
 
     return this.fb.group({
@@ -599,7 +608,7 @@ export class TdrAssessment implements OnInit {
     });
   }
 
-  /* ... use for step 4 ... */
+  /* create form on step 4 (estimate payment) */
   private createAssessmentForm(categories: IAssessmentCategoryDisplay[]): FormGroup {
     const assessmentForm = this.fb.group({});
 

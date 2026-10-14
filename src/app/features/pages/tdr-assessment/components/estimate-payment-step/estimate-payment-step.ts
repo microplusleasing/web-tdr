@@ -35,15 +35,9 @@ import { Subscription } from 'rxjs';
 })
 export class EstimatePaymentStep implements OnInit, OnChanges, OnDestroy {
   readonly showMock = isDevMode();
-  @Input({
-    required: true,
-  })
-  form!: FormGroup;
+  @Input({ required: true }) form!: FormGroup;
 
-  @Input({
-    required: true,
-  })
-  categories: IAssessmentCategoryDisplay[] = [];
+  @Input({ required: true }) categories: IAssessmentCategoryDisplay[] = [];
 
   private formSub?: Subscription;
 
