@@ -165,7 +165,7 @@
       <!-- Previous area -->
       <div class="flex flex-1 justify-start">
         @if (!isFirstStep()) {
-          <button z-button type="button" (click)="prev()">
+          <button z-button type="button" [zDisabled]="!canGoPrevious()" (click)="prev()">
             <!-- Previous icon -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -267,7 +267,7 @@
     <!-- Left -->
     <div class="flex flex-1 justify-start">
       @if (!isFirstStep()) {
-        <button z-button type="button" (click)="prev()">
+        <button z-button type="button" [zDisabled]="!canGoPrevious()" (click)="prev()">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

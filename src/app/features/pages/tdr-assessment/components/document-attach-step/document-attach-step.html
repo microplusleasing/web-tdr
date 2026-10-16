@@ -10,7 +10,7 @@
 
     @if (showMock) {
       <div class="mb-4">
-        <button z-button type="button" (click)="mockData()">Mock 🖐️</button>
+        <button z-button type="button" [zDisabled]="locked" (click)="mockData()">Mock 🖐️</button>
       </div>
     }
 
@@ -87,12 +87,16 @@
                   [id]="'attachment-' + attachment.attachmentCode"
                   [accept]="getAcceptAttribute(attachment)"
                   [multiple]="attachment.allowMultiple"
+                  [disabled]="locked"
                   (change)="onFilesSelected($event, i)"
                 />
 
                 <label
                   [for]="'attachment-' + attachment.attachmentCode"
                   class="inline-flex cursor-pointer items-center justify-center rounded-md border border-blue-500 px-5 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+                  [class.pointer-events-none]="locked"
+                  [class.opacity-50]="locked"
+                  [attr.aria-disabled]="locked"
                 >
                   อัปโหลด
                 </label>

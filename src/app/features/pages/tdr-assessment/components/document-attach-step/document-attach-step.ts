@@ -43,6 +43,13 @@ export class DocumentAttachStep implements OnInit, OnChanges, OnDestroy {
 
   @Input({ required: true }) attachments: IAttachmentTypeDisplay[] = [];
 
+  /**
+   * True while the parent is saving. The file inputs are plain <input type="file">
+   * (not bound to a FormControl), so disabling the FormGroup does not disable them —
+   * and this component is OnPush, so the parent has to push the state in via an input.
+   */
+  @Input() locked = false;
+
   private formSub?: Subscription;
 
   private readonly imageService = inject(ImageService);
@@ -74,7 +81,7 @@ export class DocumentAttachStep implements OnInit, OnChanges, OnDestroy {
   }
 
   mockData() {
-    if (!this.showMock) return;
+    if (!this.showMock || this.locked) return;
     this.mockAttachments();
   }
 
@@ -167,6 +174,10 @@ export class DocumentAttachStep implements OnInit, OnChanges, OnDestroy {
   // =========================================================
 
   onFilesSelected(event: Event, index: number): void {
+    if (this.locked) {
+      return;
+    }
+
     const input = event.target as HTMLInputElement;
 
     const fileList = input.files;

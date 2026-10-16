@@ -31,6 +31,7 @@
             [valid]="customerValid()"
             /* [visited]="customerVisited()" */
             [visited]="customerVisited()"
+            [disabled]="isLocked()"
           >
             <!-- <ng-template> -->
             <app-customer-information-step
@@ -52,6 +53,7 @@
             [showIcon]="true"
             [valid]="productInformationValid()"
             [visited]="productInformationVisited()"
+            [disabled]="isLocked()"
           >
             <app-product-information-step
               [form]="asFormGroup(mainForm.get('productInformation'))"
@@ -75,6 +77,7 @@
             [showIcon]="true"
             [valid]="estimateIncomeValid()"
             [visited]="estimateIncomeVisited()"
+            [disabled]="isLocked()"
           >
             <app-estimate-income-step
               [form]="asFormGroup(mainForm.get('estimateIncome'))"
@@ -93,6 +96,7 @@
             [showIcon]="true"
             [valid]="estimatePaymentValid()"
             [visited]="estimatePaymentVisited()"
+            [disabled]="isLocked()"
           >
             <app-estimate-payment-step
               [form]="asFormGroup(mainForm.get('estimatePayment'))"
@@ -111,6 +115,7 @@
             [showIcon]="true"
             [valid]="restuructureReasonValid()"
             [visited]="restuructureReasonValid()"
+            [disabled]="isLocked()"
           >
             <app-restructure-reason-step
               [form]="asFormGroup(mainForm.get('restructureReason'))"
@@ -129,10 +134,12 @@
             [showIcon]="true"
             [valid]="documentAttachValid()"
             [visited]="documentAttachVisited()"
+            [disabled]="isLocked()"
           >
             <app-document-attach-step
               [form]="asFormGroup(mainForm.get('documentAttachments'))"
               [attachments]="attachmentTypesDisplay()"
+              [locked]="isLocked()"
             />
           </app-step>
         </app-custom-stepper>
@@ -145,7 +152,7 @@
               [zSize]="'lg'"
               type="button"
               class="mb-4 min-w-44 gap-2 bg-emerald-600 px-6 py-2 font-semibold disabled:cursor-not-allowed disabled:opacity-70"
-              [disabled]="!mainFormValid() || isSubmitting()"
+              [disabled]="!mainFormValid() || isLocked()"
               [attr.aria-busy]="isSubmitting()"
               (click)="submitmainForm()"
             >

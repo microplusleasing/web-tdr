@@ -1,4 +1,12 @@
-import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 
 import {
   AbstractControl,
@@ -112,6 +120,16 @@ export class TdrAssessment implements OnInit {
   isSubmitting = signal(false);
   isSubmitted = signal(false);
   isSuccessSubmitted = signal(false);
+
+  /**
+   * True from the moment the save button is clicked (and after a successful save).
+   * Drives: save button, every <app-step> `disabled`, Previous/Next buttons,
+   * and the `locked` input of the step that is on screen.
+   */
+  readonly isLocked = computed(() => this.isSubmitting() || this.isSubmitted());
+
+  /** Controls that were enabled before submit, so unlockForm() restores exactly that state. */
+  private lockedControls: AbstractControl[] = [];
 
   // =========================================================
   // Main Form
@@ -1036,8 +1054,9 @@ export class TdrAssessment implements OnInit {
       return;
     }
 
-    // Disable the button + show spinner immediately (before any heavy work / request)
+    // Disable the button + steps + form immediately (before any heavy work / request)
     this.isSubmitting.set(true);
+    this.lockForm();
 
     const value = this.mainForm.getRawValue();
 
@@ -1106,7 +1125,8 @@ export class TdrAssessment implements OnInit {
         },
         error: (error) => {
           console.error('Create TDR Assessment failed:', error);
-          this.isSubmitting.set(false); // allow retry
+          this.isSubmitting.set(false); // allow retry (steps + button unlock via isLocked)
+          this.unlockForm();
 
           this.dialogService.create({
             zTitle: 'เกิดข้อผิดพลาด',
@@ -1116,6 +1136,50 @@ export class TdrAssessment implements OnInit {
           });
         },
       });
+  }
+
+  // =========================================================
+  // Lock / unlock form while saving
+  // =========================================================
+
+  /**
+   * Disable every control that is currently enabled.
+   *
+   * Why leaf controls instead of mainForm.disable():
+   *  - mainForm.enable() on error would also enable controls that were disabled on purpose
+   *    (e.g. productInformation.additionalInfo, or registered/current address when
+   *    "same as ID card" is ticked). Remembering only the enabled leaves restores the exact state.
+   *
+   * Why emitEvent:false:
+   *  - A disabled group has status DISABLED (valid === false). Emitting would flip the
+   *    step/main valid signals to false, hide the save button (@if documentAttachValid())
+   *    and the button would flash "disabled" for the wrong reason.
+   *  - Native inputs / ControlValueAccessors still get disabled (setDisabledState runs
+   *    regardless of emitEvent). getRawValue() still returns disabled values for the payload.
+   */
+  private lockForm(): void {
+    this.lockedControls = [];
+
+    const collect = (control: AbstractControl): void => {
+      if (control instanceof FormGroup) {
+        Object.values(control.controls).forEach(collect);
+      } else if (control instanceof FormArray) {
+        control.controls.forEach(collect);
+      } else if (control.enabled) {
+        this.lockedControls.push(control);
+      }
+    };
+
+    collect(this.mainForm);
+
+    this.lockedControls.forEach((control) => control.disable({ emitEvent: false }));
+  }
+
+  /** Re-enable only the controls lockForm() disabled (used when the request fails). */
+  private unlockForm(): void {
+    this.lockedControls.forEach((control) => control.enable({ emitEvent: false }));
+
+    this.lockedControls = [];
   }
 
   /** Success card -> start a fresh form (reloads the page so every step is reset) */
