@@ -1,0 +1,14 @@
+:root {
+  --brand-blue: #2e3192;
+  --brand-green: #3cb54a;
+}
+
+/* lighter blue so it stays readable on dark backgrounds */
+.dark {
+  --brand-blue: #8386f0;
+}
+
+@theme inline {
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-green: var(--brand-green);
+}
