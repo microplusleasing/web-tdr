@@ -1,10 +1,10 @@
 <div class="w-full" [formGroup]="form">
-  <div class="w-full rounded-2xl border border-gray-300 p-6 md:p-8">
+  <div class="w-full rounded-2xl border border-gray-300 p-4 md:p-8">
     <!-- ===================================================== -->
     <!-- TITLE -->
     <!-- ===================================================== -->
 
-    <h2 class="mb-8 text-center text-2xl font-bold text-[#11117a] md:text-3xl">
+    <h2 class="mb-6 text-center text-xl font-bold text-[#11117a] md:mb-8 md:text-3xl">
       เอกสารประกอบการพิจารณา
     </h2>
 
@@ -15,156 +15,202 @@
     }
 
     <!-- ===================================================== -->
-    <!-- DOCUMENT TABLE -->
+    <!-- DOCUMENT TABLE                                        -->
+    <!-- md+  : real table-like grid (5 columns)               -->
+    <!-- <md  : each row folds into a compact 3-line row       -->
+    <!--        1) name + status  2) file names  3) upload     -->
+    <!-- No horizontal scroll on mobile.                       -->
     <!-- ===================================================== -->
 
-    <div class="w-full overflow-x-auto rounded-xl border border-gray-300">
-      <table class="w-full min-w-[850px] border-collapse">
-        <!-- ================================================= -->
-        <!-- HEADER -->
-        <!-- ================================================= -->
+    <div class="w-full overflow-hidden rounded-xl border border-gray-300 bg-background">
+      <!-- ================================================= -->
+      <!-- HEADER (desktop only) -->
+      <!-- ================================================= -->
 
-        <thead>
-          <tr class="border-b-2 border-gray-300">
-            <th class="px-5 py-4 text-left text-sm font-semibold text-gray-800">ประเภทเอกสาร</th>
+      <div
+        class="hidden border-b-2 border-gray-300 bg-muted/50 text-sm font-semibold text-gray-800 md:grid md:grid-cols-[minmax(0,2fr)_7rem_9rem_minmax(0,2fr)_8rem] md:gap-x-4 md:px-5 md:py-4"
+      >
+        <div>ประเภทเอกสาร</div>
+        <div class="text-center">ความสำคัญ</div>
+        <div class="text-center">อัปโหลดไฟล์</div>
+        <div>ชื่อไฟล์</div>
+        <div class="text-center">สถานะ</div>
+      </div>
 
-            <th class="w-28 px-5 py-4 text-center text-sm font-semibold text-gray-800">
-              ความสำคัญ
-            </th>
+      <!-- ================================================= -->
+      <!-- BODY -->
+      <!-- ================================================= -->
 
-            <th class="w-36 px-5 py-4 text-center text-sm font-semibold text-gray-800">
-              อัปโหลดไฟล์
-            </th>
+      <div class="divide-y divide-gray-200">
+        @for (attachment of attachments; track attachment.attachmentTypeId; let i = $index) {
+          <div
+            class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2.5 px-4 py-4 md:grid-cols-[minmax(0,2fr)_7rem_9rem_minmax(0,2fr)_8rem] md:items-center md:gap-x-4 md:px-5 md:py-5"
+            [class.bg-red-50/50]="isInvalid(i)"
+          >
+            <!-- =========================================== -->
+            <!-- DOCUMENT NAME (+ importance on mobile) -->
+            <!-- =========================================== -->
 
-            <th class="w-56 px-5 py-4 text-left text-sm font-semibold text-gray-800">ชื่อไฟล์</th>
+            <div class="min-w-0">
+              <div class="text-sm font-medium leading-6 text-gray-800">
+                {{ attachment.attachmentName }}
+              </div>
 
-            <th class="w-32 px-5 py-4 text-center text-sm font-semibold text-gray-800">สถานะ</th>
-          </tr>
-        </thead>
-
-        <!-- ================================================= -->
-        <!-- BODY -->
-        <!-- ================================================= -->
-
-        <tbody formArrayName="attachments">
-          @for (attachment of attachments; track attachment.attachmentTypeId; let i = $index) {
-            <tr class="border-b border-gray-200 last:border-b-0" [formGroupName]="i">
-              <!-- =========================================== -->
-              <!-- DOCUMENT NAME -->
-              <!-- =========================================== -->
-
-              <td class="px-5 py-5 align-middle">
-                <div class="text-sm font-medium leading-6 text-gray-800">
-                  {{ attachment.attachmentName }}
-                </div>
-              </td>
-
-              <!-- =========================================== -->
-              <!-- IMPORTANCE -->
-              <!-- =========================================== -->
-
-              <td class="px-5 py-5 text-center align-middle">
-                @if (attachment.labelRequired) {
-                  <span
-                    class="text-sm font-medium"
-                    [style.color]="attachment.labelRequiredColor || '#111827'"
-                  >
-                    {{ attachment.labelRequired }}
-                  </span>
-                } @else {
-                  <span class="text-sm text-gray-400">-</span>
-                }
-              </td>
-
-              <!-- =========================================== -->
-              <!-- UPLOAD -->
-              <!-- =========================================== -->
-
-              <td class="px-5 py-5 text-center align-middle">
-                <input
-                  class="hidden"
-                  type="file"
-                  [id]="'attachment-' + attachment.attachmentCode"
-                  [accept]="getAcceptAttribute(attachment)"
-                  [multiple]="attachment.allowMultiple"
-                  [disabled]="locked"
-                  (change)="onFilesSelected($event, i)"
-                />
-
-                <label
-                  [for]="'attachment-' + attachment.attachmentCode"
-                  class="inline-flex cursor-pointer items-center justify-center rounded-md border border-blue-500 px-5 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-                  [class.pointer-events-none]="locked"
-                  [class.opacity-50]="locked"
-                  [attr.aria-disabled]="locked"
+              @if (attachment.labelRequired) {
+                <span
+                  class="text-xs font-medium md:hidden"
+                  [style.color]="attachment.labelRequiredColor || '#111827'"
                 >
-                  อัปโหลด
-                </label>
-              </td>
+                  {{ attachment.labelRequired }}
+                </span>
+              }
+            </div>
 
-              <!-- =========================================== -->
-              <!-- FILE NAME -->
-              <!-- =========================================== -->
+            <!-- =========================================== -->
+            <!-- STATUS (top-right on mobile, last col on desktop) -->
+            <!-- =========================================== -->
 
-              <td class="px-5 py-5 align-middle">
-                @if (hasFiles(i)) {
-                  <div class="space-y-1">
-                    @for (fileName of getFileNames(i); track fileName) {
-                      <div
-                        class="inline-block rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-700"
+            <div class="justify-self-end md:order-5 md:justify-self-center">
+              @if (getStatus(i) === 'uploaded') {
+                <z-badge
+                  zType="secondary"
+                  class="gap-1 bg-emerald-50 px-2.5 py-1 text-emerald-700"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                  อัปโหลดแล้ว
+                </z-badge>
+              } @else {
+                <z-badge zType="secondary" class="bg-amber-50 px-2.5 py-1 text-amber-700">
+                  รอการอัปโหลด
+                </z-badge>
+              }
+            </div>
+
+            <!-- =========================================== -->
+            <!-- IMPORTANCE (desktop only) -->
+            <!-- =========================================== -->
+
+            <div class="hidden text-center md:order-2 md:block">
+              @if (attachment.labelRequired) {
+                <span
+                  class="text-sm font-medium"
+                  [style.color]="attachment.labelRequiredColor || '#111827'"
+                >
+                  {{ attachment.labelRequired }}
+                </span>
+              } @else {
+                <span class="text-sm text-gray-400">-</span>
+              }
+            </div>
+
+            <!-- =========================================== -->
+            <!-- FILE NAME -->
+            <!-- =========================================== -->
+
+            <div class="col-span-2 min-w-0 md:order-4 md:col-span-1">
+              @if (hasFiles(i)) {
+                <div class="flex flex-col gap-1.5">
+                  @for (fileName of getFileNames(i); track fileName) {
+                    <div
+                      class="flex min-w-0 items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-700"
+                    >
+                      <svg
+                        class="size-3.5 shrink-0 text-gray-500"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
                       >
-                        {{ fileName }}
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <span class="text-sm text-gray-400">-</span>
-                }
-              </td>
+                        <path
+                          d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"
+                        />
+                        <path d="M14 2v6h6" />
+                      </svg>
+                      <span class="truncate">{{ fileName }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <span class="hidden text-sm text-gray-400 md:inline">-</span>
+              }
+            </div>
 
-              <!-- =========================================== -->
-              <!-- STATUS -->
-              <!-- =========================================== -->
+            <!-- =========================================== -->
+            <!-- UPLOAD (full-width button under the row on mobile) -->
+            <!-- =========================================== -->
 
-              <td class="px-5 py-5 text-center align-middle">
-                @if (getStatus(i) === 'uploaded') {
-                  <span class="text-sm font-medium text-green-600">อัปโหลดแล้ว</span>
-                } @else {
-                  <span class="text-sm font-medium text-orange-500">กำลังรอ...</span>
-                }
-              </td>
-            </tr>
+            <div class="col-span-2 md:order-3 md:col-span-1 md:text-center">
+              <input
+                class="hidden"
+                type="file"
+                [id]="'attachment-' + attachment.attachmentCode"
+                [accept]="getAcceptAttribute(attachment)"
+                [multiple]="attachment.allowMultiple"
+                [disabled]="locked"
+                (change)="onFilesSelected($event, i)"
+              />
 
-            <!-- ============================================= -->
+              <label
+                [for]="'attachment-' + attachment.attachmentCode"
+                class="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-blue-500 bg-background px-4 text-sm font-medium text-blue-600 transition hover:bg-blue-50 active:bg-blue-100 md:h-9 md:w-auto"
+                [class.pointer-events-none]="locked"
+                [class.opacity-50]="locked"
+                [attr.aria-disabled]="locked"
+              >
+                <svg
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <path d="m17 8-5-5-5 5" />
+                  <path d="M12 3v12" />
+                </svg>
+                {{ hasFiles(i) ? 'อัปโหลดใหม่' : 'อัปโหลด' }}
+              </label>
+            </div>
+
+            <!-- =========================================== -->
             <!-- VALIDATION ERROR -->
-            <!-- ============================================= -->
+            <!-- =========================================== -->
 
             @if (isInvalid(i)) {
-              <tr>
-                <td colspan="5" class="px-5 pb-3 pt-0">
-                  @if (hasFileInvalidError(i)) {
-                    <p class="text-sm text-red-500">
-                      {{ getFileErrorMessage(attachment) }}
-                    </p>
-                  } @else {
-                    <p class="text-sm text-red-500">
-                      กรุณาอัปโหลด
-                      {{ attachment.attachmentName }}
-                    </p>
-                  }
-                </td>
-              </tr>
+              <p class="col-span-full text-sm text-red-500 md:order-last">
+                @if (hasFileInvalidError(i)) {
+                  {{ getFileErrorMessage(attachment) }}
+                } @else {
+                  กรุณาอัปโหลด {{ attachment.attachmentName }}
+                }
+              </p>
             }
-          }
-        </tbody>
-      </table>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- ===================================================== -->
     <!-- FOOTER INFORMATION -->
     <!-- ===================================================== -->
 
-    <div class="mt-4 flex flex-col justify-between gap-2 text-sm text-gray-700 md:flex-row">
+    <div class="mt-4 flex flex-col justify-between gap-1 text-xs text-gray-700 md:flex-row md:text-sm">
       @if (getMaxFileSize() !== null) {
         <span>
           อัปโหลดไฟล์ได้สูงสุด

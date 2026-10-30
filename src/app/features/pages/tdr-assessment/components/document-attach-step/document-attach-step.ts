@@ -12,6 +12,7 @@ import {
 
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
+import { ZardBadgeComponent } from '@/shared/components/badge';
 import { ZardButtonComponent } from '@/shared/components/button';
 
 import { IAttachmentTypeDisplay } from '../../interfaces/master-data.interface';
@@ -23,7 +24,7 @@ import { ImageService } from '../../services/image.service';
 
   standalone: true,
 
-  imports: [ReactiveFormsModule, ZardButtonComponent],
+  imports: [ReactiveFormsModule, ZardButtonComponent, ZardBadgeComponent],
 
   templateUrl: './document-attach-step.html',
 

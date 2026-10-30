@@ -373,35 +373,102 @@
           <p class="mt-1 text-sm text-muted-foreground">กรุณาแนบไฟล์ตามรายการ</p>
         </div>
 
-        <!-- THIS IS REQUIRED -->
+        <!-- Table-like list: grid on md+, compact stacked rows on mobile -->
 
-        <div formArrayName="motorcyclePhoto" class="overflow-hidden rounded-lg border">
-          <div class="divide-y">
+        <div class="overflow-hidden rounded-xl border border-gray-300 bg-background">
+          <!-- Header (desktop only) -->
+
+          <div
+            class="hidden border-b-2 border-gray-300 bg-muted/50 text-sm font-semibold text-gray-800 md:grid md:grid-cols-[minmax(0,1.5fr)_8rem_minmax(0,2fr)_auto] md:gap-x-4 md:px-5 md:py-3"
+          >
+            <div>ประเภทรูปถ่าย</div>
+            <div class="text-center">สถานะ</div>
+            <div>ชื่อไฟล์</div>
+            <div class="w-60 text-center">จัดการ</div>
+          </div>
+
+          <div class="divide-y divide-gray-200">
             @for (photoType of motorcyclePhotoTypes; track photoType.code; let i = $index) {
-              <!-- THIS IS REQUIRED -->
-
               <div
-                [formGroupName]="i"
-                class="grid grid-cols-1 gap-4 p-5 md:grid-cols-[1fr_2fr] md:items-center"
+                class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2.5 px-4 py-4 md:grid-cols-[minmax(0,1.5fr)_8rem_minmax(0,2fr)_auto] md:items-center md:gap-x-4 md:px-5"
+                [class.bg-red-50/50]="
+                  motorcyclePhoto.at(i).get('file')?.invalid &&
+                  motorcyclePhoto.at(i).get('file')?.touched
+                "
               >
                 <!-- Type -->
 
-                <div>
-                  <p class="font-medium">
+                <div class="min-w-0">
+                  <p class="text-sm font-medium leading-6">
                     {{ photoType.name }}
                   </p>
 
-                  <p class="mt-1 text-xs text-muted-foreground">
+                  <p class="text-xs text-muted-foreground">
                     {{ photoType.code }}
                   </p>
                 </div>
 
-                <!-- Upload -->
+                <!-- Status -->
 
-                <div>
+                <div class="justify-self-end md:order-2 md:justify-self-center">
+                  @if (getPhotoFile(i)) {
+                    <z-badge
+                      zType="secondary"
+                      class="gap-1 bg-emerald-50 px-2.5 py-1 text-emerald-700"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                      แนบแล้ว
+                    </z-badge>
+                  } @else {
+                    <z-badge zType="secondary" class="bg-amber-50 px-2.5 py-1 text-amber-700">
+                      รอการอัปโหลด
+                    </z-badge>
+                  }
+                </div>
+
+                <!-- File name -->
+
+                <div class="col-span-2 min-w-0 md:order-3 md:col-span-1">
+                  @if (getPhotoFile(i)) {
+                    <div
+                      class="flex min-w-0 items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-700"
+                    >
+                      <svg
+                        class="size-3.5 shrink-0 text-gray-500"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z" />
+                        <path d="M14 2v6h6" />
+                      </svg>
+                      <span class="truncate">{{ getPhotoFile(i)?.name }}</span>
+                    </div>
+                  } @else {
+                    <span class="hidden text-sm text-gray-400 md:inline">-</span>
+                  }
+                </div>
+
+                <!-- Actions -->
+
+                <div class="col-span-2 md:order-4 md:col-span-1 md:w-60">
                   @if (!getPhotoFile(i)) {
                     <label
-                      class="flex min-h-24 cursor-pointer items-center justify-center rounded-md border-2 border-dashed p-4 text-center transition hover:bg-muted/50"
+                      class="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-blue-500 bg-background px-4 text-sm font-medium text-blue-600 transition hover:bg-blue-50 active:bg-blue-100 md:h-9"
                     >
                       <input
                         type="file"
@@ -409,65 +476,63 @@
                         accept="image/jpeg,image/png"
                         (change)="selectPhoto(i, $event)"
                       />
-
-                      <div>
-                        <div class="text-sm font-medium">คลิกเพื่อแนบรูป</div>
-
-                        <div class="mt-1 text-xs text-muted-foreground">รองรับ JPG, JPEG, PNG</div>
-                      </div>
+                      <svg
+                        class="size-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <path d="m17 8-5-5-5 5" />
+                        <path d="M12 3v12" />
+                      </svg>
+                      อัปโหลด
                     </label>
-                  }
+                  } @else {
+                    <div class="grid grid-cols-3 gap-2">
+                      <label
+                        class="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-blue-500 bg-background px-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50 md:h-9"
+                      >
+                        <input
+                          type="file"
+                          class="hidden"
+                          accept="image/jpeg,image/png"
+                          (change)="selectPhoto(i, $event)"
+                        />
+                        เปลี่ยน
+                      </label>
 
-                  @if (getPhotoFile(i)) {
-                    <div class="flex items-center justify-between gap-4 rounded-md border p-4">
-                      <div class="min-w-0">
-                        <p class="truncate text-sm font-medium">
-                          {{ getPhotoFile(i)?.name }}
-                        </p>
+                      <button
+                        type="button"
+                        class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-2 text-sm font-medium transition-colors hover:bg-muted md:h-9"
+                        (click)="previewPhoto(i)"
+                      >
+                        ดูรูป
+                      </button>
 
-                        <p class="mt-1 text-xs text-muted-foreground">แนบไฟล์แล้ว</p>
-                      </div>
-
-                      <div class="flex shrink-0 gap-2">
-                        <label
-                          class="cursor-pointer rounded-md border px-3 py-2 text-sm hover:bg-muted"
-                        >
-                          <input
-                            type="file"
-                            class="hidden"
-                            accept="image/jpeg,image/png"
-                            (change)="selectPhoto(i, $event)"
-                          />
-
-                          เปลี่ยนรูป
-                        </label>
-
-                        <button
-                          type="button"
-                          class="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                          (click)="previewPhoto(i)"
-                        >
-                          ดูรูป
-                        </button>
-
-                        <button
-                          type="button"
-                          class="rounded-md border px-3 py-2 text-sm text-destructive hover:bg-muted"
-                          (click)="removePhoto(i)"
-                        >
-                          ลบ
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        class="inline-flex h-10 items-center justify-center rounded-md border border-destructive/40 bg-background px-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 md:h-9"
+                        (click)="removePhoto(i)"
+                      >
+                        ลบ
+                      </button>
                     </div>
                   }
-
-                  @if (
-                    motorcyclePhoto.at(i).get('file')?.invalid &&
-                    motorcyclePhoto.at(i).get('file')?.touched
-                  ) {
-                    <p class="mt-2 text-sm text-destructive">กรุณาแนบรูปภาพ</p>
-                  }
                 </div>
+
+                @if (
+                  motorcyclePhoto.at(i).get('file')?.invalid &&
+                  motorcyclePhoto.at(i).get('file')?.touched
+                ) {
+                  <p class="col-span-full text-sm text-destructive md:order-last">
+                    กรุณาแนบรูปภาพ
+                  </p>
+                }
               </div>
             }
           </div>

@@ -21,6 +21,7 @@ import {
 } from '../../interfaces/master-data.interface';
 import { PhotoPreviewDialog } from '@/shared/components/photo-preview-dialog/photo-preview-dialog';
 import { ZardDialogService } from '@/shared/components/dialog';
+import { ZardBadgeComponent } from '@/shared/components/badge';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ImageService } from '../../services/image.service';
 
@@ -35,6 +36,7 @@ import { ImageService } from '../../services/image.service';
     ZardInputComponent,
     ZardSelectImports,
     ZardButtonComponent,
+    ZardBadgeComponent,
   ],
 
   templateUrl: './product-information-step.html',
