@@ -509,7 +509,7 @@
             @if (isInvalid('numberOfChildren')) {
               <p class="mt-1 text-sm text-red-500">
                 @if (control('numberOfChildren')?.hasError('required')) {
-                  กรุณาระบุจำนวนบุตร
+                  กรุณาระบุจำนวนบุตร (กรณีที่ไม่มีให้ระบุเป็น 0)
                 } @else if (control('numberOfChildren')?.hasError('min')) {
                   จำนวนบุตรต้องไม่น้อยกว่า 0
                 } @else if (control('numberOfChildren')?.hasError('max')) {
@@ -532,7 +532,7 @@
             @if (isInvalid('dependents')) {
               <p class="mt-1 text-sm text-red-500">
                 @if (control('dependents')?.hasError('required')) {
-                  กรุณาระบุจำนวนผู้ที่อยู่ในอุปการะ
+                  กรุณาระบุจำนวนผู้ที่อยู่ในอุปการะ (กรณีที่ไม่มีให้ระบุเป็น 0)
                 } @else if (control('dependents')?.hasError('min')) {
                   จำนวนผู้ที่อยู่ในอุปการะต้องไม่น้อยกว่า 0
                 } @else if (control('dependents')?.hasError('max')) {
